@@ -43,6 +43,7 @@ export const useRegister = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(false);
     setFieldErrors({});
     try {
       // Validate the form data
@@ -58,9 +59,12 @@ export const useRegister = () => {
       const response = await axios.post('/api/register', formData);
       if (response.data.success) {
         setSuccess(true);
-       new Promise((resolve) => { setTimeout(resolve, 1000); }) .then(() => {
+        alert(response.data.message || 'ההרשמה הושלמה בהצלחה');
+        // Wait 1 second then redirect to login
+        setTimeout(() => {
           router.push('/Login');
-      });}
+        }, 1000);
+      }
       
 
     } catch (err) {

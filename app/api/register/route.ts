@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/(lib)/prisma";
-import { users } from "@/generated/prisma/client";
+import { users, Role } from "@/generated/prisma/client";
 import { registerSchema } from "@/app/validtion";
+import { validateRegisterForm } from "@/app/validtion";
 import bcrypt from "bcrypt";
 
 // Types for better type safety
@@ -22,13 +23,10 @@ interface ApiResponse {
 }
 
 // Check if user already exists
-async function checkUserExists(email: string, phone: string): Promise<boolean> {
+async function checkUserExists(email: string): Promise<boolean> {
   const existingUser = await prisma.users.findFirst({
     where: {
-      OR: [
-        { email },
-        { phone }
-      ]
+      email: email.toLowerCase(),
     },
   });
   return !!existingUser;
@@ -45,7 +43,7 @@ async function createUser(userData: CreateUserData): Promise<users> {
       firstName: userData.firstName,
       lastName: userData.lastName,
       phone: userData.phone,
-      role: userData.role as "USER" | "ADMIN",
+      role: userData.role as Role,
     },
   });
 }
@@ -55,7 +53,6 @@ export async function POST(req: Request): Promise<NextResponse<ApiResponse>> {
     // Parse and validate request body
     const body = await req.json();
     const validation = registerSchema.safeParse(body);
-    
     if (!validation.success) {
       const errors: Record<string, string> = {};
       validation.error.issues.forEach((issue) => {
@@ -69,15 +66,15 @@ export async function POST(req: Request): Promise<NextResponse<ApiResponse>> {
       );
     }
 
-    const { email, phone } = validation.data;
+    const { email } = validation.data;
 
     // Check if user already exists
-    const userExists = await checkUserExists(email, phone);
+    const userExists = await checkUserExists(email);
     if (userExists) {
       return NextResponse.json(
         { 
           success: false, 
-          message: 'כתובת אימייל או מספר טלפון כבר קיימת' 
+          message: 'כתובת אימייל כבר קיימת' 
         },
         { status: 409 }
       );
