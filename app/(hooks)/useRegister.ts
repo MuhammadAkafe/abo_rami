@@ -5,13 +5,11 @@ import { validateRegisterForm, type RegisterFormData } from '@/app/validtion';
 import { Role } from '@/generated/prisma/client';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useError } from './useError';
 
 export const useRegister = () => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [success, setSuccess] = useState(false);
+  const { error, setError, loading, setLoading, success, setSuccess, fieldErrors, setFieldErrors } = useError();
   
   const [formData, setFormData] = useState<RegisterFormData>({
     firstName: '',
@@ -56,14 +54,13 @@ export const useRegister = () => {
       }
 
       // Make API call to register
-      const response = await axios.post('/api/register', formData);
+      const response = await axios.post('/register', formData);
       if (response.data.success) {
         setSuccess(true);
-        alert(response.data.message || 'ההרשמה הושלמה בהצלחה');
         // Wait 1 second then redirect to login
         setTimeout(() => {
           router.push('/Login');
-        }, 1000);
+        }, 500);
       }
       
 

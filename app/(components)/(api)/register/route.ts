@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/app/(lib)/prisma";
 import { users, Role } from "@/generated/prisma/client";
 import { registerSchema } from "@/app/validtion";
-import { validateRegisterForm } from "@/app/validtion";
 import bcrypt from "bcrypt";
 
 // Types for better type safety

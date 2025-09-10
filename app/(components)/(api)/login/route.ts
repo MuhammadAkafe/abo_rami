@@ -1,8 +1,13 @@
 import { prisma } from "@/app/(lib)/prisma";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+import dotenv from "dotenv";
+dotenv.config();
 
 export async function POST(req: Request) {
+  try {
   const { email, password } = await req.json();
   const user = await prisma.users.findUnique({
     where: { email },
@@ -14,5 +19,18 @@ export async function POST(req: Request) {
   if (!isPasswordValid) {
     return NextResponse.json({ error: "Invalid password" }, { status: 401 });
   }
+  const jwt_secret = process.env.PRIVATE_KEY as string;
+  if (!jwt_secret) {
+    return NextResponse.json({ error: "JWT secret not found" }, { status: 500 });
+  }
+
+  const token = jwt.sign({ userId: user.id }, jwt_secret, { expiresIn: '1h' ,algorithm: 'RS256'});
+  const cookieStore = await cookies();
+  cookieStore.set('token', token);
   return NextResponse.json({ message: "Login successful" }, { status: 200 });
+  } 
+  catch (error) {
+    console.error('Login error:', error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

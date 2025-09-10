@@ -1,6 +1,7 @@
 "use client"
 import Link from "next/link";
-import { useLogin } from "../../(hooks)/useLogin";
+import { useLogin } from "../../../(hooks)/useLogin";
+import LoadingButton from "../loadingButton";
 
 export default function LoginPage() {
   const { LoginHandler, error, loading, success, formData, handleChange } = useLogin();
@@ -90,13 +91,7 @@ export default function LoginPage() {
             </div>
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-[1.02]"
-              disabled={loading}
-            >
-              {loading ? 'מעבד...' : 'התחברו'}
-            </button>
+            <LoadingButton loading={loading} text ="התחברו" />
           </form>
 
           {/* Divider */}

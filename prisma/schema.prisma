@@ -25,9 +25,34 @@ model users {
   role      Role   @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  tasks     tasks[]  // One-to-many relationship with tasks
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+model tasks {
+  id          Int      @id @default(autoincrement())
+  userId      Int 
+  address     String
+  description String
+  priority    Priority @default(MEDIUM)
+  status      Status   @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Status {
+  PENDING
+  COMPLETED
+  REJECTED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
 }

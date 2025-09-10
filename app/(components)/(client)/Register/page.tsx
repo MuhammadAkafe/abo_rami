@@ -1,11 +1,11 @@
 "use client"
 
 import Link from "next/link";
-import { useRegister } from "../../(hooks)/useRegister";
+import { useRegister } from "@/app/(hooks)/useRegister";
 
 export default  function RegisterPage() {
 
-  const { RegisterHandler, error, fieldErrors, loading, success, formData, handleChange } = useRegister();
+  const { RegisterHandler, formData, handleChange, loading, success, fieldErrors, error } = useRegister();
 
 
 
@@ -204,7 +204,7 @@ export default  function RegisterPage() {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               יש לכם כבר חשבון?{" "}
-              <Link href="/login" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
+              <Link href="/Login" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
                 התחברו
               </Link>
             </p>

@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
+import { useError } from "./useError";
+import { redirect, useRouter } from "next/navigation";
 
 interface LoginFormData {
   email: string;
@@ -7,14 +9,13 @@ interface LoginFormData {
 }
 
 export const useLogin = () => {
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  
+
+  const { error, setError, loading, setLoading, success, setSuccess } = useError();
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
   });
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -27,11 +28,14 @@ export const useLogin = () => {
     setError(null);
     setSuccess(false);
     try {
-      const response = await axios.post('/api/login', formData);
+      const response = await axios.post('/login', formData);
+      console.log(response.data);
       if (response.status === 200) {
         setSuccess(true);
+        router.push('/dashboard');
       }
-    } catch (err) {
+    } catch (err) 
+    {
       if (axios.isAxiosError(err)) {
         const errorData = err.response?.data;
         setError(errorData?.message || errorData?.error || 'אירעה שגיאה בהתחברות. אנא נסו שוב.');
