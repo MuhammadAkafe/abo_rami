@@ -23,7 +23,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/Login', request.url))
   }
   
-  // Ensure decoded is a JwtPayload and has userId property
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (typeof decoded === 'object' && 'userId' in decoded) ? (decoded as any).userId : undefined;
   if (!userId) {
@@ -39,6 +38,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard'],
+  matcher: ['/dashboard','/AddTask','/DeleteTask'],
   runtime: 'nodejs',
 }

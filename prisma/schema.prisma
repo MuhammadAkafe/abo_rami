@@ -45,7 +45,9 @@ model tasks {
   user        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+
 enum Status {
+  ALL
   PENDING
   COMPLETED
   REJECTED
