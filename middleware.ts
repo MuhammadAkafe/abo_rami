@@ -5,7 +5,7 @@ import { prisma } from '@/app/(lib)/prisma'
 
 const checkToken = async (id: number) => 
     {
-    const user = await prisma.users.findUnique({
+    await prisma.users.findUnique({
         where: {
             id: id
         }
@@ -28,16 +28,22 @@ export async function middleware(request: NextRequest) {
   if (!userId) {
     return NextResponse.redirect(new URL('/Login', request.url))
   }
-  const  role = await checkToken(Number(userId));
-  if (role !== 'ADMIN') 
-    {
-    return NextResponse.redirect(new URL('/Login', request.url))
+  // Verify user exists in database
+  await checkToken(Number(userId));
+  
+  // All authenticated users (both ADMIN and non-ADMIN) should be redirected to dashboard
+  // if they're trying to access the root path or login/register pages
+  if(
+     request.nextUrl.pathname === '/Login' || 
+     request.nextUrl.pathname === '/Register'){
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
-
+  
+  // Allow access to dashboard and related admin routes for all authenticated users
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/dashboard','/AddTask','/DeleteTask'],
+  matcher: ['/','/dashboard','/AddTask','/DeleteTask'],
   runtime: 'nodejs',
 }

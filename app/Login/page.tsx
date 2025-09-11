@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
-import { useLogin } from "../../../(hooks)/useLogin";
-import LoadingButton from "../loadingButton";
+import { useLogin } from "@/app/(hooks)/useLogin";
+import LoadingButton from "@/app/(mini_components)/loadingButton";
 
 export default function LoginPage() {
   const { LoginHandler, error, loading, success, formData, handleChange } = useLogin();

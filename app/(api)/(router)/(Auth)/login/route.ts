@@ -25,9 +25,9 @@ export async function POST(req: Request) {
   }
 
   const token = jwt.sign({ userId: user.id }, jwt_secret, { expiresIn: '1h' ,algorithm: 'RS256'});
-  const cookieStore = await cookies();
-  cookieStore.set('token', token);
-  return NextResponse.json({ message: "Login successful" }, { status: 200 });
+  const response = NextResponse.json({ message: "Login successful" }, { status: 200 });
+  response.cookies.set('token', token, { httpOnly: true, secure: true, maxAge: 3600000, sameSite: 'strict' });
+  return response;
   } 
   catch (error) {
     console.error('Login error:', error);

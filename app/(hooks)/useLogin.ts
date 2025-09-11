@@ -32,7 +32,6 @@ export const useLogin = () => {
       console.log(response.data);
       if (response.status === 200) {
         setSuccess(true);
-        router.push('/dashboard');
       }
     } catch (err) 
     {

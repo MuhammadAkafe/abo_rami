@@ -57,10 +57,6 @@ export const useRegister = () => {
       const response = await axios.post('/register', formData);
       if (response.data.success) {
         setSuccess(true);
-        // Wait 1 second then redirect to login
-        setTimeout(() => {
-          router.push('/Login');
-        }, 500);
       }
       
 
