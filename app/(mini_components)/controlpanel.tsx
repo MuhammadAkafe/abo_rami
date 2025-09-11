@@ -68,6 +68,26 @@ export default function ControlPanel({user, navigate, activeTab}: ControlPanelPr
               >
                 ניהול לקוחות
               </button>
+              <button 
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  activeTab === "/listofcustomers" 
+                    ? "bg-blue-100 text-blue-700 border border-blue-200" 
+                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                }`} 
+                onClick={() => navigate("/listofcustomers")}
+              >
+                רשימת לקוחות
+              </button>
+              <button 
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  activeTab === "/listoftasks" 
+                    ? "bg-blue-100 text-blue-700 border border-blue-200" 
+                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                }`} 
+                onClick={() => navigate("/listoftasks")}
+              >
+                רשימת משימות
+              </button>
             </div>
           </div>
         </nav>

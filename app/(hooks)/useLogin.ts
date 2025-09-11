@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useError } from "./useError";
-import { redirect, useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 
 interface LoginFormData {
   email: string;
@@ -32,6 +32,7 @@ export const useLogin = () => {
       console.log(response.data);
       if (response.status === 200) {
         setSuccess(true);
+        router.push('/dashboard');
       }
     } catch (err) 
     {
