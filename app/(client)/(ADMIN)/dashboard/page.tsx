@@ -1,5 +1,5 @@
 "use client"
-import UserProfile from '../../(mini_components)/UserProfile';
+import UserProfile from '../../../(mini_components)/UserProfile';
 import TasksDashbaordDisplay from '@/app/(mini_components)/Tasksdashboard';
 import TaskManagement from '@/app/(mini_components)/TaskManagement';
 import CustomerManagement from '@/app/(mini_components)/CustomerManagement';

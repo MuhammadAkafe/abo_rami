@@ -2,11 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useError } from "./useError";
 import {  useRouter } from "next/navigation";
-
-interface LoginFormData {
-  email: string;
-  password: string;
-}
+import { LoginFormData } from "../(types)/types";
 
 export const useLogin = () => {
 

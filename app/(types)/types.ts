@@ -13,3 +13,10 @@ export interface PriorityInterface {
     id: number;
     value: PriorityType;
 }
+
+
+
+export interface LoginFormData {
+    email: string;
+    password: string;
+  }
