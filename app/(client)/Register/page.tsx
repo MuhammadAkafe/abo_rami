@@ -1,11 +1,74 @@
 "use client"
 
 import Link from "next/link";
-import { useRegister } from "@/app/(hooks)/useRegister";
+import { useTransition, useState } from "react";
+import { useError } from "@/app/(hooks)/useError";
+import { validateRegisterForm } from "@/app/validtion";
+import { Role } from "@/generated/prisma";
 
-export default  function RegisterPage() {
+export default function RegisterPage() {
+  const [pending, startTransition] = useTransition();
+  const { setError, setSuccess, success, error } = useError();
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    role: 'USER' as Role
+  });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const { RegisterHandler, formData, handleChange, loading, success, fieldErrors, error } = useRegister();
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear field error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const validation = validateRegisterForm(formData);
+    if (!validation.success) {
+      setFieldErrors(validation.errors);
+      setError('אנא תקנו את השגיאות בטופס');
+      return;
+    }
+    setFieldErrors({});
+    setError(null);
+    setSuccess(false);
+    startTransition(async () => {
+      try {
+        const response = await fetch('/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+        if (response.ok) {
+          setSuccess(true);
+          setError(null);
+          setTimeout(() => {
+            window.location.href = '/Login';
+          }, 500);
+        }
+         else {
+          const errorData = await response.json();
+          setError(errorData.message || 'Registration failed');
+          setSuccess(false);
+        }
+      } catch {
+        setError('שגיאה בחיבור לשרת');
+      }
+    });
+  };
+
+
+  
 
 
 
@@ -42,7 +105,7 @@ export default  function RegisterPage() {
 
         {/* Register Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6" dir="rtl">
-            <form className="space-y-6" onSubmit={(e) => RegisterHandler(e, formData)}>
+            <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -52,16 +115,16 @@ export default  function RegisterPage() {
                 <input
                   id="firstName"
                   name="firstName"
-                  value={formData.firstName}
                   type="text"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
                   autoComplete="given-name"
                   required
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed ${
                     fieldErrors.firstName ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  disabled={loading}
+                  disabled={pending}
                   placeholder="שם פרטי"
-                  onChange={handleChange}
                 />
                 {fieldErrors.firstName && (
                   <p className="mt-1 text-sm text-red-600">{fieldErrors.firstName}</p>
@@ -75,13 +138,15 @@ export default  function RegisterPage() {
                   id="lastName"
                   name="lastName"
                   value={formData.lastName}
+                  onChange={handleInputChange}
                   type="text"
                   autoComplete="family-name"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={loading}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    fieldErrors.lastName ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  disabled={pending}
                   placeholder="שם משפחה"
-                  onChange={handleChange}
                 />
                  {fieldErrors.lastName && (
                     <p className="mt-1 text-sm text-red-600">{fieldErrors.lastName}</p>
@@ -98,15 +163,15 @@ export default  function RegisterPage() {
                 id="email"
                 name="email"
                 value={formData.email}
+                onChange={handleInputChange}
                 type="email"
                 autoComplete="email"
                 required
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed ${
                   fieldErrors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
-                disabled={loading}
+                disabled={pending}
                 placeholder="yohanan@example.com"
-                onChange={handleChange}
                 maxLength={100}
               />
               {fieldErrors.email && (
@@ -123,11 +188,13 @@ export default  function RegisterPage() {
                 id="phone"
                 name="phone"
                 value={formData.phone}
+                onChange={handleInputChange}
                 type="tel"
                 autoComplete="tel"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
-                placeholder="+972 (50) 123-4567"
-                onChange={handleChange}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
+                  fieldErrors.phone ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="0501234567"
               />
                 {fieldErrors.phone && (
                   <p className="mt-1 text-sm text-red-600">{fieldErrors.phone}</p>
@@ -143,12 +210,14 @@ export default  function RegisterPage() {
                 id="password"
                 name="password"
                 value={formData.password}
+                onChange={handleInputChange}
                 type="password"
                 autoComplete="new-password"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
+                  fieldErrors.password ? 'border-red-500' : 'border-gray-300'
+                }`}
                 placeholder="צרו סיסמה חזקה"
-                onChange={handleChange}
               />
               {fieldErrors.password && (
                   <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
@@ -164,12 +233,14 @@ export default  function RegisterPage() {
                 id="confirmPassword"
                 name="confirmPassword"
                 value={formData.confirmPassword}
+                onChange={handleInputChange}
                 type="password"
                 autoComplete="new-password"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
+                  fieldErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                }`}
                 placeholder="אשרו את הסיסמה שלכם"
-                onChange={handleChange}
               />
                 {fieldErrors.confirmPassword && (
                   <p className="mt-1 text-sm text-red-600">{fieldErrors.confirmPassword}</p>
@@ -180,10 +251,10 @@ export default  function RegisterPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={pending}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              {loading ? (
+              {pending ? (
                 <div className="flex items-center">
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

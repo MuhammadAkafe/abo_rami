@@ -1,13 +1,23 @@
-import React from 'react'
+"use client"
 
+import React, { useEffect, useState } from 'react'
+import { users } from '@/generated/prisma/client';
+function UserProfile() {
+  const [user, setUser] = useState<users | null>(null);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await fetch('/profile').then(res => res.json());
+      setUser(user as users);
+    };
+    fetchUser();
+  }, []);
 
-function UserProfile({user}: {user: {firstName: string, lastName: string, email: string, phone: string} | null}) {
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-shadow duration-300">
       <div className="flex items-center mb-6">
         <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mr-4">
           <span className="text-white font-bold text-lg">
-            {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+         
           </span>
         </div>
         <div>
@@ -34,6 +44,16 @@ function UserProfile({user}: {user: {firstName: string, lastName: string, email:
           <p className="text-lg font-medium text-gray-900">{user?.phone}</p>
         </div>
       </div>
+      
+      <form action="/logout" method="post" className="mt-8 flex justify-end">
+        <button
+          type="submit"
+          className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+        >
+          התנתק
+        </button>
+      </form>
+      
     </div>
   )
 }

@@ -58,7 +58,6 @@ export async function POST(req: Request): Promise<NextResponse<ApiResponse>> {
         const field = issue.path[0] as string;
         errors[field] = issue.message;
       });
-      
       return NextResponse.json(
         { success: false, errors },
         { status: 400 }
@@ -92,7 +91,9 @@ export async function POST(req: Request): Promise<NextResponse<ApiResponse>> {
       user: userWithoutPassword
    }, { status: 200 });
 
-  } catch (error) {
+  } 
+  catch (error) {
+
     console.error('Registration error:', error);
     
     return NextResponse.json(

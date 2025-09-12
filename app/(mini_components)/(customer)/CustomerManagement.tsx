@@ -1,21 +1,9 @@
 "use client"
 import React, { useState } from 'react';
+import { users } from '@/generated/prisma/client';
 
-interface Customer {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  createdAt: Date;
-}
 
-interface CustomerManagementProps {
-  customers?: Customer[] | null;
-}
-
-export default function CustomerManagement({ customers = [] }: CustomerManagementProps) {
+export default function CustomerManagement() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newCustomer, setNewCustomer] = useState({
     firstName: '',
@@ -25,22 +13,7 @@ export default function CustomerManagement({ customers = [] }: CustomerManagemen
     address: ''
   });
 
-  const handleAddCustomer = () => {
-    // Here you would typically call an API to add the customer
-    console.log('Adding customer:', newCustomer);
-    setNewCustomer({ firstName: '', lastName: '', email: '', phone: '', address: '' });
-    setShowAddForm(false);
-  };
 
-  const handleDeleteCustomer = (customerId: string) => {
-    // Here you would typically call an API to delete the customer
-    console.log('Deleting customer:', customerId);
-  };
-
-  const handleUpdateCustomer = (customerId: string, updates: Partial<Customer>) => {
-    // Here you would typically call an API to update the customer
-    console.log('Updating customer:', customerId, updates);
-  };
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-shadow duration-300">
@@ -118,7 +91,7 @@ export default function CustomerManagement({ customers = [] }: CustomerManagemen
               ביטול
             </button>
             <button
-              onClick={handleAddCustomer}
+             // onClick={}
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
             >
               הוסף לקוח

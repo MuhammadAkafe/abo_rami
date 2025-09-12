@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { tasks } from '@/generated/prisma/client'
-import { getPriorityColor, getPriorityText, getStatusColor, getStatusText } from '../styles/taskstyles'
+import { getPriorityColor, getPriorityText, getStatusColor, getStatusText } from '../../styles/taskstyles'
 function Tasks({ tasks=[] }: { tasks: Partial<tasks>[] | null}) {
   return (
     <div className="bg-white rounded-lg shadow-sm">

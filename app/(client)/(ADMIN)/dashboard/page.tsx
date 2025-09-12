@@ -1,26 +1,32 @@
 "use client"
 import UserProfile from '../../../(mini_components)/UserProfile';
-import TasksDashbaordDisplay from '@/app/(mini_components)/Tasksdashboard';
-import TaskManagement from '@/app/(mini_components)/TaskManagement';
-import CustomerManagement from '@/app/(mini_components)/CustomerManagement';
+import TasksDashbaordDisplay from '@/app/(mini_components)/(tasks)/Tasksdashboard';
+import Add_task from '@/app/(mini_components)/(tasks)/Add_task';
+import CustomerManagement from '@/app/(mini_components)/(customer)/CustomerManagement';
 import ControlPanel from '@/app/(mini_components)/controlpanel';
 import { useState } from 'react';
+import ListOfCustomers from '@/app/(mini_components)/(customer)/ListOfCustomers';
+import ListOfTasks from '@/app/(mini_components)/(tasks)/ListOfTasks';
 
 export default function ParentDashbaord() {
-  const [content, setContent] = useState<React.ReactNode>(<TasksDashbaordDisplay tasks={[]} />);
+  const [content, setContent] = useState<React.ReactNode>(<TasksDashbaordDisplay />);
   const [activeTab, setActiveTab] = useState("/tasksdashboard");
 
   const navigate = (path: string) => {
     setActiveTab(path);
     switch(path){
       case "/tasksdashboard":
-        return setContent(<TasksDashbaordDisplay tasks={[]} />);
+        return setContent(<TasksDashbaordDisplay />);
       case "/taskmanagement":
-        return setContent(<TaskManagement tasks={[]} />);
+        return setContent(<Add_task />);
       case "/customermanagement":
-        return setContent(<CustomerManagement customers={[]} />);
+        return setContent(<CustomerManagement />);
+      case "/listofcustomers":
+        return setContent(<ListOfCustomers  />);
+      case "/listoftasks":
+        return setContent(<ListOfTasks />);
       default:
-        return null;
+        return setContent(<TasksDashbaordDisplay  />);
     }
   }
 
@@ -31,10 +37,10 @@ export default function ParentDashbaord() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Pass a function to navigate that returns a ReactNode */}
-          <ControlPanel user={null} navigate={navigate} activeTab={activeTab} />    
+          <ControlPanel navigate={navigate} activeTab={activeTab} />    
           {/* User Profile Card */}
           <div className="mb-8">
-            <UserProfile user={null} />
+            <UserProfile />
           </div>
 
           {/* Main Tasks Dashboard */}

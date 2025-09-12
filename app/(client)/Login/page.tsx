@@ -1,10 +1,53 @@
 "use client"
 import Link from "next/link";
-import { useLogin } from "@/app/(hooks)/useLogin";
 import LoadingButton from "@/app/(mini_components)/loadingButton";
+import { useState, useTransition } from "react";
+import { useError } from "@/app/(hooks)/useError";
+
+
 
 export default function LoginPage() {
-  const { LoginHandler, error, loading, success, formData, handleChange } = useLogin();
+  const [pending, startTransition] = useTransition();
+  const { error, setError, success, setSuccess } = useError();
+
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    
+    startTransition(async () => {
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+          setSuccess(true);
+          setError(null);
+          // Redirect to appropriate page based on user role
+          if (data.redirectTo) {
+            window.location.href = data.redirectTo;
+          }
+        } 
+        else {
+          setError(data.error || 'Login failed');
+          setSuccess(false);
+        }
+      } catch (error) {
+        console.log(error);
+        setError('Network error. Please try again.');
+        setSuccess(false);
+      }
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
@@ -35,7 +78,7 @@ export default function LoginPage() {
 
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6" dir="rtl">
-          <form className="space-y-6" onSubmit={(e) => LoginHandler(e, formData)}>
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -49,7 +92,6 @@ export default function LoginPage() {
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 placeholder="הזינו את כתובת האימייל שלכם"
-                onChange={handleChange}
               />
             </div>
 
@@ -66,7 +108,6 @@ export default function LoginPage() {
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 placeholder="הזינו את הסיסמה שלכם"
-                onChange={handleChange}
               />
             </div>
 
@@ -80,7 +121,7 @@ export default function LoginPage() {
             </div>
 
             {/* Submit Button */}
-            <LoadingButton loading={loading} text ="התחברו" />
+            <LoadingButton loading={pending} text ="התחברו" />
           </form>
 
           {/* Divider */}
