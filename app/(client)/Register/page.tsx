@@ -1,15 +1,32 @@
 "use client"
 
 import Link from "next/link";
-import { useTransition, useState } from "react";
-import { useError } from "@/app/(hooks)/useError";
+import { useState } from "react";
 import { validateRegisterForm } from "@/app/validtion";
 import { Role } from "@/generated/prisma";
+import { RegisterFormData } from "@/app/validtion";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+
+const register = async (formData: RegisterFormData) => {
+  const response = await fetch('/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData),
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Registration failed');
+  }
+  
+  return response.json();
+};
 
 export default function RegisterPage() {
-  const [pending, startTransition] = useTransition();
-  const { setError, setSuccess, success, error } = useError();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegisterFormData>({
     firstName: '',
     lastName: '',
     email: '',
@@ -19,6 +36,28 @@ export default function RegisterPage() {
     role: 'USER' as Role
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
+  const mutation = useMutation({
+    mutationFn: register,
+    onSuccess:  () => {
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: '',
+        role: 'USER' as Role
+      });
+       setTimeout(() => {
+        router.push('/Login');
+      }, 1000);
+      setFieldErrors({});
+    },
+    onError: (error) => {
+      console.error('Registration error:', error);
+    }
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -34,37 +73,10 @@ export default function RegisterPage() {
     const validation = validateRegisterForm(formData);
     if (!validation.success) {
       setFieldErrors(validation.errors);
-      setError('אנא תקנו את השגיאות בטופס');
       return;
     }
     setFieldErrors({});
-    setError(null);
-    setSuccess(false);
-    startTransition(async () => {
-      try {
-        const response = await fetch('/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
-        if (response.ok) {
-          setSuccess(true);
-          setError(null);
-          setTimeout(() => {
-            window.location.href = '/Login';
-          }, 500);
-        }
-         else {
-          const errorData = await response.json();
-          setError(errorData.message || 'Registration failed');
-          setSuccess(false);
-        }
-      } catch {
-        setError('שגיאה בחיבור לשרת');
-      }
-    });
+    mutation.mutate(formData);
   };
 
 
@@ -89,7 +101,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Success Message */}
-        {success && (
+        {mutation.isSuccess && (
           <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center">
             <p className="font-medium">ההרשמה הושלמה בהצלחה!</p>
             <p className="text-sm">אתם מועברים לעמוד ההתחברות...</p>
@@ -97,9 +109,9 @@ export default function RegisterPage() {
         )}
 
         {/* Error Message */}
-        {error && (
+        {mutation.isError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center">
-            <p className="font-medium">{error}</p>
+            <p className="font-medium">{mutation.error?.message || 'שגיאה בהרשמה'}</p>
           </div>
         )}
 
@@ -123,7 +135,7 @@ export default function RegisterPage() {
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed ${
                     fieldErrors.firstName ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  disabled={pending}
+                  disabled={mutation.isPending}
                   placeholder="שם פרטי"
                 />
                 {fieldErrors.firstName && (
@@ -145,7 +157,7 @@ export default function RegisterPage() {
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed ${
                     fieldErrors.lastName ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  disabled={pending}
+                  disabled={mutation.isPending}
                   placeholder="שם משפחה"
                 />
                  {fieldErrors.lastName && (
@@ -170,7 +182,7 @@ export default function RegisterPage() {
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed ${
                   fieldErrors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
-                disabled={pending}
+                disabled={mutation.isPending}
                 placeholder="yohanan@example.com"
                 maxLength={100}
               />
@@ -251,10 +263,10 @@ export default function RegisterPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={pending}
+              disabled={mutation.isPending}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              {pending ? (
+              {mutation.isPending ? (
                 <div className="flex items-center">
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
