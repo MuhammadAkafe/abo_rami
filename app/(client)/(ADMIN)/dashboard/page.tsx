@@ -2,7 +2,7 @@
 import UserProfile from '../../../(mini_components)/UserProfile';
 import TasksDashbaordDisplay from '@/app/(mini_components)/(tasks)/Tasksdashboard';
 import Add_task from '@/app/(mini_components)/(tasks)/Add_task';
-import CustomerManagement from '@/app/(mini_components)/(customer)/CustomerManagement';
+import AddCustomer from '@/app/(mini_components)/(customer)/AddCustomer';
 import ControlPanel from '@/app/(mini_components)/controlpanel';
 import { useState } from 'react';
 import ListOfCustomers from '@/app/(mini_components)/(customer)/ListOfCustomers';
@@ -20,7 +20,7 @@ export default function ParentDashbaord() {
       case "/taskmanagement":
         return setContent(<Add_task />);
       case "/customermanagement":
-        return setContent(<CustomerManagement />);
+        return setContent(<AddCustomer />);
       case "/listofcustomers":
         return setContent(<ListOfCustomers  />);
       case "/listoftasks":

@@ -4,9 +4,26 @@ import React, { useEffect, useState } from 'react'
 import { users } from '@/generated/prisma/client';
 function UserProfile() {
   const [user, setUser] = useState<users | null>(null);
+
   useEffect(() => {
     const fetchUser = async () => {
-      const user = await fetch('/profile').then(res => res.json());
+      // Check if we're on the client side before accessing localStorage
+      if (typeof window === 'undefined') {
+        return;
+      }
+      
+      const user_id = localStorage.getItem('userid');
+      if (!user_id) {
+        return;
+      }
+      
+      const user = await fetch('/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user_id }),
+      }).then(res => res.json());
       setUser(user as users);
     };
     fetchUser();

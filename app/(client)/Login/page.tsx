@@ -31,6 +31,7 @@ export default function LoginPage() {
         if (response.ok) {
           setSuccess(true);
           setError(null);
+          localStorage.setItem('userid', JSON.stringify(data.userid));
           // Redirect to appropriate page based on user role
           if (data.redirectTo) {
             window.location.href = data.redirectTo;

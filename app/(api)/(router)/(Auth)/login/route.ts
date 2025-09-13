@@ -27,6 +27,7 @@ export async function POST(req: Request) {
   const response = NextResponse.json({ 
     message: "Login successful", 
     role: user.role,
+    userid: user.id,
     redirectTo: user.role === 'ADMIN' ? '/dashboard' : '/Tasklist'
   }, { status: 200 });
   response.cookies.set('token', token, { httpOnly: true, secure: true, maxAge: 3600000, sameSite: 'strict' });

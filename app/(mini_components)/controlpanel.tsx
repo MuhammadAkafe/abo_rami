@@ -1,14 +1,38 @@
 "use client"
 
 import { users } from "@/generated/prisma/client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface ControlPanelProps {
     navigate: (path: string) => void
     activeTab: string
 }
+
+
 export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) {
   const [user, setUser] = useState<users | null>(null);
+  const user_id=5;
+  useEffect(() => {
+    const fetchUser = async () => {
+      // Check if we're on the client side before accessing localStorage
+      if (typeof window === 'undefined') {
+        return;
+      }
+      
+      if (!user_id) {
+        return;
+      }
+      const user = await fetch('/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user_id }),
+      }).then(res => res.json());
+      setUser(user as users);
+    };
+    fetchUser();
+  }, [user_id]);
 
 
     return (
@@ -61,7 +85,7 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
                 }`} 
                 onClick={() => navigate("/customermanagement")}
               >
-                ניהול לקוחות
+                הוספת לקוחות
               </button>
               <button 
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
@@ -71,7 +95,7 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
                 }`} 
                 onClick={() => navigate("/listofcustomers")}
               >
-                רשימת לקוחות
+                ניהול לקוחות
               </button>
               <button 
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
@@ -81,7 +105,7 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
                 }`} 
                 onClick={() => navigate("/listoftasks")}
               >
-                רשימת משימות
+                ניהול משימות
               </button>
             </div>
           </div>

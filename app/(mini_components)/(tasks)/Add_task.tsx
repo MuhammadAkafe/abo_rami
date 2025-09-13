@@ -13,6 +13,7 @@ export default function Add_task() {
     priority: undefined,
     userId: undefined,
   });
+  const user_id=localStorage.getItem('userid');
   const [users, setUsers] = useState<users[]>([]);
   const { error, setError, loading, setLoading, success, setSuccess } = useError();
 
@@ -25,6 +26,7 @@ export default function Add_task() {
   }, []);
 
   const filteredUsers  = useMemo(() => {
+
     if (!user_id) {
       return users;
     }

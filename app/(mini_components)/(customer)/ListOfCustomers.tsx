@@ -69,13 +69,7 @@ export default function CustomerTable({
                 טלפון
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                כתובת
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 תאריך הצטרפות
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                פעולות
               </th>
             </tr>
           </thead>

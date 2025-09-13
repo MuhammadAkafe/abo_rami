@@ -1,18 +1,27 @@
 import { prisma } from "@/app/(lib)/prisma";
 import { users } from "@/generated/prisma/client";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import jwt from 'jsonwebtoken';
 
 
-export async function GET() {
-const cookieStore = await cookies();
-const token = cookieStore.get('token')?.value;
-const decoded = jwt.verify(token as string, process.env.PUBLIC_KEY as string);
-const userId = (decoded as { userId: number }).userId;
+
+
+export async function POST(request: Request) {
+    try {
+    const { userId } = await request.json();
+    if (!userId) {
+        return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+    }
+
     const user = await prisma.users.findUnique({
         where: { id: Number(userId) },
     });
-    const { id, firstName, lastName, email, phone, role } = user as users;
-    return NextResponse.json({ id, firstName, lastName, email, phone, role });
+    if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+        const { id, firstName, lastName, email, phone, role } = user as users;
+        return NextResponse.json({ id, firstName, lastName, email, phone, role });
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    }
 }
