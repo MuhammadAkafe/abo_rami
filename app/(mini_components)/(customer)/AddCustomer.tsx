@@ -1,14 +1,37 @@
 "use client"
 import React, { useState } from 'react';
 import { Role } from '@/generated/prisma/client';
-import { useError } from '@/app/(hooks)/useError';
 import { validateRegisterForm } from '@/app/validtion';
+import { useMutation } from '@tanstack/react-query';
 
+const register = async (formData: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+  role: Role;
+}) => {
+  const response = await fetch('/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData),
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Registration failed');
+  }
+  
+  return response.json();
+};
 
 export default function AddCustomer() {
 
   const [showAddForm, setShowAddForm] = useState(false);
-  const { setError, setSuccess, loading, setLoading, error, success } = useError();
   const [newCustomer, setNewCustomer] = useState({
     firstName: '',
     lastName: '',
@@ -19,6 +42,26 @@ export default function AddCustomer() {
     role: 'USER' as Role
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  
+  const mutation = useMutation({
+    mutationFn: register,
+    onSuccess: () => {
+      setNewCustomer({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: '',
+        role: 'USER' as Role
+      });
+      setShowAddForm(false);
+      setFieldErrors({});
+    },
+    onError: (error) => {
+      console.error('Registration error:', error);
+    }
+  });
 
   const handle_change = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -29,49 +72,15 @@ export default function AddCustomer() {
     }
   };
 
-  const handle_submit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handle_submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validation = validateRegisterForm(newCustomer);
     if (!validation.success) {
       setFieldErrors(validation.errors);
-      setError('אנא תקנו את השגיאות בטופס');
       return;
     }
     setFieldErrors({});
-    setError(null);
-    setSuccess(false);
-    setLoading(true);
-    try {
-      const response = await fetch('/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newCustomer),
-      });
-      if (response.ok) {
-        setSuccess(true);
-        setError(null);
-        setNewCustomer({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          password: '',
-          confirmPassword: '',
-          role: 'USER' as Role
-        });
-        setShowAddForm(false);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Registration failed');
-        setSuccess(false);
-      }
-    } catch {
-      setError('שגיאה בחיבור לשרת');
-    } finally {
-      setLoading(false);
-    }
+    mutation.mutate(newCustomer);
   };
 
 
@@ -88,16 +97,16 @@ export default function AddCustomer() {
         </button>
       </div>
 
-      {success && (
+      {mutation.isSuccess && (
           <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center">
             <p className="font-medium">ההרשמה הושלמה בהצלחה!</p>
           </div>
         )}
 
         {/* Error Message */}
-        {error && (
+        {mutation.isError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center">
-            <p className="font-medium">{error}</p>
+            <p className="font-medium">{mutation.error?.message || 'שגיאה בהרשמה'}</p>
           </div>
         )}
       {/* Add Customer Form */}
@@ -242,10 +251,10 @@ export default function AddCustomer() {
             </button>
             <button
              type="submit"  
-             disabled={loading}
+             disabled={mutation.isPending}
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
             >
-           {loading ? 'מעבד...' : 'הוסף לקוח'}
+           {mutation.isPending ? 'מעבד...' : 'הוסף לקוח'}
             </button>
           </div>
         </form>
