@@ -1,9 +1,34 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { tasks, users } from '@/generated/prisma/client';
-import { useError } from '@/app/(hooks)/useError';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
+const addTask = async (taskData: Partial<tasks>) => {
+  const response = await fetch('/addTask', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(taskData),
+  });
+  
+  const result = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(result.error || 'שגיאה בהוספת המשימה');
+  }
+  
+  return result;
+};
+
+const fetchUsers = async () => {
+  const response = await fetch('/getallusers');
+  if (!response.ok) {
+    throw new Error('Failed to fetch users');
+  }
+  return response.json();
+};
 
 export default function Add_task() {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -13,24 +38,34 @@ export default function Add_task() {
     priority: undefined,
     userId: undefined,
   });
-  const user_id=localStorage.getItem('userid');
-  const [users, setUsers] = useState<users[]>([]);
-  const { error, setError, loading, setLoading, success, setSuccess } = useError();
+  const user_id = localStorage.getItem('userid');
+  
+  const { data: users = [], isLoading: usersLoading, error: usersError } = useQuery({
+    queryKey: ['users'],
+    queryFn: fetchUsers,
+  });
+  
+  const mutation = useMutation({
+    mutationFn: addTask,
+    onSuccess: () => {
+      setNewTask({
+        address: '',
+        description: '',
+        priority: undefined,
+        userId: undefined,
+      });
+      setShowAddForm(false);
+    },
+    onError: (error) => {
+      console.error('Error adding task:', error);
+    }
+  });
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const users = await fetch('/getallusers').then(res => res.json());
-      setUsers(users);
-    };
-    fetchUsers();
-  }, []);
-
-  const filteredUsers  = useMemo(() => {
-
+  const filteredUsers = useMemo(() => {
     if (!user_id) {
       return users;
     }
-    return users.filter(user => Number(user.id) !== Number(user_id));
+    return users.filter((user: users) => Number(user.id) !== Number(user_id));
   }, [users, user_id]);
 
 
@@ -40,54 +75,19 @@ export default function Add_task() {
     setNewTask({ ...newTask, [name]: value });
   };
 
-  const handleAddTask = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddTask = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
+    
     if (!newTask.userId) {
-      setError('אנא בחר לקוח');
       return;
     }
 
     if (!newTask.address || !newTask.description) {
-      setError('אנא מלא את כל השדות הנדרשים');
       return;
     }
 
     console.log('Sending task data:', newTask);
-
-    try {
-      const response = await fetch('/addTask', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newTask),
-      });
-
-      const result = await response.json();
-      console.log('Response:', result);
-
-      if (response.ok) {
-        setSuccess(true);
-        setNewTask({
-          address: '',
-          description: '',
-          priority: undefined,
-          userId: undefined,
-        });
-        setShowAddForm(false);
-      } else {
-        setError(result.error || 'שגיאה בהוספת המשימה');
-      }
-    } catch (error) {
-      console.error('Error adding task:', error);
-      setError('שגיאה בהוספת המשימה');
-    } finally {
-      setLoading(false);
-      setError(null);
-    }
+    mutation.mutate(newTask);
   };
 
 
@@ -103,8 +103,16 @@ export default function Add_task() {
         </button>
       </div>
 
-      {error && <div className="text-red-500">{error}</div>}
-      {success && <div className="text-green-500">המשימה נוספה בהצלחה</div>}
+      {mutation.isError && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center mb-4">
+          <p className="font-medium">{mutation.error?.message || 'שגיאה בהוספת המשימה'}</p>
+        </div>
+      )}
+      {mutation.isSuccess && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center mb-4">
+          <p className="font-medium">המשימה נוספה בהצלחה</p>
+        </div>
+      )}
       {/* Add Task Form */}
       {showAddForm && (
         <form onSubmit={handleAddTask}>
@@ -153,12 +161,20 @@ export default function Add_task() {
                   value={newTask.userId}
                   onChange={(e) => handleChange(e as React.ChangeEvent<HTMLSelectElement>)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={usersLoading}
                 >
-                  <option value="">בחר שם לקוח</option>
-                  {filteredUsers.map((user) => (
-                    <option key={user.id}  value={user.id}>{user.firstName + ' ' + user.lastName}</option>
+                  <option value="">
+                    {usersLoading ? 'טוען לקוחות...' : 'בחר שם לקוח'}
+                  </option>
+                  {filteredUsers.map((user: users) => (
+                    <option key={user.id} value={user.id}>
+                      {user.firstName + ' ' + user.lastName}
+                    </option>
                   ))}
                 </select>
+                {usersError && (
+                  <p className="mt-1 text-sm text-red-600">שגיאה בטעינת הלקוחות</p>
+                )}
               </div>
           </div>
           <div className="mt-4 flex justify-end space-x-3">
@@ -170,10 +186,10 @@ export default function Add_task() {
             </button>
             <button
             type="submit"
-            disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            disabled={mutation.isPending}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              {loading ? 'טוען...' : 'הוסף משימה'}
+              {mutation.isPending ? 'טוען...' : 'הוסף משימה'}
             </button>
           </div>
         </div>

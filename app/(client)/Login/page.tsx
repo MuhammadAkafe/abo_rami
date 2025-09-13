@@ -1,14 +1,40 @@
 "use client"
 import Link from "next/link";
 import LoadingButton from "@/app/(mini_components)/loadingButton";
-import { useState, useTransition } from "react";
-import { useError } from "@/app/(hooks)/useError";
+import { useMutation } from "@tanstack/react-query";
 
-
+const login = async (credentials: { email: string; password: string }) => {
+  const response = await fetch('/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+  });
+  
+  const data = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(data.error || 'Login failed');
+  }
+  
+  return data;
+};
 
 export default function LoginPage() {
-  const [pending, startTransition] = useTransition();
-  const { error, setError, success, setSuccess } = useError();
+  const mutation = useMutation({
+    mutationFn: login,
+    onSuccess: (data) => {
+      localStorage.setItem('userid', JSON.stringify(data.userid));
+      // Redirect to appropriate page based on user role
+      if (data.redirectTo) {
+        window.location.href = data.redirectTo;
+      }
+    },
+    onError: (error) => {
+      console.error('Login error:', error);
+    }
+  });
 
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -17,36 +43,7 @@ export default function LoginPage() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     
-    startTransition(async () => {
-      try {
-        const response = await fetch('/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-        });
-        
-        const data = await response.json();
-        if (response.ok) {
-          setSuccess(true);
-          setError(null);
-          localStorage.setItem('userid', JSON.stringify(data.userid));
-          // Redirect to appropriate page based on user role
-          if (data.redirectTo) {
-            window.location.href = data.redirectTo;
-          }
-        } 
-        else {
-          setError(data.error || 'Login failed');
-          setSuccess(false);
-        }
-      } catch (error) {
-        console.log(error);
-        setError('Network error. Please try again.');
-        setSuccess(false);
-      }
-    });
+    mutation.mutate({ email, password });
   };
 
   return (
@@ -64,16 +61,16 @@ export default function LoginPage() {
 
 
         {/* Success Message */}
-        {success && (
+        {mutation.isSuccess && (
           <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center">
             <p className="font-medium">ההתחברות הושלמה בהצלחה!</p>
           </div>
         )}
 
         {/* Error Message */}
-        {error && (
+        {mutation.isError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center">
-            <p className="font-medium">{error}</p>
+            <p className="font-medium">{mutation.error?.message || 'שגיאה בהתחברות'}</p>
           </div>
         )}
 
@@ -122,7 +119,7 @@ export default function LoginPage() {
             </div>
 
             {/* Submit Button */}
-            <LoadingButton loading={pending} text ="התחברו" />
+            <LoadingButton loading={mutation.isPending} text ="התחברו" />
           </form>
 
           {/* Divider */}
