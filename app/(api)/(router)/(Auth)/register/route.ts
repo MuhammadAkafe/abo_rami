@@ -3,23 +3,8 @@ import { prisma } from "@/app/(lib)/prisma";
 import { Suppliers, Role } from "@prisma/client";
 import { registerSchema } from "@/app/validtion";
 import bcrypt from "bcrypt";
+import { CreateUserData, ApiResponse } from "@/app/(types)/types";
 
-// Types for better type safety
-interface CreateUserData {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  role: string;
-}
-
-interface ApiResponse {
-  success: boolean;
-  message?: string;
-  user?: Partial<Suppliers>;
-  errors?: Record<string, string>;
-}
 
 // Check if user already exists
 async function checkUserExists(email: string): Promise<boolean> {

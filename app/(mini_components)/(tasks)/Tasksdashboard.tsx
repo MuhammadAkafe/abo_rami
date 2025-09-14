@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import Fillter from '../Fillter';
+import Fillter from './Fillter';
 import Tasks from './Tasks';
 import TasksStatus from './TasksStatus';
 

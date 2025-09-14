@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import { getPriorityColor, getPriorityText, getStatusColor, getStatusText } from '../../styles/taskstyles';
-import Fillter from '../Fillter';
+import Fillter from './Fillter';
 
 interface Task {
   id: string;

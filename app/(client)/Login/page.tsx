@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link";
-import LoadingButton from "@/app/(mini_components)/loadingButton";
+import LoadingButton from "@/app/(mini_components)/Loading/loadingButton";
 import { useMutation } from "@tanstack/react-query";
 
 const login = async (credentials: { email: string; password: string }) => {

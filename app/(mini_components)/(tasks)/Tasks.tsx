@@ -2,27 +2,15 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { tasks } from '@prisma/client'
 import { getPriorityColor, getPriorityText, getStatusColor, getStatusText } from '../../styles/taskstyles'
-import { useGetTask } from '@/app/(hooks)/useTask';
-import LoadingCompoenent from '../LoadingCompoenent';
-import Fillter from '../Fillter';
+import Fillter from './Fillter';
 function Tasks({ title='משימות היום' }: { title?: string }) 
 {
-  const { data: tasks, isLoading, refetch } = useGetTask();
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await refetch();
-    } 
-    finally {
-      setIsRefreshing(false);
-    }
-  };
+  const [tasks, setTasks] = useState<tasks[]>([]);
 
-  if (isLoading) {
-    return <LoadingCompoenent isLoading={isLoading} />
-  }
+
+
+  
 
   return (<>
 <div className="bg-white rounded-lg shadow-sm">
@@ -34,12 +22,12 @@ function Tasks({ title='משימות היום' }: { title?: string })
         <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
         <div className="flex items-center space-x-4">
           <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
+            onClick={() => {}}
+            disabled={false}
             className="flex items-center p-2 text-gray-600 hover:text-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mr-4"
           >
             <svg 
-              className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} 
+              className={`w-5 h-5 ${false ? 'animate-spin' : ''}`} 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"

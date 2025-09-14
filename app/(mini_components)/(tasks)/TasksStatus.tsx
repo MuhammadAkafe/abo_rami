@@ -1,9 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {  Status, tasks } from '@prisma/client'
-import { useGetTask } from '@/app/(hooks)/useTask';
 function TasksStatus() 
 {
-  const { data: tasks } = useGetTask();
+  const [tasks, setTasks] = useState<tasks[]>([]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

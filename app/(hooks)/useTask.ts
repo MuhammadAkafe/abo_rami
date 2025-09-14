@@ -1,49 +1,10 @@
 "use client"
 
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { tasks } from "@prisma/client";
 
-interface TaskFilters {
-    status?: string;
-    priority?: string;
-    startDate?: string;
-    endDate?: string;
-}
 
-const getTasks = async (filters?: TaskFilters) => {
-    const params = new URLSearchParams();
-    
-    if (filters?.status && filters.status !== 'all') {
-        params.append('status', filters.status);
-    }
-    if (filters?.priority && filters.priority !== 'all') {
-        params.append('priority', filters.priority);
-    }
-    if (filters?.startDate) {
-        params.append('startDate', filters.startDate);
-    }
-    if (filters?.endDate) {
-        params.append('endDate', filters.endDate);
-    }
-    
-    const queryString = params.toString();
-    const url = queryString ? `/get_all_tasks?${queryString}` : '/get_all_tasks';
-    
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('Failed to fetch tasks');
-    }
-    const result = await response.json();
-    return result;
-};
-
-export const useGetTask = (filters?: TaskFilters) => {
-    return useQuery({
-        queryKey: ['tasks', filters],
-        queryFn: () => getTasks(filters),
-    });
-};
 
 
 
