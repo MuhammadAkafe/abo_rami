@@ -1,5 +1,5 @@
 import { prisma } from "@/app/(lib)/prisma";
-import { users } from "@/generated/prisma/client";
+import { users } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { validateRegisterForm } from "@/app/validtion";
-import { Role } from "@/generated/prisma";
+import { Role } from "@prisma/client";
 import { RegisterFormData } from "@/app/validtion";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";

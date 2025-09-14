@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/(lib)/prisma";
-import { users, Role } from "@/generated/prisma/client";
+import { Suppliers, Role } from "@prisma/client";
 import { registerSchema } from "@/app/validtion";
 import bcrypt from "bcrypt";
 
@@ -17,13 +17,13 @@ interface CreateUserData {
 interface ApiResponse {
   success: boolean;
   message?: string;
-  user?: Partial<users>;
+  user?: Partial<Suppliers>;
   errors?: Record<string, string>;
 }
 
 // Check if user already exists
 async function checkUserExists(email: string): Promise<boolean> {
-  const existingUser = await prisma.users.findFirst({
+  const existingUser = await prisma.suppliers.findUnique({
     where: {
       email: email.toLowerCase(),
     },
@@ -32,10 +32,10 @@ async function checkUserExists(email: string): Promise<boolean> {
 }
 
 // Create new user
-async function createUser(userData: CreateUserData): Promise<users> {
+async function createUser(userData: CreateUserData): Promise<Suppliers> {
   const hashedPassword = await bcrypt.hash(userData.password, 10);
   
-  return await prisma.users.create({
+  return await prisma.suppliers.create({
     data: {
       email: userData.email,
       password: hashedPassword,

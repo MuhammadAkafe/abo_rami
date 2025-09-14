@@ -1,6 +1,6 @@
 "use client"
 
-import { users } from "@/generated/prisma/client"
+import { Suppliers } from "@prisma/client"
 import { useEffect, useState } from "react"
 
 interface ControlPanelProps {
@@ -10,7 +10,7 @@ interface ControlPanelProps {
 
 
 export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) {
-  const [user, setUser] = useState<users | null>(null);
+  const [user, setUser] = useState<Suppliers | null>(null);
   const user_id=5;
   useEffect(() => {
     const fetchUser = async () => {
@@ -29,7 +29,7 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
         },
         body: JSON.stringify({ userId: user_id }),
       }).then(res => res.json());
-      setUser(user as users);
+      setUser(user as Suppliers);
     };
     fetchUser();
   }, [user_id]);
@@ -85,7 +85,7 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
                 }`} 
                 onClick={() => navigate("/customermanagement")}
               >
-                הוספת לקוחות
+                הוספת ספק
               </button>
               <button 
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
@@ -95,7 +95,7 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
                 }`} 
                 onClick={() => navigate("/listofcustomers")}
               >
-                ניהול לקוחות
+                ניהול ספקים
               </button>
               <button 
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${

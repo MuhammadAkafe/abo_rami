@@ -5,7 +5,7 @@ import { prisma } from '@/app/(lib)/prisma'
 
 const checkToken = async (id: number) => 
     {
-    const user = await prisma.users.findUnique({
+    const user = await prisma.suppliers.findUnique({
         where: {
             id: id
         }

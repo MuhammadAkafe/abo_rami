@@ -1,12 +1,11 @@
 "use client"
-import UserProfile from '../../../(mini_components)/UserProfile';
 import TasksDashbaordDisplay from '@/app/(mini_components)/(tasks)/Tasksdashboard';
 import Add_task from '@/app/(mini_components)/(tasks)/Add_task';
-import AddCustomer from '@/app/(mini_components)/(customer)/AddCustomer';
+import AddSuppliers from '@/app/(mini_components)/(suppliers)/AddSuppliers';
 import ControlPanel from '@/app/(mini_components)/controlpanel';
 import { useState } from 'react';
-import ListOfCustomers from '@/app/(mini_components)/(customer)/ListOfCustomers';
-import ListOfTasks from '@/app/(mini_components)/(tasks)/ListOfTasks';
+import ListOfCustomers from '@/app/(mini_components)/(suppliers)/ListOfSuppliers';
+import ListOfTasks from '@/app/(mini_components)/(tasks)/TasksMangment';
 
 export default function ParentDashbaord() {
   const [content, setContent] = useState<React.ReactNode>(<TasksDashbaordDisplay />);
@@ -20,7 +19,7 @@ export default function ParentDashbaord() {
       case "/taskmanagement":
         return setContent(<Add_task />);
       case "/customermanagement":
-        return setContent(<AddCustomer />);
+        return setContent(<AddSuppliers />);
       case "/listofcustomers":
         return setContent(<ListOfCustomers  />);
       case "/listoftasks":
@@ -38,11 +37,6 @@ export default function ParentDashbaord() {
         <div className="space-y-8">
           {/* Pass a function to navigate that returns a ReactNode */}
           <ControlPanel navigate={navigate} activeTab={activeTab} />    
-          {/* User Profile Card */}
-          <div className="mb-8">
-            <UserProfile />
-          </div>
-
           {/* Main Tasks Dashboard */}
           <div className="w-full">
          {content}

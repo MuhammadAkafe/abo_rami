@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Role } from "@/generated/prisma/client";
+import { Role } from "@prisma/client";
 
 // Simple validation schema with Hebrew error messages
 export const registerSchema = z.object({

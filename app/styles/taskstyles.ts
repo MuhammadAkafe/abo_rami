@@ -1,10 +1,10 @@
 export const getStatusColor = (status: string) => {
     switch (status) {
-      case 'done':
+      case 'DONE':
         return 'bg-green-100 text-green-800 border-green-200';
-      case 'rejected':
+      case 'REJECTED':
         return 'bg-red-100 text-red-800 border-red-200';
-      case 'pending':
+      case 'PENDING':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -13,11 +13,11 @@ export const getStatusColor = (status: string) => {
 
   export const getStatusText = (status: string) => {
     switch (status) {
-      case 'done':
+      case 'DONE':
         return 'הושלם';
-      case 'rejected':
+      case 'REJECTED':
         return 'נדחה';
-      case 'pending':
+      case 'PENDING':
         return 'ממתין';
       default:
         return 'לא מוגדר';
@@ -26,11 +26,11 @@ export const getStatusColor = (status: string) => {
 
   export const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high':
+      case 'HIGH':
         return 'bg-red-500';
-      case 'medium':
+      case 'MEDIUM':
         return 'bg-yellow-500';
-      case 'low':
+      case 'LOW':
         return 'bg-green-500';
       default:
         return 'bg-gray-500';
@@ -39,11 +39,11 @@ export const getStatusColor = (status: string) => {
 
   export const getPriorityText = (priority: string) => {
     switch (priority) {
-      case 'high':
+      case 'HIGH':
         return 'גבוה';
-      case 'medium':
+      case 'MEDIUM':
         return 'בינוני';
-      case 'low':
+      case 'LOW':
         return 'נמוך';
       default:
         return 'לא מוגדר';

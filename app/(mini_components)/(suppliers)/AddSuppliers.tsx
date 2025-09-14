@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import { Role } from '@/generated/prisma/client';
+import { Role } from '@prisma/client';
 import { validateRegisterForm } from '@/app/validtion';
 import { useMutation } from '@tanstack/react-query';
 
@@ -29,7 +29,7 @@ const register = async (formData: {
   return response.json();
 };
 
-export default function AddCustomer() {
+export default function AddSuppliers() {
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [newCustomer, setNewCustomer] = useState({
@@ -88,12 +88,12 @@ export default function AddCustomer() {
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-shadow duration-300">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">הוספת לקוחות</h2>
+        <h2 className="text-2xl font-bold text-gray-900">הוספת ספקים</h2>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
         >
-          {showAddForm ? 'ביטול' : 'הוסף לקוח חדש'}
+          {showAddForm ? 'ביטול' : 'הוסף ספק חדש'}
         </button>
       </div>
 
@@ -111,8 +111,7 @@ export default function AddCustomer() {
         )}
       {/* Add Customer Form */}
       {showAddForm && (
-        <form onSubmit={handle_submit} className="bg-gray-50 rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">הוסף לקוח חדש</h3>
+        <form onSubmit={handle_submit} className="bg-gray-50 rounded-lg p-6 mb-6"> 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">שם פרטי</label>
@@ -234,7 +233,7 @@ export default function AddCustomer() {
                 }`}
                 onChange={(e) => handle_change(e)}
               >
-                <option value="USER">לקוח</option>
+                <option value="USER">ספק</option>
                 <option value="ADMIN">מנהל</option>
               </select>
               {fieldErrors.role && (
@@ -254,7 +253,7 @@ export default function AddCustomer() {
              disabled={mutation.isPending}
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
             >
-           {mutation.isPending ? 'מעבד...' : 'הוסף לקוח'}
+           {mutation.isPending ? 'מעבד...' : 'הוסף ספק'}
             </button>
           </div>
         </form>

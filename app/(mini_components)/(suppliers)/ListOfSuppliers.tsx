@@ -1,41 +1,37 @@
 "use client"
-import React from 'react';
+import React, { useState } from 'react';
+import { useGetAllSuppliers } from '@/app/(hooks)/useSupplier';
+import { Suppliers } from '@prisma/client';
 
-interface Customer {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  createdAt: Date;
-}
+export default function SuppliersTable() {
 
-interface CustomerTableProps {
-  customers?: Customer[] | null;
-  onEdit?: (customer: Customer) => void;
-  onDelete?: (customerId: string) => void;
-  onView?: (customer: Customer) => void;
-}
+  const { data: suppliers } = useGetAllSuppliers();
 
-export default function CustomerTable({ 
-  customers = [], 
-  onEdit, 
-  onDelete, 
-  onView 
-}: CustomerTableProps) {
+  const [onView, setOnView] = useState(false);
+  const [onEdit, setOnEdit] = useState(false);
+  const [onDelete, setOnDelete] = useState(false);
+
+  const handleView = (supplier: number) => {
+    setOnView(true);
+  };
+  const handleEdit = (supplier: number) => {
+    setOnEdit(true);
+  };
+  const handleDelete = (supplier: number) => {
+    setOnDelete(true);
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h2 className="text-2xl font-bold text-gray-900">טבלת לקוחות</h2>
+          <h2 className="text-2xl font-bold text-gray-900">טבלת ספקים</h2>
           <div className="flex items-center gap-4">
             <div className="relative">
               <input
                 type="text"
-                placeholder="חיפוש לקוחות..."
+                placeholder="חיפוש ספקים..."
                 className="w-64 px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -45,7 +41,7 @@ export default function CustomerTable({
               </div>
             </div>
             <div className="text-sm text-gray-600">
-              {customers?.length || 0} לקוחות
+              {suppliers?.length || 0} ספקים
             </div>
           </div>
         </div>
@@ -74,61 +70,56 @@ export default function CustomerTable({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {(customers?.length || 0) === 0 ? (
+            {(suppliers?.length || 0) === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-12 text-center">
                   <div className="flex flex-col items-center">
                     <svg className="h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
-                    <p className="text-gray-500 text-lg">לא נמצאו לקוחות</p>
+                    <p className="text-gray-500 text-lg">לא נמצאו ספקים</p>
                     <p className="text-gray-400 text-sm">נסה לשנות את מונח החיפוש</p>
                   </div>
                 </td>
               </tr>
             ) : (
-              (customers || []).map((customer) => (
-                <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
+              (suppliers || []).map((supplier: Suppliers) => (
+                <tr key={supplier.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                           <span className="text-white font-medium text-sm">
-                            {customer.firstName.charAt(0).toUpperCase()}
+                            {supplier.firstName.charAt(0).toUpperCase()}
                           </span>
                         </div>
                       </div>
                       <div className="mr-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {customer.firstName}
+                          {supplier.firstName}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{customer.lastName}</div>
+                    <div className="text-sm text-gray-900">{supplier.lastName}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{customer.email}</div>
+                    <div className="text-sm text-gray-900">{supplier.email}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{customer.phone}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900 max-w-xs truncate" title={customer.address}>
-                      {customer.address}
-                    </div>
+                  <td className="px-6 py-4 whitespace-nowrap">  
+                    <div className="text-sm text-gray-900">{supplier.phone}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {new Date(customer.createdAt).toLocaleDateString('he-IL')}
+                      {new Date(supplier.createdAt).toLocaleDateString('he-IL')}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
                       {onView && (
                         <button
-                          onClick={() => onView(customer)}
+                          onClick={() => handleView(supplier.id)}
                           className="text-blue-600 hover:text-blue-900 p-1 rounded-md hover:bg-blue-50 transition-colors"
                           title="צפה בפרטים"
                         >
@@ -140,7 +131,7 @@ export default function CustomerTable({
                       )}
                       {onEdit && (
                         <button
-                          onClick={() => onEdit(customer)}
+                          onClick={() => handleEdit(supplier.id)}
                           className="text-indigo-600 hover:text-indigo-900 p-1 rounded-md hover:bg-indigo-50 transition-colors"
                           title="ערוך"
                         >
@@ -151,7 +142,7 @@ export default function CustomerTable({
                       )}
                       {onDelete && (
                         <button
-                          onClick={() => onDelete(customer.id)}
+                          onClick={() => handleDelete(supplier.id)}
                           className="text-red-600 hover:text-red-900 p-1 rounded-md hover:bg-red-50 transition-colors"
                           title="מחק"
                         >

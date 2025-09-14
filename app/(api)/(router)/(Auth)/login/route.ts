@@ -9,7 +9,7 @@ dotenv.config();
 export async function POST(req: Request) {
   try {
   const { email, password } = await req.json();
-  const user = await prisma.users.findUnique({
+  const user = await prisma.suppliers.findUnique({
     where: { email },
   });
   if (!user) {

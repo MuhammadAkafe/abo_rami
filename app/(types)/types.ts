@@ -1,4 +1,4 @@
-import { Status, Priority, type Status as StatusType, type Priority as PriorityType } from "@/generated/prisma/client";
+import { Status, Priority, type Status as StatusType, type Priority as PriorityType } from "@prisma/client";
 
 // Export the Status enum type for use throughout the application
 export { Status, Priority };

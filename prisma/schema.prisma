@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -15,7 +14,7 @@ datasource db {
 }
 
 
-model users {
+model Suppliers {
   id        Int      @id @default(autoincrement())
   firstName String
   lastName  String
@@ -35,14 +34,14 @@ enum Role {
 
 model tasks {
   id          Int      @id @default(autoincrement())
-  userId      Int 
+  supplierId      Int 
   address     String
   description String
   priority    Priority @default(MEDIUM)
   status      Status   @default(PENDING)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  user        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  supplier        Suppliers    @relation(fields: [supplierId], references: [id], onDelete: Cascade)
 }
 
 

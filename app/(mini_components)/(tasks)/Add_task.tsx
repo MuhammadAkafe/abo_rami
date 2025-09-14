@@ -1,71 +1,34 @@
 "use client"
 import React, { useState } from 'react';
-import { tasks, users } from '@/generated/prisma/client';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { tasks, Suppliers } from '@prisma/client';
 import { useMemo } from 'react';
+import { useAddTask } from '@/app/(hooks)/useTask';
+import { useGetAllSuppliers } from '@/app/(hooks)/useSupplier';
 
-const addTask = async (taskData: Partial<tasks>) => {
-  const response = await fetch('/addTask', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(taskData),
-  });
-  
-  const result = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(result.error || 'שגיאה בהוספת המשימה');
-  }
-  
-  return result;
-};
 
-const fetchUsers = async () => {
-  const response = await fetch('/getallusers');
-  if (!response.ok) {
-    throw new Error('Failed to fetch users');
-  }
-  return response.json();
-};
 
 export default function Add_task() {
+
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTask, setNewTask] = useState<Partial<tasks>>({
     address: '',
     description: '',
     priority: undefined,
-    userId: undefined,
+    supplierId: undefined,
   });
+  const { data: users = [], isLoading: usersLoading, error: usersError } = useGetAllSuppliers();
+  const { mutate: addTask, isPending, isError, isSuccess, error } = useAddTask(setNewTask, setShowAddForm);
   const user_id = localStorage.getItem('userid');
   
-  const { data: users = [], isLoading: usersLoading, error: usersError } = useQuery({
-    queryKey: ['users'],
-    queryFn: fetchUsers,
-  });
-  
-  const mutation = useMutation({
-    mutationFn: addTask,
-    onSuccess: () => {
-      setNewTask({
-        address: '',
-        description: '',
-        priority: undefined,
-        userId: undefined,
-      });
-      setShowAddForm(false);
-    },
-    onError: (error) => {
-      console.error('Error adding task:', error);
-    }
-  });
+
+
 
   const filteredUsers = useMemo(() => {
     if (!user_id) {
       return users;
     }
-    return users.filter((user: users) => Number(user.id) !== Number(user_id));
+    return users.filter((user: Suppliers) => Number(user.id) !== Number(user_id));
   }, [users, user_id]);
 
 
@@ -78,7 +41,7 @@ export default function Add_task() {
   const handleAddTask = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (!newTask.userId) {
+    if (!newTask.supplierId) {
       return;
     }
 
@@ -87,7 +50,7 @@ export default function Add_task() {
     }
 
     console.log('Sending task data:', newTask);
-    mutation.mutate(newTask);
+    addTask(newTask);
   };
 
 
@@ -103,12 +66,12 @@ export default function Add_task() {
         </button>
       </div>
 
-      {mutation.isError && (
+      {isError && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center mb-4">
-          <p className="font-medium">{mutation.error?.message || 'שגיאה בהוספת המשימה'}</p>
+          <p className="font-medium">{error?.message || 'שגיאה בהוספת המשימה'}</p>
         </div>
       )}
-      {mutation.isSuccess && (
+      {isSuccess && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center mb-4">
           <p className="font-medium">המשימה נוספה בהצלחה</p>
         </div>
@@ -149,24 +112,25 @@ export default function Add_task() {
                 onChange={(e) => handleChange(e as React.ChangeEvent<HTMLSelectElement>)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
+                <option value="">בחר עדיפות</option>
                 <option value="LOW">נמוכה</option>
                 <option value="MEDIUM">בינונית</option>
                 <option value="HIGH">גבוהה</option>
               </select>
             </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">שם לקוח</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">שם ספק</label>
                 <select
                   name="userId"
-                  value={newTask.userId}
+                  value={newTask.supplierId}
                   onChange={(e) => handleChange(e as React.ChangeEvent<HTMLSelectElement>)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={usersLoading}
                 >
                   <option value="">
-                    {usersLoading ? 'טוען לקוחות...' : 'בחר שם לקוח'}
+                    {usersLoading ? 'טוען ספקים...' : 'בחר שם ספק'}
                   </option>
-                  {filteredUsers.map((user: users) => (
+                  {filteredUsers.map((user: Suppliers) => (
                     <option key={user.id} value={user.id}>
                       {user.firstName + ' ' + user.lastName}
                     </option>
@@ -186,10 +150,10 @@ export default function Add_task() {
             </button>
             <button
             type="submit"
-            disabled={mutation.isPending}
+            disabled={isPending}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              {mutation.isPending ? 'טוען...' : 'הוסף משימה'}
+              {isPending ? 'טוען...' : 'הוסף משימה'}
             </button>
           </div>
         </div>
