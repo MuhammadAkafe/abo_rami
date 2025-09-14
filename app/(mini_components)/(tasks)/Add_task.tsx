@@ -60,7 +60,7 @@ export default function Add_task() {
         <h2 className="text-2xl font-bold text-gray-900">הוספת משימה</h2>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
         >
           {showAddForm ? 'ביטול' : 'הוסף משימה חדשה'}
         </button>
@@ -144,14 +144,14 @@ export default function Add_task() {
           <div className="mt-4 flex justify-end space-x-3">
             <button
               onClick={() => setShowAddForm(false)}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
             >
               ביטול
             </button>
             <button
             type="submit"
             disabled={isPending}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-blue-600 cursor-pointer text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
               {isPending ? 'טוען...' : 'הוסף משימה'}
             </button>

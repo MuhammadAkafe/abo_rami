@@ -38,7 +38,7 @@ const [user, setUser] = useState<Suppliers | null>(null);
                       console.error('Logout failed:', error);
                     }
                   }}
-                  className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors ml-4"
+                  className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors mr-4 cursor-pointer"
                 >
                   התנתק
                 </button>
