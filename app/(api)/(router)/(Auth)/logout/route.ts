@@ -4,8 +4,7 @@ import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    cookieStore.delete('token');
+    console.log("request.url", request.url);
     return NextResponse.redirect(new URL('/Login', request.url));
   } 
   catch (error) 

@@ -10,29 +10,8 @@ interface ControlPanelProps {
 
 
 export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) {
-  const [user, setUser] = useState<Suppliers | null>(null);
-  const user_id=5;
-  useEffect(() => {
-    const fetchUser = async () => {
-      // Check if we're on the client side before accessing localStorage
-      if (typeof window === 'undefined') {
-        return;
-      }
-      
-      if (!user_id) {
-        return;
-      }
-      const user = await fetch('/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: user_id }),
-      }).then(res => res.json());
-      setUser(user as Suppliers);
-    };
-    fetchUser();
-  }, [user_id]);
+const [user, setUser] = useState<Suppliers | null>(null);
+
 
 
     return (
@@ -48,6 +27,21 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
                 <span className="text-sm text-gray-500">
                   {user?.role === 'ADMIN' ? 'מנהל' : 'משתמש'}
                 </span>
+                <button
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/logout', {
+                        method: 'POST',
+                      }); 
+                    } 
+                    catch (error) {
+                      console.error('Logout failed:', error);
+                    }
+                  }}
+                  className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors ml-4"
+                >
+                  התנתק
+                </button>
               </div>
             </div>
           </div>
