@@ -1,11 +1,5 @@
 import React, { useState } from 'react'
-
-interface TaskFilters {
-  status: string;
-  priority: string;
-  startDate: string;
-  endDate: string;
-}
+import { TaskFilters } from '@/app/(types)/types'
 
 
 
@@ -16,6 +10,11 @@ export default function Fillter() {
     startDate: '',
     endDate: ''
   });
+
+
+  const searchTasks = () => {
+    console.log(filters);
+  };
 
   const handleFilterChange = (key: keyof TaskFilters, value: string) => {
     const newFilters = {
@@ -93,10 +92,12 @@ export default function Fillter() {
       </div>
     </div>
 
-    {/* Clear Filters Button */}
-    <div className="mt-4 flex justify-end">
-      <button onClick={clearFilters} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <div className="mt-4 flex justify-end space-x-2">
+      <button onClick={clearFilters} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none  focus:ring-2 focus:ring-blue-500 cursor-pointer">
         נקה סינון
+      </button>
+      <button onClick={searchTasks} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none  focus:ring-2 focus:ring-blue-500 mr-1 cursor-pointer">
+        חפש
       </button>
     </div>
   </div>

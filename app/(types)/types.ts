@@ -39,3 +39,14 @@ export interface CreateUserData {
     user?: Partial<Suppliers>;
     errors?: Record<string, string>;
   }
+
+
+
+  export interface TaskFilters {
+    status: string;
+    priority: string;
+    startDate: string;
+    endDate: string;
+  }
+  
+  

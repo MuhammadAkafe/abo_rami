@@ -1,8 +1,6 @@
 "use client"
 import React from 'react';
-import Fillter from './Fillter';
 import Tasks from './Tasks';
-import TasksStatus from './TasksStatus';
 
 
 export default function TasksDashbaordDisplay() {

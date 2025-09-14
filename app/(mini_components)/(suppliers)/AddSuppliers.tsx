@@ -91,7 +91,7 @@ export default function AddSuppliers() {
         <h2 className="text-2xl font-bold text-gray-900">הוספת ספקים</h2>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+          className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors cursor-pointer"
         >
           {showAddForm ? 'ביטול' : 'הוסף ספק חדש'}
         </button>
@@ -244,14 +244,14 @@ export default function AddSuppliers() {
           <div className="mt-4 flex justify-end space-x-3">
             <button
               onClick={() => setShowAddForm(false)}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
             >
               ביטול
             </button>
             <button
              type="submit"  
              disabled={mutation.isPending}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 cursor-pointer"
             >
            {mutation.isPending ? 'מעבד...' : 'הוסף ספק'}
             </button>
