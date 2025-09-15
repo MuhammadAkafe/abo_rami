@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import Tasks from './Tasks';
+import TasksTable from './TasksTable';
 
 
 export default function TasksDashbaordDisplay() {
@@ -12,7 +12,7 @@ export default function TasksDashbaordDisplay() {
       <div className="space-y-8">
         {/* Tasks Section */}
         <div className="w-full">
-          <Tasks  />
+          <TasksTable  />
         </div>
       </div>
     </div>

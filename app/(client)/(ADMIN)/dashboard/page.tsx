@@ -4,7 +4,7 @@ import Add_task from '@/app/(mini_components)/(tasks)/Add_task';
 import AddSuppliers from '@/app/(mini_components)/(suppliers)/AddSuppliers';
 import ControlPanel from '@/app/(mini_components)/controlpanel';
 import { useState } from 'react';
-import ListOfCustomers from '@/app/(mini_components)/(suppliers)/ListOfSuppliers';
+import ListOfCustomers from '@/app/(mini_components)/(suppliers)/SuppliersMangement';
 import ListOfTasks from '@/app/(mini_components)/(tasks)/TasksMangment';
 
 export default function ParentDashbaord() {
