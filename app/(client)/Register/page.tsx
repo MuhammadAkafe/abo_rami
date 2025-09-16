@@ -5,25 +5,10 @@ import { useState } from "react";
 import { validateRegisterForm } from "@/app/validtion";
 import { Role } from "@prisma/client";
 import { RegisterFormData } from "@/app/validtion";
-import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useRegister } from "@/app/(hooks)/useSupplier";
 
-const register = async (formData: RegisterFormData) => {
-  const response = await fetch('/register', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(formData),
-  });
-  
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Registration failed');
-  }
-  
-  return response.json();
-};
+
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState<RegisterFormData>({
@@ -36,28 +21,8 @@ export default function RegisterPage() {
     role: 'USER' as Role
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const router = useRouter();
-  const mutation = useMutation({
-    mutationFn: register,
-    onSuccess:  () => {
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        password: '',
-        confirmPassword: '',
-        role: 'USER' as Role
-      });
-       setTimeout(() => {
-        router.push('/Login');
-      }, 1000);
-      setFieldErrors({});
-    },
-    onError: (error) => {
-      console.error('Registration error:', error);
-    }
-  });
+  const router = useRouter()
+  const mutation = useRegister();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -76,7 +41,27 @@ export default function RegisterPage() {
       return;
     }
     setFieldErrors({});
-    mutation.mutate(formData);
+    mutation.mutate(formData, {
+      onSuccess: () => {
+        // Reset form
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          password: '',
+          confirmPassword: '',
+          role: 'USER' as Role
+        });
+        // Redirect after a short delay
+        setTimeout(() => {
+          router.push('/Login');
+        }, 2000);
+      },
+      onError: (error) => {
+        console.error('Registration error:', error);
+      }
+    });
   };
 
 

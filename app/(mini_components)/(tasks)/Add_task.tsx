@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import { tasks, Suppliers } from '@prisma/client';
+import { tasks, users } from '@prisma/client';
 import { useMemo } from 'react';
 import { useAddTask } from '@/app/(hooks)/useTask';
 import { useGetAllSuppliers } from '@/app/(hooks)/useSupplier';
@@ -15,7 +15,7 @@ export default function Add_task() {
     address: '',
     description: '',
     priority: undefined,
-    supplierId: undefined,
+    userid: undefined,
   });
 
 
@@ -30,7 +30,7 @@ export default function Add_task() {
     if (!user_id) {
       return users;
     }
-    return users.filter((user: Suppliers) => Number(user.id) !== Number(user_id));
+    return users.filter((user: users) => Number(user.id) !== Number(user_id));
   }, [users, user_id]);
 
 
@@ -43,7 +43,7 @@ export default function Add_task() {
   const handleAddTask = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (!newTask.supplierId) {
+    if (!newTask.userid) {
       return;
     }
 
@@ -123,8 +123,8 @@ export default function Add_task() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">שם ספק</label>
                 <select
-                  name="userId"
-                  value={newTask.supplierId}
+                  name="userid"
+                  value={newTask.userid}
                   onChange={(e) => handleChange(e as React.ChangeEvent<HTMLSelectElement>)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={usersLoading}
@@ -132,7 +132,7 @@ export default function Add_task() {
                   <option value="">
                     {usersLoading ? 'טוען ספקים...' : 'בחר שם ספק'}
                   </option>
-                  {filteredUsers.map((user: Suppliers) => (
+                  {filteredUsers.map((user: users) => (
                     <option key={user.id} value={user.id}>
                       {user.firstName + ' ' + user.lastName}
                     </option>

@@ -4,12 +4,15 @@ import Add_task from '@/app/(mini_components)/(tasks)/Add_task';
 import AddSuppliers from '@/app/(mini_components)/(suppliers)/AddSuppliers';
 import ControlPanel from '@/app/(mini_components)/controlpanel';
 import { useState } from 'react';
+
 import ListOfCustomers from '@/app/(mini_components)/(suppliers)/SuppliersMangement';
 import ListOfTasks from '@/app/(mini_components)/(tasks)/TasksMangment';
+import React from 'react';
 
-export default function ParentDashbaord() {
+export  function ParentDashbaord() {
   const [content, setContent] = useState<React.ReactNode>(<TasksDashbaordDisplay />);
   const [activeTab, setActiveTab] = useState("/tasksdashboard");
+
 
   const navigate = (path: string) => {
     setActiveTab(path);
@@ -29,6 +32,8 @@ export default function ParentDashbaord() {
     }
   }
 
+ 
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" dir="rtl">
@@ -47,4 +52,4 @@ export default function ParentDashbaord() {
   )
 }
 
-
+export default React.memo(ParentDashbaord);

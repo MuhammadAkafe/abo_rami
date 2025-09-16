@@ -94,7 +94,7 @@ export default function TaskManagement() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {/* {task.supplier.firstName + ' ' + task.supplier.lastName || 'לא מוגדר'} */}
+                      {/* {task.user.firstName + ' ' + task.user.lastName || 'לא מוגדר'} */}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

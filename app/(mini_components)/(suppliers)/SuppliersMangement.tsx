@@ -1,11 +1,10 @@
 "use client"
-import React, { useState } from 'react';
+import React from 'react';
 import { useGetAllSuppliers } from '@/app/(hooks)/useSupplier';
-import { Suppliers } from '@prisma/client';
 import SuppliersTable from './SuppliersTable';
 export default function SuppliersManagement() {
 
-  const { data: suppliers=[], refetch } = useGetAllSuppliers();
+  const { data, refetch } = useGetAllSuppliers();
 
 
   return (
@@ -28,7 +27,7 @@ export default function SuppliersManagement() {
               </div>
             </div>
             <div className="text-sm text-gray-600">
-              {suppliers?.length || 0} ספקים
+              {data?.length || 0} ספקים
             </div>
             <button
               className="text-gray-600 hover:text-gray-900 transition-colors"
@@ -44,7 +43,7 @@ export default function SuppliersManagement() {
       </div>
 
       {/* Table */}
-      <SuppliersTable suppliers={suppliers} refetch={refetch} />
+      <SuppliersTable users={data || []} refetch={refetch} />
     </div>
   );
 }

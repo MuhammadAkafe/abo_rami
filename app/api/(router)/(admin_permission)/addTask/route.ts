@@ -4,14 +4,15 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) 
 {
     try{
-    const { address, description, priority, userId } = await req.json();
+    const { address, description, priority, userid } = await req.json();
     
-    // Convert userId to integer since it comes as string from form
-    const userIdInt = parseInt(userId);
+    // Convert userid to integer since it comes as string from form
+    const userIdInt = parseInt(userid);
     
     if (isNaN(userIdInt)) {
         return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
     }
+
     
     const user = await prisma.users.findUnique({
         where: { id: userIdInt },
@@ -19,13 +20,16 @@ export async function POST(req: Request)
     if (!user) {
         return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+    if(user.role !== "ADMIN") {
+        return NextResponse.json({ error: "User is not a admin" }, { status: 400 });
+    }
     
     const task = await prisma.tasks.create({
         data: { 
             address, 
             description, 
             priority, 
-            userId: userIdInt 
+            userid: userIdInt 
         },
     });
     

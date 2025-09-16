@@ -9,7 +9,7 @@ import { tasks } from "@prisma/client";
 
 
 const addTask = async (taskData: Partial<tasks>) => {
-    const response = await fetch('/addTask', {
+    const response = await fetch('/api/router/addTask', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ const addTask = async (taskData: Partial<tasks>) => {
             address: '',
             description: '',
             priority: undefined,
-            supplierId: undefined,
+            userid: undefined,
           });
           setShowAddForm(false);
         },

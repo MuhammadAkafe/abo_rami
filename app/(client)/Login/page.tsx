@@ -1,49 +1,47 @@
 "use client"
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import LoadingButton from "@/app/(mini_components)/Loading/loadingButton";
-import { useMutation } from "@tanstack/react-query";
-
-const login = async (credentials: { email: string; password: string }) => {
-  const response = await fetch('/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-  });
-  
-  const data = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(data.error || 'Login failed');
-  }
-  
-  return data;
-};
-
-export default function LoginPage() {
-  const mutation = useMutation({
-    mutationFn: login,
-    onSuccess: (data) => {
-      localStorage.setItem('userid', JSON.stringify(data.userid));
-      // Redirect to appropriate page based on user role
-      if (data.redirectTo) {
-        window.location.href = data.redirectTo;
-      }
-    },
-    onError: (error) => {
-      console.error('Login error:', error);
-    }
-  });
+import React from "react";
 
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+
+export  function LoginPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    
-    mutation.mutate({ email, password });
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+      if (result?.error) {
+        setError('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
+      } else if (result?.ok) {
+        // Get the user data to determine redirect
+        const response = await fetch('/api/auth/session');
+        const sessionData = await response.json();
+        const redirectTo = sessionData.user?.role === 'ADMIN' ? '/dashboard' : '/Tasklist';
+        router.push(redirectTo);
+      }
+    } catch {
+      setError('שגיאה בחיבור לשרת');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -60,17 +58,10 @@ export default function LoginPage() {
         </div>
 
 
-        {/* Success Message */}
-        {mutation.isSuccess && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center">
-            <p className="font-medium">ההתחברות הושלמה בהצלחה!</p>
-          </div>
-        )}
-
         {/* Error Message */}
-        {mutation.isError && (
+        {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center">
-            <p className="font-medium">{mutation.error?.message || 'שגיאה בהתחברות'}</p>
+            <p className="font-medium">{error}</p>
           </div>
         )}
 
@@ -119,7 +110,7 @@ export default function LoginPage() {
             </div>
 
             {/* Submit Button */}
-            <LoadingButton loading={mutation.isPending} text ="התחברו" />
+            <LoadingButton loading={isLoading} text="התחברו" />
           </form>
 
           {/* Divider */}
@@ -147,3 +138,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+export default React.memo(LoginPage);

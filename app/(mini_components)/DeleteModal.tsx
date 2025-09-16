@@ -1,14 +1,7 @@
 import React from 'react';
+import { DeleteModalProps } from '@/app/(types)/types';
 
-interface DeleteModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  message: string;
-  itemName?: string;
-  isLoading?: boolean;
-}
+
 
 export default function DeleteModal({
   isOpen,

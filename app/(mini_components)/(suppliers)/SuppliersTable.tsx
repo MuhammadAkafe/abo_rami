@@ -1,62 +1,62 @@
-import { Suppliers } from '@prisma/client';
+import { users } from '@prisma/client';
 import React, { useState } from 'react'
 import DeleteModal from '../DeleteModal';
 
 interface DeleteModalState 
 {
     isOpen: boolean;
-    supplier: Suppliers | null;
+    user: users | null;
     isLoading: boolean;
 }
 
-function SuppliersTable({ suppliers, refetch }: { suppliers: Suppliers[], refetch: () => void }) 
+function SuppliersTable({ users, refetch }: { users: users[], refetch: () => void }) 
 {
     const [deleteModal, setDeleteModal] = useState<DeleteModalState>({
         isOpen: false,
-        supplier: null,
+        user: null,
         isLoading: false
     });
 
-    const handleDeleteClick = (supplier: Suppliers) => {
-        console.log("Supplier clicked:", supplier);
+    const handleDeleteClick = (user: users) => {
+        console.log("Supplier clicked:", user);
         setDeleteModal({
             isOpen: true,
-            supplier,
+            user: user,
             isLoading: false
         });
     };
 
     const handleDeleteConfirm = async () => {
-        if (!deleteModal.supplier) return;
+        if (!deleteModal.user) return;
 
         setDeleteModal(prev => ({ ...prev, isLoading: true }));
-
         try {
-            const response = await fetch(`/deleteUser`, {
+            const response = await fetch(`/api/deleteUser`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id: deleteModal.supplier.id }),
+                body: JSON.stringify({ id: deleteModal.user.id }),
             });
 
             if (response.ok) {
                 console.log("Supplier deleted successfully");
                 refetch();
-                setDeleteModal({ isOpen: false, supplier: null, isLoading: false });
+                setDeleteModal({ isOpen: false, user: null, isLoading: false });
             }
-             else {
-                console.error("Error deleting supplier");
+            else {
+                console.error("Error deleting user");
                 setDeleteModal(prev => ({ ...prev, isLoading: false }));
             }
-        } catch (error) {
-            console.error("Error deleting supplier:", error);
+        } 
+        catch (error ) {
+            console.error("Error deleting user:", error);
             setDeleteModal(prev => ({ ...prev, isLoading: false }));
         }
     };
 
     const handleDeleteCancel = () => {
-        setDeleteModal({ isOpen: false, supplier: null, isLoading: false });
+        setDeleteModal({ isOpen: false, user: null, isLoading: false });
     };
 
 
@@ -86,7 +86,7 @@ function SuppliersTable({ suppliers, refetch }: { suppliers: Suppliers[], refetc
         </tr>
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
-        {(suppliers?.length || 0) === 0 ? (
+        {(users?.length || 0) === 0 ? (
           <tr>
             <td colSpan={7} className="px-6 py-12 text-center">
               <div className="flex flex-col items-center">
@@ -99,42 +99,42 @@ function SuppliersTable({ suppliers, refetch }: { suppliers: Suppliers[], refetc
             </td>
           </tr>
         ) : (
-          (suppliers || []).map((supplier: Suppliers) => (
-            <tr key={supplier.id} className="hover:bg-gray-50 transition-colors">
+          (users || []).map((user: users) => (
+            <tr key={user.id} className="hover:bg-gray-50 transition-colors">
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 h-10 w-10">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                       <span className="text-white font-medium text-sm">
-                        {supplier.firstName.charAt(0).toUpperCase()}
+                        {user.firstName.charAt(0).toUpperCase()}
                       </span>
                     </div>
                   </div>
                   <div className="mr-4">
                     <div className="text-sm font-medium text-gray-900">
-                      {supplier.firstName}
+                      {user.firstName}
                     </div>
                   </div>
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{supplier.lastName}</div>
+                <div className="text-sm text-gray-900">{user.lastName}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{supplier.email}</div>
+                <div className="text-sm text-gray-900">{user.email}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">  
-                <div className="text-sm text-gray-900">{supplier.phone}</div>
+                <div className="text-sm text-gray-900">{user.phone}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">
-                  {new Date(supplier.createdAt).toLocaleDateString('he-IL')}
+                  {new Date(user.createdAt).toLocaleDateString('he-IL')}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div className="flex items-center justify-center gap-1">
                     <button
-                      onClick={() => handleDeleteClick(supplier)}
+                      onClick={() => handleDeleteClick(user)}
                       className="text-red-600 cursor-pointer hover:text-red-900 p-1 rounded-md hover:bg-red-50 transition-colors"
                       title="מחק"
                     >
@@ -156,7 +156,7 @@ function SuppliersTable({ suppliers, refetch }: { suppliers: Suppliers[], refetc
     onConfirm={handleDeleteConfirm}
     title="מחיקת ספק"
     message="האם אתה בטוח שברצונך למחוק את הספק הזה?"
-    itemName={deleteModal.supplier ? `${deleteModal.supplier.firstName} ${deleteModal.supplier.lastName}` : ''}
+    itemName={deleteModal.user ? `${deleteModal.user.firstName} ${deleteModal.user.lastName}` : ''}
     isLoading={deleteModal.isLoading}
   />
   </>

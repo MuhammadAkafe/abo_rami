@@ -3,36 +3,13 @@ import React, { useState } from 'react';
 import { Role } from '@prisma/client';
 import { validateRegisterForm } from '@/app/validtion';
 import { useMutation } from '@tanstack/react-query';
+import { useRegister } from '@/app/(hooks)/useSupplier';
 
-const register = async (formData: {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
-  role: Role;
-}) => {
-  const response = await fetch('/register', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(formData),
-  });
-  
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Registration failed');
-  }
-  
-  return response.json();
-};
 
 export default function AddSuppliers() {
 
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newCustomer, setNewCustomer] = useState({
+  const [newSupplier, setNewSupplier] = useState({
     firstName: '',
     lastName: '',
     email: '',
@@ -43,29 +20,11 @@ export default function AddSuppliers() {
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   
-  const mutation = useMutation({
-    mutationFn: register,
-    onSuccess: () => {
-      setNewCustomer({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        password: '',
-        confirmPassword: '',
-        role: 'USER' as Role
-      });
-      setShowAddForm(false);
-      setFieldErrors({});
-    },
-    onError: (error) => {
-      console.error('Registration error:', error);
-    }
-  });
+  const mutation = useRegister();
 
   const handle_change = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNewCustomer(prev => ({ ...prev, [name]: value }));
+    setNewSupplier(prev => ({ ...prev, [name]: value }));
     // Clear field error when user starts typing
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({ ...prev, [name]: '' }));
@@ -74,13 +33,20 @@ export default function AddSuppliers() {
 
   const handle_submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const validation = validateRegisterForm(newCustomer);
+    const validation = validateRegisterForm(newSupplier);
     if (!validation.success) {
       setFieldErrors(validation.errors);
       return;
     }
+    mutation.mutate(newSupplier,{
+      onSuccess: () => {
+        setShowAddForm(false);
+      },
+      onError: (error) => {
+        console.error('Registration error:', error);
+      }
+    });
     setFieldErrors({});
-    mutation.mutate(newCustomer);
   };
 
 
@@ -118,7 +84,7 @@ export default function AddSuppliers() {
               <input
                 type="text"
                 name="firstName"
-                value={newCustomer.firstName}
+                value={newSupplier.firstName}
                 onChange={(e) => handle_change(e)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
                   fieldErrors.firstName 
@@ -136,7 +102,7 @@ export default function AddSuppliers() {
               <input
                 type="text"
                 name="lastName"
-                value={newCustomer.lastName}
+                value={newSupplier.lastName}
                 onChange={(e) => handle_change(e)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
                   fieldErrors.lastName 
@@ -154,7 +120,7 @@ export default function AddSuppliers() {
               <input
                 type="email"
                 name="email"
-                value={newCustomer.email}
+                value={newSupplier.email}
                 onChange={(e) => handle_change(e)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
                   fieldErrors.email 
@@ -172,7 +138,7 @@ export default function AddSuppliers() {
               <input
                 type="tel"
                 name="phone"
-                value={newCustomer.phone}
+                value={newSupplier.phone}
                 onChange={(e) => handle_change(e)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
                   fieldErrors.phone 
@@ -190,7 +156,7 @@ export default function AddSuppliers() {
               <input
                 type="password"
                 name="password"
-                value={newCustomer.password}
+                value={newSupplier.password}
                 onChange={(e) => handle_change(e)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
                   fieldErrors.password 
@@ -208,7 +174,7 @@ export default function AddSuppliers() {
               <input
                 type="password"
                 name="confirmPassword"
-                value={newCustomer.confirmPassword}
+                value={newSupplier.confirmPassword}
                 onChange={(e) => handle_change(e)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
                   fieldErrors.confirmPassword 
@@ -225,7 +191,7 @@ export default function AddSuppliers() {
               <label className="block text-sm font-medium text-gray-700 mb-2">תפקיד</label>
               <select 
                 name="role"
-                value={newCustomer.role}
+                value={newSupplier.role}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
                   fieldErrors.role 
                     ? 'border-red-500 focus:ring-red-500' 

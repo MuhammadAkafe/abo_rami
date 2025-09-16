@@ -1,4 +1,4 @@
-import { Status, Priority, type Status as StatusType, type Priority as PriorityType, Suppliers } from "@prisma/client";
+import { Status, Priority, type Status as StatusType, type Priority as PriorityType, users } from "@prisma/client";
 
 // Export the Status enum type for use throughout the application
 export { Status, Priority };
@@ -36,7 +36,7 @@ export interface CreateUserData {
   export interface ApiResponse {
     success: boolean;
     message?: string;
-    user?: Partial<Suppliers>;
+    user?: Partial<users>;
     errors?: Record<string, string>;
   }
 
@@ -50,3 +50,18 @@ export interface CreateUserData {
   }
   
   
+
+  export interface DeleteModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title: string;
+    message: string;
+    itemName?: string;
+    isLoading?: boolean;
+  }
+
+  export interface ControlPanelProps {
+    navigate?: (path: string) => void
+    activeTab?: string
+}
