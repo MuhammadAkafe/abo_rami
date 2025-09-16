@@ -4,14 +4,15 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) 
 {
     try{
-    const { address, description, priority, userid } = await req.json();
+    const { address, description,date, taskArea, userid } = await req.json();
 
 
     await prisma.tasks.create({
         data: {
             address,
             description,
-            priority,
+            date,
+            taskArea,
             userid: parseInt(userid)
         }
     });

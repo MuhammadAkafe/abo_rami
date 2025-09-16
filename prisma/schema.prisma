@@ -38,6 +38,7 @@ model tasks {
   userid      Int 
   address     String
   description String
+  taskArea    String
   url         String?
   status      Status   @default(PENDING)
   date        DateTime? 
@@ -58,7 +59,6 @@ model workareas {
 
 
 enum Status {
-  ALL
   PENDING
   COMPLETED
   REJECTED
