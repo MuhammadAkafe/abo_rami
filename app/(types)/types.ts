@@ -44,7 +44,6 @@ export interface CreateUserData {
 
   export interface TaskFilters {
     status: string;
-    priority: string;
     startDate: string;
     endDate: string;
   }
@@ -64,4 +63,13 @@ export interface CreateUserData {
   export interface ControlPanelProps {
     navigate?: (path: string) => void
     activeTab?: string
+}
+
+
+export interface NewTask {
+  address: string;
+  description: string;
+  userid: number | null;
+  date: Date | null;
+  taskArea: string;
 }

@@ -4,7 +4,14 @@ import { tasks } from '@prisma/client'
 import { getPriorityColor, getPriorityText, getStatusColor, getStatusText } from '../../../styles/taskstyles'
 import DeleteModal from '../../../(mini_components)/DeleteModal';
 
-function TasksTable({ title='משימות היום', tasks: tasksData = [], refetch }: { title?: string, tasks?: tasks[], refetch?: () => void }) 
+
+interface TasksTableProps {
+  title?: string;
+  tasks?: tasks[];
+  refetch?: () => void;
+}
+
+function TasksTable({ title='משימות היום', tasks: tasksData = [], refetch }: TasksTableProps) 
 {
   const [tasks] = useState<tasks[]>(tasksData);
   const [deleteModal, setDeleteModal] = useState<{

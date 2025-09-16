@@ -6,7 +6,6 @@ import { TaskFilters } from '@/app/(types)/types'
 export default function Fillter() {
   const [filters, setFilters] = useState<TaskFilters>({
     status: '',
-    priority: '',
     startDate: '',
     endDate: ''
   });
@@ -28,7 +27,6 @@ export default function Fillter() {
   const clearFilters = () => {
     const clearedFilters = {
       status: '',
-      priority: '',
       startDate: '',
       endDate: ''
     };
@@ -50,24 +48,10 @@ export default function Fillter() {
           <option value="all">כל הסטטוסים</option>
           <option value="pending">ממתין</option>
           <option value="completed">הושלם</option>
-          <option value="rejected">דחוף</option>
+          <option value="rejected">נדחה</option>
         </select>
       </div>
 
-      {/* Priority Filter */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">עדיפות</label>
-        <select 
-          value={filters.priority}
-          onChange={(e) => handleFilterChange('priority', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        >
-          <option value="all">כל העדיפויות</option>
-          <option value="low">נמוכה</option>
-          <option value="medium">בינונית</option>
-          <option value="high">גבוהה</option>
-        </select>
-      </div>
 
       {/* Start Date Filter */}
       <div>

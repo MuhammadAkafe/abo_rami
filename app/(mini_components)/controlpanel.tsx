@@ -8,7 +8,7 @@ import { logout } from "./logout";
 
 
 export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) {
-  const { data    }  = useSession();
+  const { data, status }  = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
 
@@ -20,11 +20,11 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
             <div className="flex justify-between items-center py-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">לוח בקרה</h1>
-                <p className="text-gray-600 text-sm">ברוך הבא, {data?.user?.name } </p>
+                <p className="text-gray-600 text-sm">ברוך הבא, {status === "authenticated" ? data?.user?.name : "משתמש"} </p>
               </div>
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-500">
-                  {data?.user?.role === 'ADMIN' ? 'מנהל' : 'משתמש'}
+                  {status === "authenticated" ? data?.user?.role === 'ADMIN' ? 'מנהל' : 'משתמש' : "משתמש"}
                 </span>
                 <button
                   onClick={() => logout(setIsLoading)}

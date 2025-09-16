@@ -2,10 +2,11 @@
 import React from 'react';
 import { useGetAllSuppliers } from '@/app/(hooks)/useSupplier';
 import SuppliersTable from './SuppliersTable';
+import LoadingCompoenent from '@/app/(mini_components)/Loading/LoadingCompoenent';
 
 export default function SuppliersManagement() {
 
-  const { data :users, refetch } = useGetAllSuppliers();
+  const { data :users, refetch,isLoading } = useGetAllSuppliers();
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
@@ -43,7 +44,9 @@ export default function SuppliersManagement() {
       </div>
 
       {/* Table */}
-      <SuppliersTable users={users || []} refetch={refetch} />
+      {isLoading ? <LoadingCompoenent isLoading={isLoading} /> : 
+      <SuppliersTable users={users || []} refetch={refetch} 
+      />}
     </div>
   );
 }

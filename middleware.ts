@@ -19,7 +19,7 @@ export default withAuth(
       {
       // Only ADMIN can access these pages
       if (token?.role !== 'ADMIN') {
-        return NextResponse.json({ error: "You are not authorized to access this page" }, { status: 403 })
+        return NextResponse.json({ error: "You are not authorized to access this page"}, { status: 403 })
       }
     }
 

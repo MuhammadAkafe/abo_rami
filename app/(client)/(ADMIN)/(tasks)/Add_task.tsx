@@ -1,27 +1,37 @@
 "use client"
 import React, { useState } from 'react';
-import { tasks, users } from '@prisma/client';
+import { users } from '@prisma/client';
 import { useMemo } from 'react';
 import { useAddTask } from '@/app/(hooks)/useTask';
 import { useGetAllSuppliers } from '@/app/(hooks)/useSupplier';
+import { useSession } from 'next-auth/react';
+import { NewTask } from '@/app/(types)/types';
+
+
 
 
 
 export default function Add_task() {
 
+  const { data: session } = useSession();
+  const user_id = session?.user?.id;
+
 
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newTask, setNewTask] = useState<Partial<tasks>>({
+  const [newTask, setNewTask] = useState<NewTask>({
     address: '',
     description: '',
-    priority: undefined,
-    userid: undefined,
+    userid: null,
+    date: null,
+    taskArea: '',
   });
+
+
+  const [TaskArea, setTaskArea] = useState('');
 
 
   const { data: users = [], isLoading: usersLoading, error: usersError } = useGetAllSuppliers();
   const { mutate: addTask, isPending, isError, isSuccess, error } = useAddTask(setNewTask, setShowAddForm);
-  const user_id = localStorage.getItem('userid');
   
 
 
@@ -43,15 +53,13 @@ export default function Add_task() {
   const handleAddTask = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (!newTask.userid) {
+    // Validate all required fields
+    if (!newTask.userid || !newTask.address || !newTask.description || !newTask.date || !TaskArea) {
       return;
     }
 
-    if (!newTask.address || !newTask.description) {
-      return;
-    }
-
-    console.log('Sending task data:', newTask);
+    const taskData: NewTask = { ...newTask, taskArea: TaskArea };
+    console.log('Sending task data:', taskData);
     addTask(newTask);
   };
 
@@ -61,7 +69,12 @@ export default function Add_task() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">הוספת משימה</h2>
         <button
-          onClick={() => setShowAddForm(!showAddForm)}
+          onClick={() => {
+            setShowAddForm(!showAddForm);
+            if (showAddForm) {
+              setTaskArea('');
+            }
+          }}
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
         >
           {showAddForm ? 'ביטול' : 'הוסף משימה חדשה'}
@@ -85,7 +98,7 @@ export default function Add_task() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">הוסף משימה חדשה</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">כתובת</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">כתובת *</label>
               <input
                 type="text"
                 name="address"
@@ -93,10 +106,11 @@ export default function Add_task() {
                 onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="הכנס כתובת"
+                required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">תיאור</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">תיאור *</label>
               <input
                 type="text"
                 name="description"
@@ -104,30 +118,18 @@ export default function Add_task() {
                 onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="הכנס תיאור"
+                required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">עדיפות</label>
-              <select
-                name="priority"
-                value={newTask.priority}
-                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLSelectElement>)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">בחר עדיפות</option>
-                <option value="LOW">נמוכה</option>
-                <option value="MEDIUM">בינונית</option>
-                <option value="HIGH">גבוהה</option>
-              </select>
-            </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">שם ספק</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">שם ספק *</label>
                 <select
                   name="userid"
-                  value={newTask.userid}
+                  value={newTask.userid || ''}
                   onChange={(e) => handleChange(e as React.ChangeEvent<HTMLSelectElement>)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={usersLoading}
+                  required
                 >
                   <option value="">
                     {usersLoading ? 'טוען ספקים...' : 'בחר שם ספק'}
@@ -142,10 +144,43 @@ export default function Add_task() {
                   <p className="mt-1 text-sm text-red-600">שגיאה בטעינת הלקוחות</p>
                 )}
               </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">עד תאריך *</label>
+              <input
+                type="date"
+                name="date"
+                value={newTask.date ? new Date(newTask.date).toISOString().split('T')[0] : ''}
+                onChange={(e) => setNewTask({ ...newTask, date: new Date(e.target.value) })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">איזורי עבודה *</label>
+              <select
+                name="taskArea"
+                value={TaskArea}
+                onChange={(e) => setTaskArea(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              >
+                <option value="">בחר איזור עבודה</option>
+                <option value="צפון">צפון</option>
+                <option value="מרכז">מרכז</option>
+                <option value="דרום">דרום</option>
+                <option value="ירושלים">ירושלים</option>
+                <option value="יהודה ושומרון">יהודה ושומרון</option>
+                <option value="גולן">גולן</option>
+                <option value="אילת">אילת</option>
+              </select>
+            </div>
           </div>
           <div className="mt-4 flex justify-end space-x-3">
             <button
-              onClick={() => setShowAddForm(false)}
+              onClick={() => {
+                setShowAddForm(false);
+                setTaskArea('');
+              }}
               className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
             >
               ביטול
