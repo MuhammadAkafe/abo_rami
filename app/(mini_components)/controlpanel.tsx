@@ -1,20 +1,16 @@
 "use client"
 
-import { signOut, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { ControlPanelProps } from '@/app/(types)/types';
+import { useState } from "react";
+import { logout } from "./logout";
 
 
 
 export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) {
-  const { data   }  = useSession();
-const logout = async () => {
-  try {
-    await signOut( { callbackUrl: '/Login' });
-  }
-   catch (error) {
-    console.error('Logout failed:', error);
-  }
-}
+  const { data    }  = useSession();
+  const [isLoading, setIsLoading] = useState(false);
+
 
 
     return (
@@ -31,10 +27,11 @@ const logout = async () => {
                   {data?.user?.role === 'ADMIN' ? 'מנהל' : 'משתמש'}
                 </span>
                 <button
-                  onClick={logout}
+                  onClick={() => logout(setIsLoading)}
+                  disabled={isLoading}
                   className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors mr-4 cursor-pointer"
                 >
-                  התנתק
+                  {isLoading ? 'מעבד...' : 'התנתק'}
                 </button>
               </div>
             </div>
@@ -42,6 +39,9 @@ const logout = async () => {
         </header>
 
         {/* Navigation Menu */}
+        {
+          data?.user?.role === 'ADMIN' ? (
+          <>
         <nav className="border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex space-x-6 py-3">
@@ -96,8 +96,11 @@ const logout = async () => {
                 ניהול משימות
               </button>
             </div>
-          </div>
-        </nav>
+            </div>
+          </nav>
+          </>
+          ) : null
+        }
         </div>
     )
 }
