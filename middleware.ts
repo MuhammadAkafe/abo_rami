@@ -14,6 +14,14 @@ export default withAuth(
         return NextResponse.redirect(new URL('/Tasklist', req.url))
       }
     }
+    if (pathname.startsWith('/api/addTask' ) || 
+    pathname.startsWith('/api/deleteTask') || pathname.startsWith('/api/deleteUser') || pathname.startsWith('/api/GetAllUsers')) 
+      {
+      // Only ADMIN can access these pages
+      if (token?.role !== 'ADMIN') {
+        return NextResponse.json({ error: "You are not authorized to access this page" }, { status: 403 })
+      }
+    }
 
     if (pathname.startsWith('/Tasklist')) {
       // Only USER can access Tasklist (ADMIN should go to dashboard)
@@ -48,6 +56,10 @@ export default withAuth(
 export const config = {
   matcher: [
     '/dashboard/:path*', 
-    '/Tasklist/:path*'
+    '/Tasklist/:path*',
+    '/api/addTask/:path*',
+    '/api/deleteTask/:path*',
+    '/api/deleteUser/:path*',
+    '/api/GetAllUsers/:path*',
   ],
 }

@@ -1,7 +1,6 @@
 import { users } from '@prisma/client';
 import React, { useState } from 'react'
-import DeleteModal from '../DeleteModal';
-
+import DeleteModal from '../../../(mini_components)/DeleteModal';
 interface DeleteModalState 
 {
     isOpen: boolean;
@@ -16,7 +15,6 @@ function SuppliersTable({ users, refetch }: { users: users[], refetch: () => voi
         user: null,
         isLoading: false
     });
-
     const handleDeleteClick = (user: users) => {
         console.log("Supplier clicked:", user);
         setDeleteModal({
@@ -31,12 +29,11 @@ function SuppliersTable({ users, refetch }: { users: users[], refetch: () => voi
 
         setDeleteModal(prev => ({ ...prev, isLoading: true }));
         try {
-            const response = await fetch(`/api/deleteUser`, {
+            const response = await fetch(`/api/deleteUser?id=${deleteModal.user.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id: deleteModal.user.id }),
             });
 
             if (response.ok) {

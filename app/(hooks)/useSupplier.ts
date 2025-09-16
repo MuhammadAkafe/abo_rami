@@ -5,7 +5,7 @@ import { users } from "@prisma/client";
 import { RegisterFormData } from "../validtion";
 
 const getAllSuppliers = async (): Promise<users[]> => {
-    const response = await fetch('/api/GetAllUsers', {
+    const response = await fetch(`/api/GetAllUsers`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ const getAllSuppliers = async (): Promise<users[]> => {
 export const useGetAllSuppliers = () => {
     return useQuery({
         queryKey: ['users'],
-        queryFn: getAllSuppliers,
+        queryFn: getAllSuppliers
     });
 };
 

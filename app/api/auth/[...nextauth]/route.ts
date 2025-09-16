@@ -38,7 +38,7 @@ const handler = NextAuth({
                     
                     console.log('Authentication successful for user:', credentials.email)
                     return {
-                        id: user.id.toString(),
+                        id: user.id,
                         email: user.email,
                         name: `${user.firstName} ${user.lastName}`,
                         role: user.role,
@@ -60,8 +60,8 @@ const handler = NextAuth({
         },
         async session({ session, token }) {
             if (token && session.user) {
-                (session.user as { id: string; role: string }).id = token.id as string
-                (session.user as { id: string; role: string }).role = token.role as string
+                (session.user as { id: number; role: string }).id = token.id as number
+                (session.user as { id: number; role: string }).role = token.role as string
             }
             return session
         },

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { tasks } from '@prisma/client'
-import { getPriorityColor, getPriorityText, getStatusColor, getStatusText } from '../../styles/taskstyles'
-import DeleteModal from '../DeleteModal';
+import { getPriorityColor, getPriorityText, getStatusColor, getStatusText } from '../../../styles/taskstyles'
+import DeleteModal from '../../../(mini_components)/DeleteModal';
 
 function TasksTable({ title='משימות היום', tasks: tasksData = [], refetch }: { title?: string, tasks?: tasks[], refetch?: () => void }) 
 {

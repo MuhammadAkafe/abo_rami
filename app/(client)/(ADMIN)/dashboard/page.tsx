@@ -1,12 +1,12 @@
 "use client"
-import TasksDashbaordDisplay from '@/app/(mini_components)/(tasks)/Tasksdashboard';
-import Add_task from '@/app/(mini_components)/(tasks)/Add_task';
-import AddSuppliers from '@/app/(mini_components)/(suppliers)/AddSuppliers';
+import TasksDashbaordDisplay from '@/app/(client)/(ADMIN)/(tasks)/Tasksdashboard';
+import Add_task from '@/app/(client)/(ADMIN)/(tasks)/Add_task';
+import AddSuppliers from '@/app/(client)/(ADMIN)/(suppliers)/AddSuppliers';
 import ControlPanel from '@/app/(mini_components)/controlpanel';
 import { useState } from 'react';
 
-import ListOfCustomers from '@/app/(mini_components)/(suppliers)/SuppliersMangement';
-import ListOfTasks from '@/app/(mini_components)/(tasks)/TasksMangment';
+import ListOfCustomers from '@/app/(client)/(ADMIN)/(suppliers)/SuppliersMangement';
+import ListOfTasks from '@/app/(client)/(ADMIN)/(tasks)/TasksMangment';
 import React from 'react';
 
 export  function ParentDashbaord() {

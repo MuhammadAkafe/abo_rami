@@ -2,10 +2,10 @@
 import React from 'react';
 import { useGetAllSuppliers } from '@/app/(hooks)/useSupplier';
 import SuppliersTable from './SuppliersTable';
+
 export default function SuppliersManagement() {
 
-  const { data, refetch } = useGetAllSuppliers();
-
+  const { data :users, refetch } = useGetAllSuppliers();
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
@@ -27,7 +27,7 @@ export default function SuppliersManagement() {
               </div>
             </div>
             <div className="text-sm text-gray-600">
-              {data?.length || 0} ספקים
+              {users?.length || 0} ספקים
             </div>
             <button
               className="text-gray-600 hover:text-gray-900 transition-colors"
@@ -43,7 +43,7 @@ export default function SuppliersManagement() {
       </div>
 
       {/* Table */}
-      <SuppliersTable users={data || []} refetch={refetch} />
+      <SuppliersTable users={users || []} refetch={refetch} />
     </div>
   );
 }

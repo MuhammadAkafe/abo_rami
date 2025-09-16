@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import { getPriorityColor, getPriorityText, getStatusColor, getStatusText } from '../../styles/taskstyles';
+import { getPriorityColor, getPriorityText, getStatusColor, getStatusText } from '../../../styles/taskstyles';
 import Fillter from './Fillter';
 import { tasks } from '@prisma/client';
 

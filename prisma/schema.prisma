@@ -21,10 +21,11 @@ model users {
   email     String   @unique
   phone     String
   password  String
-  role      Role   @default(USER)
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tasks     tasks[]  // One-to-many relationship with tasks
+  workareas workareas[] // One-to-many relationship with work areas
 }
 
 enum Role {
@@ -38,11 +39,23 @@ model tasks {
   address     String
   description String
   priority    Priority @default(MEDIUM)
+  url         String?
   status      Status   @default(PENDING)
+  date        DateTime? 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   user        users    @relation(fields: [userid], references: [id], onDelete: Cascade)
 }
+
+model workareas {
+  id        Int      @id @default(autoincrement())
+  userid    Int
+  area      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      users    @relation(fields: [userid], references: [id], onDelete: Cascade)
+}
+
 
 
 enum Status {
@@ -53,6 +66,7 @@ enum Status {
 }
 
 enum Priority {
+  ALL
   LOW
   MEDIUM
   HIGH

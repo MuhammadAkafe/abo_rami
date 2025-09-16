@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react'
-import TasksTable from '@/app/(mini_components)/(tasks)/TasksTable'
+import TasksTable from '@/app/(client)/(ADMIN)/(tasks)/TasksTable'
 import ControlPanel from '@/app/(mini_components)/controlpanel'
 function Taskslist() 
 {
