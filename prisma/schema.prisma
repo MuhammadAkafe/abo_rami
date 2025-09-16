@@ -38,7 +38,6 @@ model tasks {
   userid      Int 
   address     String
   description String
-  priority    Priority @default(MEDIUM)
   url         String?
   status      Status   @default(PENDING)
   date        DateTime? 
@@ -63,11 +62,4 @@ enum Status {
   PENDING
   COMPLETED
   REJECTED
-}
-
-enum Priority {
-  ALL
-  LOW
-  MEDIUM
-  HIGH
 }

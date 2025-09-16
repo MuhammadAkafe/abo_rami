@@ -24,28 +24,6 @@ export const getStatusColor = (status: string) => {
     }
   };
 
-  export const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'HIGH':
-        return 'bg-red-500';
-      case 'MEDIUM':
-        return 'bg-yellow-500';
-      case 'LOW':
-        return 'bg-green-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
 
-  export const getPriorityText = (priority: string) => {
-    switch (priority) {
-      case 'HIGH':
-        return 'גבוה';
-      case 'MEDIUM':
-        return 'בינוני';
-      case 'LOW':
-        return 'נמוך';
-      default:
-        return 'לא מוגדר';
-    }
-  };
+
+

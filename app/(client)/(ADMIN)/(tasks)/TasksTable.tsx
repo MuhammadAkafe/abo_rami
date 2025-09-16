@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { tasks } from '@prisma/client'
-import { getPriorityColor, getPriorityText, getStatusColor, getStatusText } from '../../../styles/taskstyles'
+import { getStatusColor, getStatusText } from '../../../styles/taskstyles'
 import DeleteModal from '../../../(mini_components)/DeleteModal';
 
 
@@ -118,9 +118,6 @@ function TasksTable({ title='משימות היום', tasks: tasksData = [], refe
                 <h3 className="text-sm font-medium text-gray-900">{task.address}</h3>
                 <p className="text-sm text-gray-500 mt-1">{task.description}</p>
                 <div className="mt-2 flex items-center space-x-4">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority || '')}`}>
-                    {getPriorityText(task.priority || '')}
-                  </span>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status || '')}`}>
                     {getStatusText(task.status || '')}
                   </span>
