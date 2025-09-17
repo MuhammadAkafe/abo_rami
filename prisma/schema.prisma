@@ -22,9 +22,8 @@ model users {
   phone     String
   password  String
   role      Role     @default(ADMIN)
+  suppliers suppliers[]
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tasks     tasks[]  // One-to-many relationship with tasks
 }
 
 
@@ -41,7 +40,7 @@ model suppliers {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tasks     tasks[]  // One-to-many relationship with tasks
-
+  user      users    @relation(fields: [userid], references: [id], onDelete: Cascade)
   @@index([userid,id])
 }
 
@@ -62,18 +61,8 @@ model tasks {
   date        DateTime? 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  user        users    @relation(fields: [userid], references: [id], onDelete: Cascade)
   supplier    suppliers    @relation(fields: [supplierid], references: [id], onDelete: Cascade)
 }
-
-model workareas {
-  id        Int      @id @default(autoincrement())
-  userid    Int
-  area      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 
 
 enum Status {

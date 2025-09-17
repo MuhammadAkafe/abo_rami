@@ -10,6 +10,7 @@ import { useAddSupplier } from "@/app/(hooks)/useSupplier";
 import LoadingButton from "@/app/(mini_components)/Loading/loadingButton";
 import { useSession } from "next-auth/react";
 import { users } from "@prisma/client";
+import BackUpBtn from "@/app/(mini_components)/backUpBtn";
 
 interface SupplierFormData extends RegisterFormData {
   userid: number | null;
@@ -92,7 +93,12 @@ export default function RegisterPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 relative">
+
+
+      {/* Back Button - Top Middle */}
+      <BackUpBtn />
+
       {/* Header at the top */}
       <div className="pt-8 pb-4">
         <div className="text-center">
@@ -125,7 +131,7 @@ export default function RegisterPage() {
         )}
 
         {/* Register Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8" dir="rtl">
+        <div className="bg-white rounded-2xl shadow-xl p-8 mt-10" dir="rtl">
             <form onSubmit={handleSubmit}>
             {/* Horizontal Layout - All fields in one row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
