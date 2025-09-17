@@ -21,9 +21,7 @@ export default withAuth(
     if (pathname.startsWith('/api/AddTask' ) || 
     pathname.startsWith('/api/DeleteTask') || 
     pathname.startsWith('/api/DeleteSupplier') ||
-     pathname.startsWith('/api/GetAllSuppliers') || 
-     pathname.startsWith('/api/AddSupplier')) 
-      {
+     pathname.startsWith('/api/GetAllSuppliers')) {
       // Only ADMIN can access these pages
       if (token?.role !== Role.ADMIN) {
         console.log('User is not an admin')

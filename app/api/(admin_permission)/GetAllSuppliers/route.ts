@@ -5,9 +5,12 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const userid = searchParams.get('userid');
     try {
+        if (!userid) {
+            return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+        }
         const suppliers = await prisma.suppliers.findMany({
             where: {
-                userid: userid ? parseInt(userid) : undefined
+                userid: parseInt(userid) 
             }
         });
         if (!suppliers) 
