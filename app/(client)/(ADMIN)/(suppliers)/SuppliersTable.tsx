@@ -33,7 +33,7 @@ function SuppliersTable({ suppliers, refetch }: SuppliersTableProps)
 
         setDeleteModal(prev => ({ ...prev, isLoading: true }));
         try {
-            const response = await fetch(`/api/deleteUser?id=${deleteModal.Supplier.id}`, {
+            const response = await fetch(`/api/DeleteSupplier?supplierid=${deleteModal.Supplier.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
