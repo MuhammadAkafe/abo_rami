@@ -6,7 +6,13 @@ import { registerSchema } from "@/app/validtion";
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        
+        const { userid } = body;
+        if (!userid) {
+            return NextResponse.json(
+                { error: "User ID is required" },
+                { status: 400 }
+            );
+        }
         // Validate input using schema
         const validation = registerSchema.safeParse(body);
         if (!validation.success) {
@@ -21,10 +27,10 @@ export async function POST(request: Request) {
             );
         }
 
-        const { email, password: userPassword, confirmPassword, firstName, lastName, phone, role } = validation.data;
+        const { email, password: SupplierPassword, confirmPassword, firstName, lastName, phone, role } = validation.data;
 
         // Check if passwords match
-        if (userPassword !== confirmPassword) {
+        if (SupplierPassword !== confirmPassword) {
             return NextResponse.json(
                 { error: "Passwords do not match" },
                 { status: 400 }
@@ -32,7 +38,7 @@ export async function POST(request: Request) {
         }
 
         // Check if user already exists
-        const existingUser = await prisma.users.findUnique({
+        const existingUser = await prisma.suppliers.findUnique({
             where: { email: email.toLowerCase() }
         });
         
@@ -44,10 +50,11 @@ export async function POST(request: Request) {
         }
 
         // Hash password and create user
-        const hashedPassword = await bcrypt.hash(userPassword, 10);
+        const hashedPassword = await bcrypt.hash(SupplierPassword, 10);
         
-        const newUser = await prisma.users.create({
+        const newUser = await prisma.suppliers.create({
             data: {
+                userid: userid,
                 email: email.toLowerCase(),
                 password: hashedPassword,
                 firstName,
@@ -60,6 +67,7 @@ export async function POST(request: Request) {
         // Return success response (exclude password)
         const userWithoutPassword = {
             id: newUser.id,
+            userid: newUser.userid,
             email: newUser.email,
             firstName: newUser.firstName,
             lastName: newUser.lastName,
@@ -75,7 +83,8 @@ export async function POST(request: Request) {
             user: userWithoutPassword
         }, { status: 201 });
 
-    } catch (error) {
+    } 
+    catch (error) {
         console.error('Registration error:', error);
         return NextResponse.json(
             { error: "אירעה שגיאה בשרת. אנא נסו שוב." },

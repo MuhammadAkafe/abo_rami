@@ -1,34 +1,34 @@
 "use client"
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { users } from "@prisma/client";
-import { RegisterFormData } from "../validtion";
+import { suppliers } from "@prisma/client";
+import { NewSupplier } from "../(types)/types";
 
-const getAllSuppliers = async (): Promise<users[]> => {
-    const response = await fetch(`/api/GetAllUsers`, {
+const getAllSuppliers = async (User_id: number): Promise<suppliers[]> => {
+    const response = await fetch(`/api/GetAllSuppliers?userid=${User_id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
         },
     });
     if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        throw new Error('Failed to fetch suppliers');
     }
     return response.json();
 };
 
-export const useGetAllSuppliers = () => {
+export const useGetAllSuppliers = (User_id: number) => {
     return useQuery({
-        queryKey: ['users'],
-        queryFn: getAllSuppliers
+        queryKey: ['suppliers'],
+        queryFn: () => getAllSuppliers(User_id),
     });
 };
 
 
 
 
-const register = async (formData: RegisterFormData) => {
-    const response = await fetch('/api/auth/register', {
+const Add_Supplier = async (formData: NewSupplier) => {
+    const response = await fetch('/api/AddSupplier', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -38,15 +38,15 @@ const register = async (formData: RegisterFormData) => {
     
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || errorData.message || 'Registration failed');
+      throw new Error(errorData.error || errorData.message || 'Add Supplier failed');
     }
     
     return response.json();
   };
 
-  export const useRegister = () => {
+  export const useAddSupplier = () => {
     return useMutation({
-      mutationFn: register,
+      mutationFn: Add_Supplier,
     });
   };
 

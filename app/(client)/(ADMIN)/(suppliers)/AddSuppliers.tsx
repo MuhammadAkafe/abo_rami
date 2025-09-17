@@ -2,14 +2,21 @@
 import React, { useState } from 'react';
 import { Role } from '@prisma/client';
 import { validateRegisterForm } from '@/app/validtion';
-import { useMutation } from '@tanstack/react-query';
-import { useRegister } from '@/app/(hooks)/useSupplier';
+import { useAddSupplier } from '@/app/(hooks)/useSupplier';
+import { useSession } from 'next-auth/react';
+import { NewSupplier } from '@/app/(types)/types';
+
+
 
 
 export default function AddSuppliers() {
 
+  const { data: session } = useSession();
+  const user_id = session?.user?.id;
+
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newSupplier, setNewSupplier] = useState({
+  const [newSupplier, setNewSupplier] = useState<NewSupplier>({
+    userid: null,
     firstName: '',
     lastName: '',
     email: '',
@@ -20,7 +27,7 @@ export default function AddSuppliers() {
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   
-  const mutation = useRegister();
+  const mutation = useAddSupplier();
 
   const handle_change = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -38,7 +45,11 @@ export default function AddSuppliers() {
       setFieldErrors(validation.errors);
       return;
     }
-    mutation.mutate(newSupplier,{
+    if (!user_id) {
+      return;
+    }
+
+    mutation.mutate({...newSupplier, userid: user_id as number || null},{
       onSuccess: () => {
         setShowAddForm(false);
       },
@@ -200,7 +211,6 @@ export default function AddSuppliers() {
                 onChange={(e) => handle_change(e)}
               >
                 <option value="USER">ספק</option>
-                <option value="ADMIN">מנהל</option>
               </select>
               {fieldErrors.role && (
                 <p className="mt-1 text-sm text-red-600">{fieldErrors.role}</p>

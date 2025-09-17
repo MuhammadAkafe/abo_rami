@@ -21,11 +21,26 @@ model users {
   email     String   @unique
   phone     String
   password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tasks     tasks[]  // One-to-many relationship with tasks
+}
+
+
+
+model suppliers {
+  id Int  @id @default(autoincrement())
+  userid        Int      
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String
+  password  String
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tasks     tasks[]  // One-to-many relationship with tasks
-  workareas workareas[] // One-to-many relationship with work areas
 }
 
 enum Role {
@@ -35,7 +50,8 @@ enum Role {
 
 model tasks {
   id          Int      @id @default(autoincrement())
-  userid      Int 
+  userid      Int
+  supplierid      Int 
   address     String
   description String
   taskArea    String
@@ -45,6 +61,7 @@ model tasks {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   user        users    @relation(fields: [userid], references: [id], onDelete: Cascade)
+  supplier    suppliers    @relation(fields: [supplierid], references: [id], onDelete: Cascade)
 }
 
 model workareas {
@@ -53,7 +70,6 @@ model workareas {
   area      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      users    @relation(fields: [userid], references: [id], onDelete: Cascade)
 }
 
 

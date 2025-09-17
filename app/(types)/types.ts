@@ -1,4 +1,4 @@
-import { Status, users } from "@prisma/client";
+import { Role, Status, users } from "@prisma/client";
 
 // Export the Status enum type for use throughout the application
 export { Status };
@@ -66,4 +66,18 @@ export interface NewTask {
   userid: number | null;
   date: Date | null;
   taskArea: string;
+}
+
+
+
+export interface NewSupplier 
+{
+  userid: number | null;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+  role: Role;
 }

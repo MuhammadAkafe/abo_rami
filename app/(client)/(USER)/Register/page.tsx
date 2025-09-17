@@ -6,7 +6,7 @@ import { validateRegisterForm } from "@/app/validtion";
 import { Role } from "@prisma/client";
 import { RegisterFormData } from "@/app/validtion";
 import { useRouter } from "next/navigation";
-import { useRegister } from "@/app/(hooks)/useSupplier";
+import { useAddSupplier } from "@/app/(hooks)/useSupplier";
 import LoadingButton from "@/app/(mini_components)/Loading/loadingButton";
 
 
@@ -23,7 +23,7 @@ export default function RegisterPage() {
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const router = useRouter()
-  const mutation = useRegister();
+  const mutation = useAddSupplier();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

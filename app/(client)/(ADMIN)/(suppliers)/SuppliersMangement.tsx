@@ -3,10 +3,12 @@ import React from 'react';
 import { useGetAllSuppliers } from '@/app/(hooks)/useSupplier';
 import SuppliersTable from './SuppliersTable';
 import LoadingCompoenent from '@/app/(mini_components)/Loading/LoadingCompoenent';
-
+import { useSession } from 'next-auth/react';
 export default function SuppliersManagement() {
+  const { data: session } = useSession();
+  const User_id = session?.user?.id;
+  const { data :Suppliers, refetch,isLoading } = useGetAllSuppliers(User_id as number);
 
-  const { data :users, refetch,isLoading } = useGetAllSuppliers();
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
@@ -28,7 +30,7 @@ export default function SuppliersManagement() {
               </div>
             </div>
             <div className="text-sm text-gray-600">
-              {users?.length || 0} ספקים
+              {Suppliers?.length || 0} ספקים
             </div>
             <button
               className="text-gray-600 hover:text-gray-900 transition-colors"
@@ -45,7 +47,7 @@ export default function SuppliersManagement() {
 
       {/* Table */}
       {isLoading ? <LoadingCompoenent isLoading={isLoading} /> : 
-      <SuppliersTable users={users || []} refetch={refetch} 
+      <SuppliersTable  suppliers={Suppliers || []} refetch={refetch} 
       />}
     </div>
   );

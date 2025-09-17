@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import LoadingButton from "@/app/(mini_components)/Loading/loadingButton";
 import React from "react";
+import { Role } from "@prisma/client";
 
 
 
-
-export  function LoginPage() {
+export  function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -26,6 +26,7 @@ export  function LoginPage() {
       const result = await signIn('credentials', {
         email,
         password,
+        role: Role.ADMIN,
         redirect: false,
       });
       if (result?.error) {
@@ -34,7 +35,7 @@ export  function LoginPage() {
         // Get the user data to determine redirect
         const response = await fetch('/api/auth/session');
         const sessionData = await response.json();
-        const redirectTo = sessionData.user?.role === 'ADMIN' ? '/dashboard' : '/Tasklist';
+        const redirectTo = sessionData.user?.role === Role.ADMIN ? '/dashboard' : '/AdminLogin';
         router.push(redirectTo);
       }
     } catch {
@@ -50,10 +51,10 @@ export  function LoginPage() {
         {/* Header */}
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            ברוכים השבים
+          כניסה מנהלים
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            התחברו לחשבון שלכם
+            התחברו לחשבון שלכם כמנהל
           </p>
         </div>
 
@@ -119,24 +120,13 @@ export  function LoginPage() {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">או התחברו באמצעות</span>
             </div>
           </div>
 
-
-          {/* Sign Up Link */}
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              אין לכם חשבון?{" "}
-              <Link href="/Register" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
-                הירשמו
-              </Link>
-            </p>
-          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export default React.memo(LoginPage);
+export default React.memo(AdminLoginPage);

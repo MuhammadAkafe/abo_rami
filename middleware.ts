@@ -1,32 +1,40 @@
 
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
+import { Role } from "@prisma/client"
 
 export default withAuth(
   function middleware(req) {
     const { pathname } = req.nextUrl
     const token = req.nextauth.token
 
+
     // Strict role-based access control
     if (pathname.startsWith('/dashboard')) {
       // Only ADMIN can access dashboard
-      if (token?.role !== 'ADMIN') {
-        return NextResponse.redirect(new URL('/Tasklist', req.url))
+      if (token?.role !== Role.ADMIN) {
+        console.log('User is not an admin')
+        return NextResponse.redirect(new URL('/', req.url))
       }
     }
-    if (pathname.startsWith('/api/addTask' ) || 
-    pathname.startsWith('/api/deleteTask') || pathname.startsWith('/api/deleteUser') || pathname.startsWith('/api/GetAllUsers')) 
+
+    if (pathname.startsWith('/api/AddTask' ) || 
+    pathname.startsWith('/api/DeleteTask') || 
+    pathname.startsWith('/api/DeleteSupplier') ||
+     pathname.startsWith('/api/GetAllSuppliers') || 
+     pathname.startsWith('/api/AddSupplier')) 
       {
       // Only ADMIN can access these pages
-      if (token?.role !== 'ADMIN') {
+      if (token?.role !== Role.ADMIN) {
+        console.log('User is not an admin')
         return NextResponse.json({ error: "You are not authorized to access this page"}, { status: 403 })
       }
     }
 
     if (pathname.startsWith('/Tasklist')) {
       // Only USER can access Tasklist (ADMIN should go to dashboard)
-      if (token?.role === 'ADMIN') {
-        return NextResponse.redirect(new URL('/dashboard', req.url))
+      if (token?.role !== Role.USER) {
+       return NextResponse.redirect(new URL(`/`, req.url))
       }
     }
 
@@ -38,7 +46,7 @@ export default withAuth(
         const { pathname } = req.nextUrl
         
         // Allow access to login and register pages without authentication
-        if (pathname === '/Login' || pathname === '/Register') {
+        if (pathname === '/Login' || pathname === '/Register' || pathname === '/AdminLogin') {
           return true
         }
         
@@ -57,9 +65,11 @@ export const config = {
   matcher: [
     '/dashboard/:path*', 
     '/Tasklist/:path*',
-    '/api/addTask/:path*',
-    '/api/deleteTask/:path*',
-    '/api/deleteUser/:path*',
+    '/api/AddTask/:path*',
+    '/api/DeleteTask/:path*',
+    '/api/DeleteUser/:path*',
     '/api/GetAllUsers/:path*',
+    '/api/AddAdmin/:path*',
+    '/api/AddSupplier/:path*',
   ],
 }

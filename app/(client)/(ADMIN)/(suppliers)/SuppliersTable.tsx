@@ -1,35 +1,39 @@
-import { users } from '@prisma/client';
+import { suppliers } from '@prisma/client';
 import React, { useState } from 'react'
 import DeleteModal from '../../../(mini_components)/DeleteModal';
 interface DeleteModalState 
 {
     isOpen: boolean;
-    user: users | null;
+    Supplier: suppliers | null;
     isLoading: boolean;
 }
+interface SuppliersTableProps {
+    suppliers: suppliers[];
+    refetch: () => void;
+}
 
-function SuppliersTable({ users, refetch }: { users: users[], refetch: () => void }) 
+function SuppliersTable({ suppliers, refetch }: SuppliersTableProps) 
 {
     const [deleteModal, setDeleteModal] = useState<DeleteModalState>({
         isOpen: false,
-        user: null,
+        Supplier: null,
         isLoading: false
     });
-    const handleDeleteClick = (user: users) => {
-        console.log("Supplier clicked:", user);
+    const handleDeleteClick = (Supplier: suppliers) => {
+        console.log("Supplier clicked:", Supplier);
         setDeleteModal({
             isOpen: true,
-            user: user,
+            Supplier: Supplier,
             isLoading: false
         });
     };
 
     const handleDeleteConfirm = async () => {
-        if (!deleteModal.user) return;
+        if (!deleteModal.Supplier) return;
 
         setDeleteModal(prev => ({ ...prev, isLoading: true }));
         try {
-            const response = await fetch(`/api/deleteUser?id=${deleteModal.user.id}`, {
+            const response = await fetch(`/api/deleteUser?id=${deleteModal.Supplier.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -39,7 +43,7 @@ function SuppliersTable({ users, refetch }: { users: users[], refetch: () => voi
             if (response.ok) {
                 console.log("Supplier deleted successfully");
                 refetch();
-                setDeleteModal({ isOpen: false, user: null, isLoading: false });
+                setDeleteModal({ isOpen: false, Supplier: null, isLoading: false });
             }
             else {
                 console.error("Error deleting user");
@@ -53,7 +57,7 @@ function SuppliersTable({ users, refetch }: { users: users[], refetch: () => voi
     };
 
     const handleDeleteCancel = () => {
-        setDeleteModal({ isOpen: false, user: null, isLoading: false });
+        setDeleteModal({ isOpen: false, Supplier: null, isLoading: false });
     };
 
 
@@ -83,7 +87,7 @@ function SuppliersTable({ users, refetch }: { users: users[], refetch: () => voi
         </tr>
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
-        {(users?.length || 0) === 0 ? (
+        {(suppliers?.length || 0) === 0 ? (
           <tr>
             <td colSpan={7} className="px-6 py-12 text-center">
               <div className="flex flex-col items-center">
@@ -96,42 +100,42 @@ function SuppliersTable({ users, refetch }: { users: users[], refetch: () => voi
             </td>
           </tr>
         ) : (
-          (users || []).map((user: users) => (
-            <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+          (suppliers || []).map((Supplier: suppliers) => (
+            <tr key={Supplier.id} className="hover:bg-gray-50 transition-colors">
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 h-10 w-10">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                       <span className="text-white font-medium text-sm">
-                        {user.firstName.charAt(0).toUpperCase()}
+                        {Supplier.firstName.charAt(0).toUpperCase()}
                       </span>
                     </div>
                   </div>
                   <div className="mr-4">
                     <div className="text-sm font-medium text-gray-900">
-                      {user.firstName}
+                      {Supplier.firstName}
                     </div>
                   </div>
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{user.lastName}</div>
+                <div className="text-sm text-gray-900">{Supplier.lastName}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{user.email}</div>
+                <div className="text-sm text-gray-900">{Supplier.email}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">  
-                <div className="text-sm text-gray-900">{user.phone}</div>
+                <div className="text-sm text-gray-900">{Supplier.phone}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">
-                  {new Date(user.createdAt).toLocaleDateString('he-IL')}
+                  {new Date(Supplier.createdAt).toLocaleDateString('he-IL')}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div className="flex items-center justify-center gap-1">
                     <button
-                      onClick={() => handleDeleteClick(user)}
+                      onClick={() => handleDeleteClick(Supplier)}
                       className="text-red-600 cursor-pointer hover:text-red-900 p-1 rounded-md hover:bg-red-50 transition-colors"
                       title="מחק"
                     >
@@ -153,7 +157,7 @@ function SuppliersTable({ users, refetch }: { users: users[], refetch: () => voi
     onConfirm={handleDeleteConfirm}
     title="מחיקת ספק"
     message="האם אתה בטוח שברצונך למחוק את הספק הזה?"
-    itemName={deleteModal.user ? `${deleteModal.user.firstName} ${deleteModal.user.lastName}` : ''}
+    itemName={deleteModal.Supplier ? `${deleteModal.Supplier.firstName} ${deleteModal.Supplier.lastName}` : ''}
     isLoading={deleteModal.isLoading}
   />
   </>

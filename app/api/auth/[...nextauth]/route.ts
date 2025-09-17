@@ -2,6 +2,52 @@ import { prisma } from "@/app/(lib)/prisma"
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt"
+import { Role } from "@prisma/client"
+
+
+
+const findUser = async (email: string, role: Role, password: string) => {
+    const user = await prisma.users.findUnique({
+        where: { email: email },
+    })
+    if (!user) {
+        console.log('User not found:', email)
+        return null
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+    if (!isPasswordValid) {
+        console.log('Invalid password for user:', email)
+        return null
+    }
+    return {
+        ...user,
+        name: `${user.firstName} ${user.lastName}`
+    }
+}
+
+
+const findSupplier = async (email: string, role: Role, password: string) => {
+    const supplier = await prisma.suppliers.findUnique({
+        where: { email: email },
+    })
+    if (!supplier) {
+        console.log('Supplier not found:', email)
+        return null
+    }
+    const isPasswordValid = await bcrypt.compare(password, supplier.password)
+    if (!isPasswordValid) {
+        console.log('Invalid password for supplier:', email)
+        return null
+    }
+    return {
+        ...supplier,
+        name: `${supplier.firstName} ${supplier.lastName}`
+    }
+}
+
+
+
+
 
 const handler = NextAuth({
     providers: [
@@ -10,43 +56,19 @@ const handler = NextAuth({
             credentials: {
                 email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" },
+                role: { label: "Role", type: "string" },
             },
             authorize: async (credentials) => {
-                if (!credentials?.email || !credentials?.password) {
+                if (!credentials?.email || !credentials?.password || !credentials?.role) {
                     console.log('Missing credentials')
                     return null
                 }
-                
-                try {
-                    console.log('Attempting to find user with email:', credentials.email)
-                    const user = await prisma.users.findUnique({
-                        where: { email: credentials.email },
-                    })
-                    
-                    if (!user) {
-                        console.log('User not found:', credentials.email)
-                        return null
+                    if (credentials.role === Role.ADMIN) {
+                        return await findUser(credentials.email, credentials.role as Role, credentials.password)
                     }
-                    
-                    console.log('User found:', user.email, 'Role:', user.role)
-                    const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
-                    
-                    if (!isPasswordValid) {
-                        console.log('Invalid password for user:', credentials.email)
-                        return null
+                    else {
+                        return await findSupplier(credentials.email, credentials.role as Role, credentials.password)
                     }
-                    
-                    console.log('Authentication successful for user:', credentials.email)
-                    return {
-                        id: user.id,
-                        email: user.email,
-                        name: `${user.firstName} ${user.lastName}`,
-                        role: user.role,
-                    }
-                } catch (error) {
-                    console.error('Authentication error:', error)
-                    return null
-                }
             },
         }),
     ],
@@ -68,8 +90,7 @@ const handler = NextAuth({
     },
     secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
     pages: {
-        signIn: '/Login',
-        signOut: '/Login',
+        signOut: '/',
     },
     session: {
         strategy: 'jwt',
