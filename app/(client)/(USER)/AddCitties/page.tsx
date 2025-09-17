@@ -55,6 +55,8 @@ export default function CitiesSelector() {
     setIsOpen(false);
   };
 
+
+
   const handleRemoveCity = (cityToRemove: string) => {
     setSelectedCities(selectedCities.filter(city => city !== cityToRemove));
   };
@@ -70,12 +72,6 @@ export default function CitiesSelector() {
     setIsOpen(true);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      setIsOpen(false);
-      setSearchTerm('');
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -122,7 +118,6 @@ export default function CitiesSelector() {
                   value={searchTerm}
                   onChange={handleInputChange}
                   onClick={handleInputClick}
-                  onKeyDown={handleKeyDown}
                   placeholder="בחר ערים או חפש..."
                   className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-10 text-right"
                 />
