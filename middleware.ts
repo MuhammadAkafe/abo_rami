@@ -2,6 +2,13 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
 import { Role } from "@prisma/client"
+import { signOut } from "next-auth/react" 
+
+const logout=async ()=>{
+
+  await signOut()   
+}
+
 
 export default withAuth(
   function middleware(req) {
@@ -32,6 +39,7 @@ export default withAuth(
     if (pathname.startsWith('/Tasklist')) {
       // Only USER can access Tasklist (ADMIN should go to dashboard)
       if (token?.role !== Role.USER) {
+      
        return NextResponse.redirect(new URL(`/`, req.url))
       }
     }

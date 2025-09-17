@@ -21,7 +21,6 @@ export  function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
@@ -34,16 +33,20 @@ export  function LoginPage() {
       });
       if (result?.error) {
         setError('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
-      } else if (result?.ok) {
+      } 
+      else if (result?.ok) {
         // Get the user data to determine redirect
         const response = await fetch('/api/auth/session');
         const sessionData = await response.json();
-        const redirectTo = sessionData.user?.role === Role.USER ? '/Tasklist' : '/Login';
+        const redirectTo = sessionData.user?.role === Role.USER ? '/AddCitties' : '/Login';
         router.push(redirectTo);
       }
-    } catch {
+    } catch 
+    {
       setError('שגיאה בחיבור לשרת');
-    } finally {
+    } 
+    finally 
+    {
       setIsLoading(false);
     }
   };
