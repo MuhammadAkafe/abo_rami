@@ -1,13 +1,11 @@
 "use client"
-import React, { useState } from 'react';
-import { users } from '@prisma/client';
+import React, { useEffect, useState } from 'react';
+import { users, cities } from '@prisma/client';
 import { useMemo } from 'react';
-import { useAddTask } from '@/app/(hooks)/useTask';
-import { useGetAllSuppliers } from '@/app/(hooks)/useSupplier';
+import { useAddTask } from '@/app/hooks/useAddTask';
+import { useGetAllSuppliers } from '@/app/hooks/useGetAllSuppliers';
 import { useSession } from 'next-auth/react';
 import { NewTask } from '@/app/(types)/types';
-
-
 
 
 
@@ -18,7 +16,8 @@ export default function Add_task() {
 
 
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newTask, setNewTask] = useState<NewTask>({
+  const [newTask, setNewTask] = useState<NewTask>(
+    {
     address: '',
     description: '',
     userid: null,
@@ -26,13 +25,28 @@ export default function Add_task() {
     taskArea: '',
   });
 
+  const [TaskCities, setTaskCities] = useState<cities[]>([]);
+  const [selectedCity, setSelectedCity] = useState<string>('');
 
-  const [TaskArea, setTaskArea] = useState('');
 
-
-  const { data: users = [], isLoading: usersLoading, error: usersError } = useGetAllSuppliers();
+  const { data: users = [], isLoading: usersLoading, error: usersError } = useGetAllSuppliers(user_id as number);
   const { mutate: addTask, isPending, isError, isSuccess, error } = useAddTask(setNewTask, setShowAddForm);
-  
+
+
+  useEffect(() => {
+
+    const fetchExistingCities = async () => {
+      if (!newTask.userid) {
+        return;
+      }
+      const response = await fetch(`/api/GetAllCities?supplier_id=${newTask.userid}`);
+      const data = await response.json();
+      setTaskCities(data);
+    }
+    fetchExistingCities();
+  }, [newTask.userid]);
+
+
 
 
 
@@ -54,13 +68,13 @@ export default function Add_task() {
     e.preventDefault();
     
     // Validate all required fields
-    if (!newTask.userid || !newTask.address || !newTask.description || !newTask.date || !TaskArea) {
+    if (!newTask.userid || !newTask.address || !newTask.description || !newTask.date || !selectedCity) {
       return;
     }
 
-    const taskData: NewTask = { ...newTask, taskArea: TaskArea };
+    const taskData: NewTask = { ...newTask, taskArea: selectedCity };
     console.log('Sending task data:', taskData);
-    addTask(newTask);
+    addTask(taskData);
   };
 
 
@@ -72,7 +86,8 @@ export default function Add_task() {
           onClick={() => {
             setShowAddForm(!showAddForm);
             if (showAddForm) {
-              setTaskArea('');
+              setTaskCities([]);
+              setSelectedCity('');
             }
           }}
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
@@ -156,22 +171,18 @@ export default function Add_task() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">איזורי עבודה *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">איזור עבודה *</label>
               <select
                 name="taskArea"
-                value={TaskArea}
-                onChange={(e) => setTaskArea(e.target.value)}
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
                 <option value="">בחר איזור עבודה</option>
-                <option value="צפון">צפון</option>
-                <option value="מרכז">מרכז</option>
-                <option value="דרום">דרום</option>
-                <option value="ירושלים">ירושלים</option>
-                <option value="יהודה ושומרון">יהודה ושומרון</option>
-                <option value="גולן">גולן</option>
-                <option value="אילת">אילת</option>
+                {TaskCities.map((city: cities, index: number) => (
+                  <option key={`${city.id}-${index}`} value={city.city}>{city.city}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -179,7 +190,8 @@ export default function Add_task() {
             <button
               onClick={() => {
                 setShowAddForm(false);
-                setTaskArea('');
+                setTaskCities([]);
+                setSelectedCity('');
               }}
               className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
             >

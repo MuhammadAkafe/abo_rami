@@ -1,19 +1,17 @@
 "use client"
-import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import LoadingButton from "@/app/(mini_components)/Loading/loadingButton";
 import React from "react";
-import { Role } from "@prisma/client";
 import BackUpBtn from "@/app/(mini_components)/backUpBtn";
+import { useAdminSignUp } from "@/app/hooks/useAdminSignUp";
 
 
 export  function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
+  const mutation = useAdminSignUp();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -22,27 +20,20 @@ export  function AdminLoginPage() {
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        role: Role.ADMIN,
-        redirect: false,
-      });
-      if (result?.error) {
+
+    mutation.mutate({email, password}, {
+      onSuccess: () => {
+        setIsLoading(false);
+        router.push('/dashboard');
+      },
+      onError: () => {
         setError('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
-      } else if (result?.ok) {
-        // Get the user data to determine redirect
-        const response = await fetch('/api/auth/session');
-        const sessionData = await response.json();
-        const redirectTo = sessionData.user?.role === Role.ADMIN ? '/dashboard' : '/AdminLogin';
-        router.push(redirectTo);
-      }
-    } catch {
-      setError('שגיאה בחיבור לשרת');
-    } finally {
-      setIsLoading(false);
-    }
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
+    });
+
   };
 
   return (
@@ -112,7 +103,10 @@ export  function AdminLoginPage() {
             </div>
 
             {/* Submit Button */}
-            <LoadingButton loading={isLoading} text="התחברו" />
+            <LoadingButton
+              loading={isLoading}
+              text="התחברו"
+            />
           </form>
 
           {/* Divider */}

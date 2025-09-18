@@ -1,6 +1,10 @@
 import React from 'react'
 
-export default function LoadingCompoenent({isLoading}: {isLoading: boolean}) {
+interface LoadingCompoenentProps {
+  isLoading: boolean;
+}
+
+export default function LoadingCompoenent({isLoading}: LoadingCompoenentProps) {
     if (isLoading) {
         return (
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">

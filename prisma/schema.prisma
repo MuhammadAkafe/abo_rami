@@ -41,6 +41,7 @@ model suppliers {
   updatedAt DateTime @updatedAt
   tasks     tasks[]  // One-to-many relationship with tasks
   user      users    @relation(fields: [userid], references: [id], onDelete: Cascade)
+  cities    cities[]
   @@index([userid,id])
 }
 
@@ -63,6 +64,16 @@ model tasks {
   updatedAt   DateTime @updatedAt
   supplier    suppliers    @relation(fields: [supplierid], references: [id], onDelete: Cascade)
 }
+
+model cities {
+  id Int  @id @default(autoincrement())
+  userid Int
+  supplierid Int
+  city String
+  supplier    suppliers    @relation(fields: [supplierid], references: [id], onDelete: Cascade)
+  @@index([userid,supplierid])
+}
+
 
 
 enum Status {

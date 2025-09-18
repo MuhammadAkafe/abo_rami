@@ -6,7 +6,7 @@ import { validateRegisterForm } from "@/app/validtion";
 import { Role } from "@prisma/client";
 import { RegisterFormData } from "@/app/validtion";
 import { useRouter } from "next/navigation";
-import { useAddSupplier } from "@/app/(hooks)/useSupplier";
+import { useAddSupplier } from "@/app/hooks/useSupplier";
 import LoadingButton from "@/app/(mini_components)/Loading/loadingButton";
 import { useSession } from "next-auth/react";
 import { users } from "@prisma/client";
@@ -37,7 +37,7 @@ export default function RegisterPage() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await fetch('/api/GetAllUsers');
+      const response = await fetch('/api/ADMIN/GetAllUsers');
       const data = await response.json();
       setUsers(data);
     };
@@ -62,7 +62,8 @@ export default function RegisterPage() {
       return;
     }
     setFieldErrors({});
-    mutation.mutate(formData, {
+    mutation.mutate(formData, 
+      {
       onSuccess: () => {
         // Reset form
         setFormData({

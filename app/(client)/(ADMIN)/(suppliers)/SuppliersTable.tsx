@@ -1,6 +1,8 @@
 import { suppliers } from '@prisma/client';
 import React, { useState } from 'react'
 import DeleteModal from '../../../(mini_components)/DeleteModal';
+import { useEffect } from 'react';
+import { useDeleteSupplier } from '@/app/hooks/useDeleteSupplier';
 interface DeleteModalState 
 {
     isOpen: boolean;
@@ -27,39 +29,34 @@ function SuppliersTable({ suppliers, refetch }: SuppliersTableProps)
             isLoading: false
         });
     };
-
+    const mutation = useDeleteSupplier();
     const handleDeleteConfirm = async () => {
         if (!deleteModal.Supplier) return;
 
         setDeleteModal(prev => ({ ...prev, isLoading: true }));
-        try {
-            const response = await fetch(`/api/DeleteSupplier?supplierid=${deleteModal.Supplier.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
 
-            if (response.ok) {
-                console.log("Supplier deleted successfully");
+        mutation.mutate(deleteModal.Supplier.id, {
+            onSuccess: () => {
                 refetch();
                 setDeleteModal({ isOpen: false, Supplier: null, isLoading: false });
+            },
+            onError: () => {
+                setDeleteModal({ isOpen: false, Supplier: null, isLoading: false });
+            },
+            onSettled: () => {
+                setDeleteModal({ isOpen: false, Supplier: null, isLoading: false });
             }
-            else {
-                console.error("Error deleting user");
-                setDeleteModal(prev => ({ ...prev, isLoading: false }));
-            }
-        } 
-        catch (error ) {
-            console.error("Error deleting user:", error);
-            setDeleteModal(prev => ({ ...prev, isLoading: false }));
-        }
+        });
     };
 
     const handleDeleteCancel = () => {
         setDeleteModal({ isOpen: false, Supplier: null, isLoading: false });
     };
 
+
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
 
 

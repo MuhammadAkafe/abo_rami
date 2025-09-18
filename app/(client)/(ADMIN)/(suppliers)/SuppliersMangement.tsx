@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import { useGetAllSuppliers } from '@/app/(hooks)/useSupplier';
+import { useGetAllSuppliers } from '@/app/hooks/useGetAllSuppliers';
 import SuppliersTable from './SuppliersTable';
 import LoadingCompoenent from '@/app/(mini_components)/Loading/LoadingCompoenent';
 import { useSession } from 'next-auth/react';

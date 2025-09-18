@@ -2,14 +2,11 @@
 
 
 import { useMutation } from "@tanstack/react-query";
-import { tasks } from "@prisma/client";
 import { NewTask } from "@/app/(types)/types";
 
 
-
-
 const addTask = async (taskData: NewTask) => {
-    const response = await fetch('/api/router/addTask', {
+    const response = await fetch('/api/ADMIN/addTask', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -26,7 +23,8 @@ const addTask = async (taskData: NewTask) => {
     return result;
   };
 
-  export const useAddTask = (setNewTask: (task: NewTask) => void, setShowAddForm: (show: boolean) => void) => {
+  export const useAddTask = (setNewTask: (task: NewTask) => void, setShowAddForm: (show: boolean) => void) => 
+    {
    return useMutation({
         mutationFn: addTask,
         onSuccess: () => {

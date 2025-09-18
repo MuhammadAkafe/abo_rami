@@ -1,6 +1,10 @@
 import { signOut } from "next-auth/react";
 
-export const logout = async (setIsLoading: (isLoading: boolean) => void) => {
+export interface LogoutProps {
+  setIsLoading: (isLoading: boolean) => void;
+}
+
+export const logout = async ({setIsLoading}: LogoutProps) => {
     try {
       setIsLoading(true);
       await signOut( { callbackUrl: '/' });

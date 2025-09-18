@@ -90,7 +90,8 @@ const handler = NextAuth({
     },
     secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
     pages: {
-        signOut: '/',
+        signIn: '/AdminLogin',
+        signOut: '/Login',
     },
     session: {
         strategy: 'jwt',

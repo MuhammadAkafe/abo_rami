@@ -1,23 +1,53 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
 import { israel_cities as cities } from '@/app/(mini_components)/israel_cities_names_and__geometric_data';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import LoadingButton from '@/app/(mini_components)/Loading/loadingButton';
+import LoadingComponent from '@/app/(mini_components)/Loading/LoadingCompoenent';
+import ErrorAlert from '@/app/(mini_components)/ErrorAlert';
+import { useCities } from '@/app/hooks/useCities';
+import { Role } from '@prisma/client';
 
 interface City {
   name: string;
-  english_name: string;
-  long: number;
-  latt: number;
 }
 
 
 
+
 export default function CitiesSelector() {
-  const [selectedCities, setSelectedCities] = useState<string[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  // State management
+  const [selectedCities, setSelectedCities] = useState<City[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredCities, setFilteredCities] = useState<City[]>(cities);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Refs
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Custom hooks
+  const { isCheckingExistingCities, supplierId, addCities, sessionStatus } = useCities(); // supplierId used in addCities function
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  // Session validation - redirect if not authenticated or wrong role
+  useEffect(() => {
+    if (sessionStatus === 'loading') return; // Still loading session
+    
+    if (sessionStatus === 'unauthenticated') {
+      router.push('/Login');
+      return;
+    }
+    
+    if (session?.user?.role !== Role.USER) {
+      router.push('/Login');
+      return;
+    }
+  }, [session, sessionStatus, router]);
 
   // Filter cities based on search term
   useEffect(() => {
@@ -25,8 +55,7 @@ export default function CitiesSelector() {
       setFilteredCities(cities);
     } else {
       const filtered = cities.filter(city =>
-        city.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        city.english_name.includes(searchTerm)
+        city.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredCities(filtered);
     }
@@ -36,7 +65,7 @@ export default function CitiesSelector() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setIsDropdownOpen(false);
         setSearchTerm('');
       }
     };
@@ -47,29 +76,84 @@ export default function CitiesSelector() {
     };
   }, []);
 
+
+  // Show loading component while checking session or existing cities
+  // Always show loading until all checks are complete
+  if (sessionStatus === 'loading' || isCheckingExistingCities) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <LoadingComponent isLoading={true} />
+      </div>
+    );
+  }
+
+  // If session is not authenticated or wrong role, show loading while redirecting
+  if (sessionStatus === 'unauthenticated' || (session?.user?.role !== Role.USER)) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <LoadingComponent isLoading={true} />
+      </div>
+    );
+  }
+
+
+
+
+
+
+
+
+
+  // Event handlers
   const handleCitySelect = (city: City) => {
-    if (!selectedCities.includes(city.name)) {
-      setSelectedCities([...selectedCities, city.name]);
+    if (!selectedCities.some(selectedCity => selectedCity.name === city.name)) {
+      setSelectedCities(prev => [...prev, city]);
     }
     setSearchTerm('');
-    setIsOpen(false);
+    setIsDropdownOpen(false);
   };
 
-
-
-  const handleRemoveCity = (cityToRemove: string) => {
-    setSelectedCities(selectedCities.filter(city => city !== cityToRemove));
+  const handleRemoveCity = (cityToRemove: City) => {
+    setSelectedCities(prev => prev.filter(city => city.name !== cityToRemove.name));
   };
 
   const handleInputClick = () => {
-    setIsOpen(true);
+    setIsDropdownOpen(true);
     inputRef.current?.focus();
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
-    setIsOpen(true);
+    setIsDropdownOpen(true);
+  };
+
+  const handleClearAll = () => {
+    setSelectedCities([]);
+    setSearchTerm('');
+    setIsDropdownOpen(false);
+  };
+
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setError(null);
+    
+    if (selectedCities.length === 0) {
+      setError('אנא בחר לפחות עיר אחת');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await addCities(selectedCities);
+      // Success - redirect to TaskList
+      router.push('/Tasklist');
+    } catch (error) {
+      console.error('Error submitting cities:', error);
+      setError(error instanceof Error ? error.message : 'שגיאה בהוספת הערים');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
@@ -82,6 +166,14 @@ export default function CitiesSelector() {
             <p className="text-gray-600">בחר את הערים שלך מהרשימה</p>
           </div>
 
+          {/* Error Alert */}
+          {error && (
+            <ErrorAlert 
+              message={error} 
+              onClose={() => setError(null)} 
+            />
+          )}
+
           <div className="space-y-6">
             {/* City Selector */}
             <div className="relative" ref={dropdownRef}>
@@ -92,15 +184,16 @@ export default function CitiesSelector() {
               {/* Selected Cities Display */}
               {selectedCities.length > 0 && (
                 <div className="mb-3 flex flex-wrap gap-2">
-                  {selectedCities.map((city, index) => (
+                  {selectedCities.map((city) => (
                     <div
-                      key={index}
+                      key={city.name}
                       className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800 border border-green-200"
                     >
-                      <span className="mr-2">{city}</span>
+                      <span className="mr-2">{city.name}</span>
                       <button
                         onClick={() => handleRemoveCity(city)}
                         className="text-green-600 hover:text-green-800 focus:outline-none"
+                        disabled={isLoading}
                       >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -125,7 +218,7 @@ export default function CitiesSelector() {
                 {/* Dropdown arrow */}
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <svg
-                    className={`h-5 w-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    className={`h-5 w-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -136,7 +229,7 @@ export default function CitiesSelector() {
               </div>
 
               {/* Dropdown menu */}
-              {isOpen && (
+              {isDropdownOpen && (
                 <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
                   {filteredCities.length === 0 ? (
                     <div className="px-3 py-2 text-sm text-gray-500 text-center">
@@ -144,10 +237,10 @@ export default function CitiesSelector() {
                     </div>
                   ) : (
                     filteredCities
-                      .filter(city => !selectedCities.includes(city.name))
+                      .filter(city => !selectedCities.some(selected => selected.name === city.name))
                       .map((city, index) => (
                         <div
-                          key={index}
+                          key={`${city.name}-${index}`}
                           onClick={() => handleCitySelect(city)}
                           className="px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 cursor-pointer flex justify-between items-center border-b border-gray-100 last:border-b-0"
                         >
@@ -160,51 +253,21 @@ export default function CitiesSelector() {
               )}
             </div>
 
-            {/* Selected Cities Summary */}
-            {selectedCities.length > 0 && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="mr-3">
-                    <h3 className="text-sm font-medium text-green-800">
-                      הערים שנבחרו ({selectedCities.length}):
-                    </h3>
-                    <p className="text-sm text-green-700">
-                      {selectedCities.join(', ')}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Action Buttons */}
             <div className="flex space-x-3 pt-4">
               <button
-                onClick={() => {
-                  setSelectedCities([]);
-                  setSearchTerm('');
-                  setIsOpen(false);
-                }}
+                onClick={handleClearAll}
                 className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                disabled={isLoading}
               >
                 נקה הכל
               </button>
-              <button
-                onClick={() => {
-                  if (selectedCities.length > 0) {
-                    alert(`הערים שנבחרו: ${selectedCities.join(', ')}`);
-                  } else {
-                    alert('אנא בחר לפחות עיר אחת');
-                  }
-                }}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                אישור
-              </button>
+              <LoadingButton 
+                loading={isLoading} 
+                text="אישור" 
+                handleClick={handleSubmit}
+              />
             </div>
           </div>
         </div>

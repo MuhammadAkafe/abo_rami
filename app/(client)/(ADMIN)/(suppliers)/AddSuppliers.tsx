@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Role } from '@prisma/client';
 import { validateRegisterForm } from '@/app/validtion';
-import { useAddSupplier } from '@/app/(hooks)/useSupplier';
+import { useAddSupplier } from '@/app/hooks/useSupplier';
 import { useSession } from 'next-auth/react';
 import { NewSupplier } from '@/app/(types)/types';
 
@@ -23,7 +23,7 @@ export default function AddSuppliers() {
     phone: '',
     password: '',
     confirmPassword: '',
-    role: 'USER' as Role
+    role: Role.USER
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   

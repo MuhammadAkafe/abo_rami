@@ -81,3 +81,11 @@ export interface NewSupplier
   confirmPassword: string;
   role: Role;
 }
+
+
+export interface City {
+  name: string;
+  english_name: string;
+  long: number;
+  latt: number;
+}

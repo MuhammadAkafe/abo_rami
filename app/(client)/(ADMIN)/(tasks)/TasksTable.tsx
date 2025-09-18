@@ -3,26 +3,30 @@ import Link from 'next/link'
 import { tasks } from '@prisma/client'
 import { getStatusColor, getStatusText } from '../../../styles/taskstyles'
 import DeleteModal from '../../../(mini_components)/DeleteModal';
+import { useDeleteTask } from '@/app/hooks/useDeleteTask';
 
 
 interface TasksTableProps {
   title?: string;
-  tasks?: tasks[];
   refetch?: () => void;
 }
+interface DeleteModalState {
+  isOpen: boolean;
+  task: tasks | null;
+  isLoading: boolean;
+}
 
-function TasksTable({ title='משימות היום', tasks: tasksData = [], refetch }: TasksTableProps) 
+function TasksTable({ title='משימות היום', refetch }: TasksTableProps) 
 {
-  const [tasks] = useState<tasks[]>(tasksData);
-  const [deleteModal, setDeleteModal] = useState<{
-    isOpen: boolean;
-    task: tasks | null;
-    isLoading: boolean;
-  }>({
+  const [tasks] = useState<tasks[]>([]);
+  const [deleteModal, setDeleteModal] = useState<DeleteModalState>({
     isOpen: false,
     task: null,
     isLoading: false
   });
+  const mutation = useDeleteTask();
+
+
 
   const handleDeleteClick = (task: tasks) => {
     setDeleteModal({
@@ -37,27 +41,16 @@ function TasksTable({ title='משימות היום', tasks: tasksData = [], refe
 
     setDeleteModal(prev => ({ ...prev, isLoading: true }));
 
-    try {
-      const response = await fetch(`/api/deleteTask`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: deleteModal.task.id }),
-      });
-
-      if (response.ok) {
-        console.log("Task deleted successfully");
-        if (refetch) refetch();
-        setDeleteModal({ isOpen: false, task: null, isLoading: false });
-      } else {
-        console.error("Error deleting task");
-        setDeleteModal(prev => ({ ...prev, isLoading: false }));
-      }
-    } catch (error) {
-      console.error("Error deleting task:", error);
-      setDeleteModal(prev => ({ ...prev, isLoading: false }));
-    }
+  mutation.mutate(deleteModal.task.id, 
+    {
+    onSuccess: () => {
+      setDeleteModal({ isOpen: false, task: null, isLoading: false });
+      refetch?.();
+    },
+    onError: () => {
+      setDeleteModal({ isOpen: false, task: null, isLoading: false });
+    },
+  });
   };
 
   const handleDeleteCancel = () => {

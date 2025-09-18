@@ -1,12 +1,10 @@
 "use client"
-import React, { useState } from 'react';
+import React from 'react';
 import Fillter from './Fillter';
-import { tasks } from '@prisma/client';
 import TasksTable from './TasksTable';
 
 
 export default function TaskManagement() {
-  const [tasks, setTasks] = useState<tasks[]>([]);
 
   return (
     <>
@@ -30,7 +28,7 @@ export default function TaskManagement() {
       </div>
 
 
-      <TasksTable tasks={tasks} title="ניהול משימות " />
+      <TasksTable  title="ניהול משימות " />
     </div>
     </>
   );

@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react"
 import { ControlPanelProps } from '@/app/(types)/types';
 import { useState } from "react";
 import { logout } from "./logout";
+import LoadingButton from "./Loading/loadingButton";
 
 
 
@@ -20,19 +21,30 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
             <div className="flex justify-between items-center py-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">לוח בקרה</h1>
-                <p className="text-gray-600 text-sm">ברוך הבא, {status === "authenticated" ? data?.user?.name : "משתמש"} </p>
+                <p className="text-gray-600 text-sm">
+                  ברוך הבא, {status === "authenticated" ? data?.user?.name : 
+                    <span className="inline-flex items-center">
+                      <svg className="animate-spin h-4 w-4 text-gray-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      טוען...
+                    </span>
+                  }
+                </p>
               </div>
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-500">
                   {status === "authenticated" ? data?.user?.role === 'ADMIN' ? 'מנהל' : 'משתמש' : "משתמש"}
                 </span>
-                <button
-                  onClick={() => logout(setIsLoading)}
-                  disabled={isLoading}
-                  className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors mr-4 cursor-pointer"
-                >
-                  {isLoading ? 'מעבד...' : 'התנתק'}
-                </button>
+                <div className="mr-4">
+                  <LoadingButton
+                    loading={isLoading}
+                    text="התנתק"
+                    variant="danger"
+                    handleClick={() => logout({setIsLoading})}
+                  />
+                </div>
               </div>
             </div>
           </div>
