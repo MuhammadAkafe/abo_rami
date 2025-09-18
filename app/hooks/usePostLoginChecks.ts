@@ -38,7 +38,7 @@ export const usePostLoginChecks = () => {
 
       // Check if user has cities in database
       setLoadingMessage('בודק ערים קיימות...');
-      const response = await fetch(`/api/GetAllCitiess?supplier_id=${session.user.id}`);
+      const response = await fetch(`/api/GetAllCities?supplier_id=${session.user.id}`);
       const citiesData = await response.json();
 
       if (response.ok && citiesData.length > 0) {
