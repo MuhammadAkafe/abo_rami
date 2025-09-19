@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useGetAllSuppliers } from '@/app/hooks/useGetAllSuppliers';
 import SuppliersTable from './SuppliersTable';
-import LoadingCompoenent from '@/app/(mini_components)/Loading/LoadingCompoenent';
+import LoadingCompoenent from '@/app/components/Loading/LoadingCompoenent';
 import { useSession } from 'next-auth/react';
 import { suppliers } from '@prisma/client';
 export default function SuppliersManagement() {

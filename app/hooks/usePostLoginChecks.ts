@@ -1,7 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Role } from '@prisma/client';
+
+interface ExtendedUser {
+  id: number;
+  role: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}
 
 export const usePostLoginChecks = () => {
   const [loadingMessage, setLoadingMessage] = useState('בודק פרטי משתמש...');
@@ -9,28 +17,17 @@ export const usePostLoginChecks = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    if (status === 'loading') {
-      setLoadingMessage('טוען פרטי משתמש...');
-      return;
-    }
+  // Extract user data for cleaner dependency tracking
+  const user = session?.user as ExtendedUser | undefined;
+  const userRole = user?.role;
+  const userId = user?.id;
 
-    if (status === 'unauthenticated') {
-      router.push('/Login');
-      return;
-    }
-
-    if (session?.user) {
-      performChecks();
-    }
-  }, [session, status, router]);
-
-  const performChecks = async () => {
+  const performChecks = useCallback(async () => {
     try {
       setIsChecking(true);
 
       // Check user role
-      if (session?.user?.role !== Role.USER) {
+      if (userRole !== Role.USER) {
         setLoadingMessage('מפנה לממשק המתאים...');
         router.push('/Login');
         return;
@@ -38,7 +35,7 @@ export const usePostLoginChecks = () => {
 
       // Check if user has cities in database
       setLoadingMessage('בודק ערים קיימות...');
-      const response = await fetch(`/api/GetAllCities?supplier_id=${session.user.id}`);
+      const response = await fetch(`/api/GetAllCities?supplier_id=${userId}`);
       const citiesData = await response.json();
 
       if (response.ok && citiesData.length > 0) {
@@ -60,7 +57,23 @@ export const usePostLoginChecks = () => {
     } finally {
       setIsChecking(false);
     }
-  };
+  }, [userRole, userId, router]);
+
+  useEffect(() => {
+    if (status === 'loading') {
+      setLoadingMessage('טוען פרטי משתמש...');
+      return;
+    }
+
+    if (status === 'unauthenticated') {
+      router.push('/Login');
+      return;
+    }
+
+    if (user) {
+      performChecks();
+    }
+  }, [user, status, router, performChecks]);
 
   return {
     loadingMessage,

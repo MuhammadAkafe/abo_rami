@@ -14,8 +14,15 @@ export async function POST(req: Request) {
         if (!cities) {
             return NextResponse.json({error: "Cities are required"}, {status: 400});
         }
+
+        // Convert supplier_id to integer
+        const supplierIdInt = parseInt(supplier_id);
+        if (isNaN(supplierIdInt)) {
+            return NextResponse.json({error: "Invalid supplier ID format"}, {status: 400});
+        }
+
         const id = await prisma.suppliers.findUnique({
-            where: { id: supplier_id },
+            where: { id: supplierIdInt },
             select: { userid: true }
         });
         if (!id) {
@@ -28,7 +35,7 @@ export async function POST(req: Request) {
                     in: cities.map((city: City) => city.name)
                 },
                 userid: id.userid,
-                supplierid: supplier_id,
+                supplierid: supplierIdInt,
             }
         });
         if (existingCities.length > 0) 
@@ -36,12 +43,12 @@ export async function POST(req: Request) {
             return NextResponse.json({error: "Cities already exist"}, {status: 400});
         }
 
-        const newCities = await prisma.cities.createMany(
+        await prisma.cities.createMany(
             {
             data: cities.map((city: City) => ({
                 city: city.name,
                 userid: id.userid,
-                supplierid: supplier_id,
+                supplierid: supplierIdInt,
             })),
         });
         return NextResponse.json({message: "Cities added successfully", cities});

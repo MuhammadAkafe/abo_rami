@@ -3,9 +3,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import LoadingButton from "@/app/(mini_components)/Loading/loadingButton";
+import LoadingButton from "@/app/components/Loading/loadingButton";
 import React from "react";
-import BackUpBtn from "@/app/(mini_components)/backUpBtn";
+import BackUpBtn from "@/app/components/backUpBtn";
 import { Role } from "@prisma/client";
 
 
@@ -55,7 +55,7 @@ export  function LoginPage() {
     const password = formData.get('password') as string;
     const sessionData = await sign_in_user(email, password, setError, setIsLoading);
     if (sessionData) {
-      const redirectTo = sessionData.user?.role === Role.USER ? '/Loading' : '/Login';
+      const redirectTo = sessionData.user?.role === Role.USER ? '/components/Loading' : '/Login';
       router.push(redirectTo);
     }
   };

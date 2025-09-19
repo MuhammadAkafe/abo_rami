@@ -4,10 +4,10 @@ import { useSession } from 'next-auth/react';
 
 // Import custom hook and components
 import { useSupplierTasks, TaskWithSupplier } from '../../../hooks/useSupplierTasks';
-import { TaskRow } from './components/TaskRow';
-import { LoadingState } from './components/LoadingState';
-import { ErrorState } from './components/ErrorState';
-import { EmptyState } from './components/EmptyState';
+import { TaskRow } from '../../../components/TaskRow';
+import { LoadingState } from '../../../components/LoadingState';
+import { ErrorState } from '../../../components/ErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 
 interface SupplierTasksTableProps {
   title?: string;

@@ -1,6 +1,6 @@
 import { suppliers } from '@prisma/client';
 import React, { useState } from 'react'
-import DeleteModal from '../../../(mini_components)/DeleteModal';
+import DeleteModal from '@/app/components/DeleteModal';
 import { useDeleteSupplier } from '@/app/hooks/useDeleteSupplier';
 import { SuppliersTableProps, DeleteModalState } from '@/app/(types)/types';
 

@@ -45,7 +45,6 @@ export const config = {
     '/api/ADMIN/:path*',
     '/dashboard/:path*', 
     '/Tasklist/:path*',
-    '/api/AddSupplier/:path*',
     '/api/GetAllUsers/:path*',
     '/api/GetAllSuppliers/:path*',
     '/api/GetAllCities/:path*',

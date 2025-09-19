@@ -1,9 +1,9 @@
 "use client"
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import LoadingButton from "@/app/(mini_components)/Loading/loadingButton";
+import LoadingButton from "@/app/components/Loading/loadingButton";
 import React from "react";
-import BackUpBtn from "@/app/(mini_components)/backUpBtn";
+import BackUpBtn from "@/app/components/backUpBtn";
 import { useAdminSignUp } from "@/app/hooks/useAdminSignUp";
 
 

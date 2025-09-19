@@ -7,10 +7,9 @@ import { Role } from "@prisma/client";
 import { RegisterFormData } from "@/app/validtion";
 import { useRouter } from "next/navigation";
 import { useAddSupplier } from "@/app/hooks/useSupplier";
-import LoadingButton from "@/app/(mini_components)/Loading/loadingButton";
-import { useSession } from "next-auth/react";
+import LoadingButton from "@/app/components/Loading/loadingButton";
 import { users } from "@prisma/client";
-import BackUpBtn from "@/app/(mini_components)/backUpBtn";
+import BackUpBtn from "@/app/components/backUpBtn";
 
 interface SupplierFormData extends RegisterFormData {
   userid: number | null;
@@ -18,10 +17,8 @@ interface SupplierFormData extends RegisterFormData {
 
 
 export default function RegisterPage() {
-  const { data: session } = useSession();
-  const userid = session?.user?.id as number;
   const [formData, setFormData] = useState<SupplierFormData>({
-    userid: userid || null,
+    userid: null,
     firstName: '',
     lastName: '',
     email: '',
@@ -37,9 +34,24 @@ export default function RegisterPage() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await fetch('/api/ADMIN/GetAllUsers');
-      const data = await response.json();
-      setUsers(data);
+      try {
+        const response = await fetch('/api/SystemPermission/GetAllUsers');
+        const data = await response.json();
+        
+        // Handle the new API response structure
+        if (data.success && Array.isArray(data.data)) {
+          setUsers(data.data);
+        } else if (Array.isArray(data)) {
+          // Fallback for old API format
+          setUsers(data);
+        } else {
+          console.error('Invalid users data format:', data);
+          setUsers([]);
+        }
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        setUsers([]);
+      }
     };
     fetchUsers();
   }, []);
@@ -281,7 +293,7 @@ export default function RegisterPage() {
               <div className="space-y-6">
                 <div>
                   <label htmlFor="userid" className="block text-sm font-medium text-gray-700 mb-2">
-                    שם מנהל
+                    שם המעסיק
                   </label>
                   <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                     id="userid"

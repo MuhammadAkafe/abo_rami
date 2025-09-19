@@ -2,7 +2,7 @@
 import TasksDashbaordDisplay from '@/app/(client)/(ADMIN)/(tasks)/Tasksdashboard';
 import Add_task from '@/app/(client)/(ADMIN)/(tasks)/Add_task';
 import AddSuppliers from '@/app/(client)/(ADMIN)/(suppliers)/AddSuppliers';
-import ControlPanel from '@/app/(mini_components)/controlpanel';
+import ControlPanel from '@/app/components/controlpanel';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 

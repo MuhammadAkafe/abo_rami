@@ -2,7 +2,7 @@
 
 import React from 'react';
 import SupplierTasksTable from './SupplierTasksTable';
-import ControlPanel from '@/app/(mini_components)/controlpanel';
+import ControlPanel from '@/app/components/controlpanel';
 
 /**
  * Main Task List Page Component

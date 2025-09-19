@@ -1,5 +1,5 @@
 import { prisma } from "@/app/(lib)/prisma"
-import NextAuth from "next-auth"
+import NextAuth from "next-auth/next"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt"
 import { Role } from "@prisma/client"
@@ -21,6 +21,7 @@ const findUser = async (email: string, role: Role, password: string) => {
     }
     return {
         ...user,
+        id: user.id.toString(),
         name: `${user.firstName} ${user.lastName}`
     }
 }
@@ -41,6 +42,7 @@ const findSupplier = async (email: string, role: Role, password: string) => {
     }
     return {
         ...supplier,
+        id: supplier.id.toString(),
         name: `${supplier.firstName} ${supplier.lastName}`
     }
 }

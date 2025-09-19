@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { TaskWithSupplier } from '../../../../hooks/useSupplierTasks';
+import { TaskWithSupplier } from '../hooks/useSupplierTasks';
 import { SignatureModal } from './SignatureModal';
+import Image from 'next/image';
 
 interface SignatureSectionProps {
   task: TaskWithSupplier;
@@ -47,9 +48,11 @@ export const SignatureSection: React.FC<SignatureSectionProps> = ({
       >
         {task.url ? (
           <div>
-            <img 
+            <Image 
               src={task.url} 
               alt="חתימת ספק" 
+              width={400}
+              height={300}
               className="max-w-full h-auto mx-auto border border-gray-300 rounded-lg shadow-sm"
               style={{ maxHeight: '300px' }}
             />

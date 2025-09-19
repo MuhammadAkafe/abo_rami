@@ -12,7 +12,7 @@ type TaskWithSupplier = tasks & {
   } | null;
 };
 import { getStatusColor, getStatusText } from '../../../styles/taskstyles'
-import DeleteModal from '../../../(mini_components)/DeleteModal';
+import DeleteModal from '@/app/components/DeleteModal';
 import { useDeleteTask } from '@/app/hooks/useDeleteTask';
 import { DeleteModalState, TasksTableProps } from '@/app/(types)/types';
 import { useGetAllTasks } from '@/app/hooks/useGetAllTasks';

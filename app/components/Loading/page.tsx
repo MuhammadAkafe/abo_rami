@@ -3,7 +3,7 @@ import React from 'react';
 import { usePostLoginChecks } from '@/app/hooks/usePostLoginChecks';
 
 export default function PostLoginLoading() {
-  const { loadingMessage, isChecking } = usePostLoginChecks();
+  const { loadingMessage } = usePostLoginChecks();
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">

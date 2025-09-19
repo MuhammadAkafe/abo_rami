@@ -5,10 +5,10 @@ import { useSession } from 'next-auth/react';
 
 // Import custom hook and components
 import { useSupplierTaskDetails } from '../../../hooks/useSupplierTaskDetails';
-import { TaskDetailsCard } from './components/TaskDetailsCard';
-import { SupplierDetailsCard } from './components/SupplierDetailsCard';
-import { UserDetailsCard } from './components/UserDetailsCard';
-import { SignatureSection } from './components/SignatureSection';
+import { TaskDetailsCard } from '../../../components/TaskDetailsCard';
+import { SupplierDetailsCard } from '../../../components/SupplierDetailsCard';
+import { UserDetailsCard } from '../../../components/UserDetailsCard';
+import { SignatureSection } from '../../../components/SignatureSection';
 
 /**
  * Supplier Task Details Component

@@ -1,6 +1,6 @@
 import React from 'react';
 import { getStatusColor, getStatusText } from '@/app/styles/taskstyles';
-import { TaskWithSupplier } from '../../../../hooks/useSupplierTasks';
+import { TaskWithSupplier } from '../hooks/useSupplierTasks';
 
 interface TaskRowProps {
   task: TaskWithSupplier;

@@ -1,11 +1,11 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
-import { israel_cities as cities } from '@/app/(mini_components)/israel_cities_names_and__geometric_data';
+import { israel_cities as cities } from '@/app/components/israel_cities_names_and__geometric_data';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import LoadingButton from '@/app/(mini_components)/Loading/loadingButton';
-import LoadingComponent from '@/app/(mini_components)/Loading/LoadingCompoenent';
-import ErrorAlert from '@/app/(mini_components)/ErrorAlert';
+import LoadingButton from '@/app/components/Loading/loadingButton';
+import LoadingComponent from '@/app/components/Loading/LoadingCompoenent';
+import ErrorAlert from '@/app/components/ErrorAlert';
 import { useCities } from '@/app/hooks/useCities';
 import { Role } from '@prisma/client';
 
@@ -30,7 +30,7 @@ export default function CitiesSelector() {
   const inputRef = useRef<HTMLInputElement>(null);
   
   // Custom hooks
-  const { isCheckingExistingCities, supplierId, addCities, sessionStatus } = useCities(); // supplierId used in addCities function
+  const { isCheckingExistingCities, addCities, sessionStatus } = useCities();
   const { data: session } = useSession();
   const router = useRouter();
 

@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { suppliers, tasks } from '@prisma/client';
 import { getStatusColor, getStatusText } from '@/app/styles/taskstyles';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 type TaskWithSupplier = tasks & {
   supplier?: {
@@ -222,9 +223,11 @@ export default function SupplierDetails() {
             <div className="bg-gray-50 rounded-lg p-8 text-center">
               {task.url ? (
                 <div>
-                  <img 
+                  <Image 
                     src={task.url} 
                     alt="חתימת ספק" 
+                    width={400}
+                    height={300}
                     className="max-w-full h-auto mx-auto border border-gray-300 rounded-lg shadow-sm"
                     style={{ maxHeight: '300px' }}
                   />

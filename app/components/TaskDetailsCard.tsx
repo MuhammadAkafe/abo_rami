@@ -1,7 +1,7 @@
 import React from 'react';
 import { Status } from '@prisma/client';
 import { getStatusColor, getStatusText } from '@/app/styles/taskstyles';
-import { TaskWithSupplier } from '../../../../hooks/useSupplierTasks';
+import { TaskWithSupplier } from '../hooks/useSupplierTasks';
 
 interface TaskDetailsCardProps {
   task: TaskWithSupplier;
