@@ -17,7 +17,7 @@ const MemoizedAddSuppliers = React.memo(AddSuppliers);
 const MemoizedListOfCustomers = React.memo(ListOfCustomers);
 const MemoizedListOfTasks = React.memo(ListOfTasks);
 
-export function ParentDashbaord() {
+function ParentDashbaord() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("/tasksdashboard");

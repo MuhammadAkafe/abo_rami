@@ -7,7 +7,7 @@ import BackUpBtn from "@/app/components/backUpBtn";
 import { useAdminSignUp } from "@/app/hooks/useAdminSignUp";
 
 
-export  function AdminLoginPage() {
+function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();

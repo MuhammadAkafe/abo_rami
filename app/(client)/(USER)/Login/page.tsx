@@ -41,7 +41,7 @@ setIsLoading: (loading: boolean) => void) => {
 
 
 
-export  function LoginPage() {
+function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
