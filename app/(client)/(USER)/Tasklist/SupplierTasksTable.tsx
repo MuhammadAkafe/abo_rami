@@ -1,114 +1,44 @@
-import React, { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { tasks } from '@prisma/client'
-import { useEffect } from 'react'
-
-type TaskWithSupplier = tasks & {
-  supplier?: {
-    firstName: string;
-    lastName: string;
-    phone: string;
-  } | null;
-};
-
-import { getStatusColor, getStatusText } from '@/app/styles/taskstyles'
+import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
-// Custom hook for getting supplier tasks
-const useGetSupplierTasks = (supplierId: number) => {
-  const [tasks, setTasks] = React.useState<TaskWithSupplier[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+// Import custom hook and components
+import { useSupplierTasks, TaskWithSupplier } from '../../../hooks/useSupplierTasks';
+import { TaskRow } from './components/TaskRow';
+import { LoadingState } from './components/LoadingState';
+import { ErrorState } from './components/ErrorState';
+import { EmptyState } from './components/EmptyState';
 
-  React.useEffect(() => {
-    const fetchTasks = async () => {
-      if (!supplierId) return;
-      
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/Supplier/GetSupplierTasks?supplierId=${supplierId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch tasks');
-        }
-        const data = await response.json();
-        setTasks(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch tasks');
-      } finally {
-        setLoading(false);
-      }
-    };
+interface SupplierTasksTableProps {
+  title?: string;
+}
 
-    fetchTasks();
-  }, [supplierId]);
-
-  return { tasks, loading, error };
-};
-
-// Memoized TaskRow component for better performance
-const TaskRow = React.memo(({ task, onRowClick }: { 
-  task: TaskWithSupplier; 
-  onRowClick?: (task: TaskWithSupplier) => void;
-}) => (
-  <tr 
-    className="hover:bg-gray-50 cursor-pointer transition-colors"
-    onClick={() => onRowClick?.(task)}
-  >
-    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-      {task.address}
-    </td>
-    <td className="px-6 py-4 text-sm text-gray-500">
-      {task.description}
-    </td>
-    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-      {task.city}
-    </td>
-    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-      {task.date ? new Date(task.date).toLocaleDateString('he-IL') : 'לא מוגדר'}
-    </td>
-    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status || '')}`}>
-        {getStatusText(task.status || '')}
-      </span>
-    </td>
-  </tr>
-));
-
-TaskRow.displayName = 'TaskRow';
-
-function SupplierTasksTable({ title = 'המשימות שלי' }: { title?: string }) {
+/**
+ * Supplier Tasks Table Component
+ * Displays a table of tasks assigned to the current supplier
+ */
+function SupplierTasksTable({ title = 'המשימות שלי' }: SupplierTasksTableProps) {
   const router = useRouter();
   const { data: session } = useSession();
   const supplierId = session?.user?.id;
 
-  const { tasks, loading, error } = useGetSupplierTasks(supplierId as number);
+  const { tasks, loading, error } = useSupplierTasks(supplierId as number);
 
+  /**
+   * Handle row click to navigate to task details
+   */
   const handleRowClick = (task: TaskWithSupplier) => {
-    // Navigate to supplier task details page
     router.push(`/supplier-task-details?taskId=${task.id}&supplierId=${task.supplierid}`);
   };
 
+  // Show loading state
   if (loading) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm p-8">
-        <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="mr-3 text-gray-600">טוען משימות...</span>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
+  // Show error state
   if (error) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm p-8">
-        <div className="text-center">
-          <div className="text-red-600 text-lg mb-2">שגיאה</div>
-          <p className="text-gray-600">{error}</p>
-        </div>
-      </div>
-    );
+    return <ErrorState error={error} />;
   }
 
   return (
@@ -124,13 +54,7 @@ function SupplierTasksTable({ title = 'המשימות שלי' }: { title?: strin
 
       <div className="overflow-x-auto">
         {tasks?.length === 0 ? (
-          <div className="px-6 py-8 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">אין משימות</h3>
-            <p className="mt-1 text-sm text-gray-500">לא הוקצו לך משימות עדיין.</p>
-          </div>
+          <EmptyState />
         ) : (
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">

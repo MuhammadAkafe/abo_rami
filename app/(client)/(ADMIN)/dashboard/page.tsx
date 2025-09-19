@@ -3,7 +3,8 @@ import TasksDashbaordDisplay from '@/app/(client)/(ADMIN)/(tasks)/Tasksdashboard
 import Add_task from '@/app/(client)/(ADMIN)/(tasks)/Add_task';
 import AddSuppliers from '@/app/(client)/(ADMIN)/(suppliers)/AddSuppliers';
 import ControlPanel from '@/app/(mini_components)/controlpanel';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 import ListOfCustomers from '@/app/(client)/(ADMIN)/(suppliers)/SuppliersMangement';
 import ListOfTasks from '@/app/(client)/(ADMIN)/(tasks)/TasksMangment';
@@ -17,7 +18,17 @@ const MemoizedListOfCustomers = React.memo(ListOfCustomers);
 const MemoizedListOfTasks = React.memo(ListOfTasks);
 
 export function ParentDashbaord() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("/tasksdashboard");
+
+  // Initialize activeTab based on URL search parameters
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab) {
+      setActiveTab(`/${tab}`);
+    }
+  }, [searchParams]);
 
   // Memoize the content to prevent unnecessary re-renders
   const content = useMemo(() => {
@@ -39,7 +50,10 @@ export function ParentDashbaord() {
 
   const navigate = useCallback((path: string) => {
     setActiveTab(path);
-  }, []);
+    // Update URL with search parameter
+    const tabName = path.replace('/', '');
+    router.push(`/dashboard?tab=${tabName}`);
+  }, [router]);
 
  
 

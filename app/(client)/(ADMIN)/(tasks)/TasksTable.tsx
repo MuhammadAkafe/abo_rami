@@ -129,9 +129,9 @@ function TasksTable({ title='משימות היום', filters, showDeleteButton =
   };
 
   const handleRowClick = (task: TaskWithSupplier) => {
-    if (task.supplier) {
-      // Navigate to supplier details page with task and supplier data
-      router.push(`/supplier-details?taskId=${task.id}&supplierId=${task.supplierid}`);
+    if (task.supplierid) {
+      // Navigate to supplier task details page with task and supplier data
+      router.push(`/supplier-task-details?taskId=${task.id}&supplierId=${task.supplierid}`);
     }
   };
 

@@ -7,14 +7,15 @@ interface AdminSignUpProps {
     password: string;
 }
 
-const adminSignUp = async ({email, password}: AdminSignUpProps) => 
-    {
+const adminSignUp = async ({email, password}: AdminSignUpProps) => {
         const result = await signIn('credentials', {
           email: email,
           password: password,
           role: Role.ADMIN,
           redirect: false,
         });
+        
+        // Return the result which includes error information
         return result;
 };
 

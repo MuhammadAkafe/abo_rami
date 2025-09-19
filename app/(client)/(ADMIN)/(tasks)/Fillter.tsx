@@ -74,7 +74,6 @@ export default function Fillter({ onFilterChange }: FilterProps) {
           type="date"
           value={filters.endDate}
           onChange={(e) => handleFilterChange('endDate', e.target.value)}
-          min={new Date().toISOString().split('T')[0]}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>

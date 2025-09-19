@@ -12,6 +12,11 @@ export  function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const mutation = useAdminSignUp();
+
+  const clearError = () => {
+    setError(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -22,12 +27,21 @@ export  function AdminLoginPage() {
     const password = formData.get('password') as string;
 
     mutation.mutate({email, password}, {
-      onSuccess: () => {
-        setIsLoading(false);
-        router.push('/dashboard');
+      onSuccess: (result) => {
+        if (result?.error) {
+          // Display the actual error from the response
+          setError(result.error);
+          setIsLoading(false);
+        } else {
+          // Successful login
+          setIsLoading(false);
+          router.push('/dashboard');
+        }
       },
-      onError: () => {
-        setError('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
+      onError: (error: Error) => {
+        // Display error from the mutation error
+        setError(error?.message || 'שגיאה בהתחברות - בדקו את פרטי ההתחברות');
+        setIsLoading(false);
       },
       onSettled: () => {
         setIsLoading(false);
@@ -72,6 +86,7 @@ export  function AdminLoginPage() {
                 type="email"
                 autoComplete="email"
                 required
+                onChange={clearError}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 placeholder="הזינו את כתובת האימייל שלכם"
               />
@@ -88,6 +103,7 @@ export  function AdminLoginPage() {
                 type="password"
                 autoComplete="current-password"
                 required
+                onChange={clearError}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 placeholder="הזינו את הסיסמה שלכם"
               />
