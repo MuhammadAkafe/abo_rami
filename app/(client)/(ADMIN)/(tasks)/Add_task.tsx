@@ -15,6 +15,31 @@ export default function Add_task() {
   const { data: session } = useSession() as { data: Session | null };
   const user_id = session?.user?.id;
 
+  // Get today's date in Israel timezone
+  const getTodayIsraelDate = () => {
+    const now = new Date();
+    // Israel is UTC+2 (standard time) or UTC+3 (daylight saving time)
+    // Using Intl.DateTimeFormat to get the correct timezone
+    const israelDate = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Jerusalem',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(now);
+    return israelDate; // Returns YYYY-MM-DD format
+  };
+
+  // Convert date to Israel timezone for display
+  const formatDateForInput = (date: Date | null) => {
+    if (!date) return '';
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Jerusalem',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(date);
+  };
+
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTask, setNewTask] = useState<NewTask>(
@@ -185,8 +210,8 @@ export default function Add_task() {
               <input
                 type="date"
                 name="date"
-                min={new Date().toISOString().split('T')[0]}
-                value={newTask.date ? new Date(newTask.date).toISOString().split('T')[0] : ''}
+                min={getTodayIsraelDate()}
+                value={formatDateForInput(newTask.date)}
                 onChange={(e) => setNewTask({ ...newTask, date: new Date(e.target.value) })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
