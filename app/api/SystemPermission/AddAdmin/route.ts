@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     } catch (error) {
         console.error('Registration error:', error);
         return NextResponse.json(
-            { error: "אירעה שגיאה בשרת. אנא נסו שוב." },
+            { error: "אירעה שגיאה בשרת. אנא נסו שוב." + error },
             { status: 500 }
         );
     }
