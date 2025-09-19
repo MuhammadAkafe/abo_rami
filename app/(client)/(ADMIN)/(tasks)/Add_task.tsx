@@ -20,9 +20,9 @@ export default function Add_task() {
     {
     address: '',
     description: '',
-    userid: null,
+    Supplier_id: null,
     date: null,
-    taskArea: '',
+    city: '',
   });
 
   const [TaskCities, setTaskCities] = useState<cities[]>([]);
@@ -36,15 +36,15 @@ export default function Add_task() {
   useEffect(() => {
 
     const fetchExistingCities = async () => {
-      if (!newTask.userid) {
+      if (!newTask.Supplier_id) {
         return;
       }
-      const response = await fetch(`/api/GetAllCities?supplier_id=${newTask.userid}`);
+      const response = await fetch(`/api/GetAllCities?supplier_id=${newTask.Supplier_id}`);
       const data = await response.json();
       setTaskCities(data);
     }
     fetchExistingCities();
-  }, [newTask.userid]);
+  }, [newTask.Supplier_id]);
 
 
 
@@ -64,17 +64,37 @@ export default function Add_task() {
     setNewTask({ ...newTask, [name]: value });
   };
 
+
+
+
+
   const handleAddTask = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     // Validate all required fields
-    if (!newTask.userid || !newTask.address || !newTask.description || !newTask.date || !selectedCity) {
+    if (!newTask.Supplier_id || !newTask.address || !newTask.description || !newTask.date || !selectedCity || !user_id) {
       return;
     }
 
-    const taskData: NewTask = { ...newTask, taskArea: selectedCity };
-    console.log('Sending task data:', taskData);
-    addTask(taskData);
+    const taskData: NewTask = { ...newTask, city: selectedCity };
+
+    if(!user_id){
+      return;
+    }
+
+
+    addTask({taskData,userid:user_id as number},{
+      onSuccess: () => {
+        setShowAddForm(false);
+      },
+      onError: (error) => {
+        console.error('Error adding task:', error);
+      }
+    });
+
+
+
+
   };
 
 
@@ -139,8 +159,8 @@ export default function Add_task() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">שם ספק *</label>
                 <select
-                  name="userid"
-                  value={newTask.userid || ''}
+                  name="Supplier_id"
+                  value={newTask.Supplier_id || ''}
                   onChange={(e) => handleChange(e as React.ChangeEvent<HTMLSelectElement>)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={usersLoading}
@@ -173,13 +193,13 @@ export default function Add_task() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">איזור עבודה *</label>
               <select
-                name="taskArea"
+                name="city"
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="">בחר איזור עבודה</option>
+                <option value="">בחר עיר </option>
                 {TaskCities.map((city: cities, index: number) => (
                   <option key={`${city.id}-${index}`} value={city.city}>{city.city}</option>
                 ))}

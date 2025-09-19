@@ -1,13 +1,42 @@
 "use client"
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGetAllSuppliers } from '@/app/hooks/useGetAllSuppliers';
 import SuppliersTable from './SuppliersTable';
 import LoadingCompoenent from '@/app/(mini_components)/Loading/LoadingCompoenent';
 import { useSession } from 'next-auth/react';
+import { suppliers } from '@prisma/client';
 export default function SuppliersManagement() {
   const { data: session } = useSession();
   const User_id = session?.user?.id;
   const { data :Suppliers, refetch,isLoading } = useGetAllSuppliers(User_id as number);
+
+  const [filters, setFilters] = useState<suppliers[]>([]);  
+
+  useEffect(() => 
+    { 
+      if(Suppliers){
+      setFilters(Suppliers || []);
+      }
+  }, [Suppliers]);
+
+  const fillterSuppliers = (e: React.ChangeEvent<HTMLInputElement>)=>{
+    const filteredSuppliers = Suppliers?.filter((supplier: suppliers) => {
+      return supplier.firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+             supplier.lastName.toLowerCase().includes(e.target.value.toLowerCase()) 
+    });
+    setFilters(filteredSuppliers || []);
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
   return (
@@ -18,7 +47,7 @@ export default function SuppliersManagement() {
           <h2 className="text-2xl font-bold text-gray-900">טבלת ספקים</h2>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <input
+              <input onChange={fillterSuppliers}
                 type="text"
                 placeholder="חיפוש ספקים..."
                 className="w-64 px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -30,7 +59,7 @@ export default function SuppliersManagement() {
               </div>
             </div>
             <div className="text-sm text-gray-600">
-              {Suppliers?.length || 0} ספקים
+              {(filters?.length ?? 0)} ספקים
             </div>
             <button
               className="text-gray-600 hover:text-gray-900 transition-colors"
@@ -47,8 +76,8 @@ export default function SuppliersManagement() {
 
       {/* Table */}
       {isLoading ? <LoadingCompoenent isLoading={isLoading} /> : 
-      <SuppliersTable  suppliers={Suppliers || []} refetch={refetch} 
-      />}
+      <SuppliersTable  fillters={filters} refetch={refetch} />
+      }
     </div>
   );
 }

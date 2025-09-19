@@ -5,8 +5,13 @@ import { useMutation } from "@tanstack/react-query";
 import { NewTask } from "@/app/(types)/types";
 
 
-const addTask = async (taskData: NewTask) => {
-    const response = await fetch('/api/ADMIN/addTask', {
+interface AddTaskProps {
+  taskData: NewTask;
+  userid: number;
+}
+
+const addTask = async ({taskData,userid}: AddTaskProps) => {
+    const response = await fetch(`/api/ADMIN/AddTask?supplierid=${taskData.Supplier_id}&userid=${userid}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -26,14 +31,14 @@ const addTask = async (taskData: NewTask) => {
   export const useAddTask = (setNewTask: (task: NewTask) => void, setShowAddForm: (show: boolean) => void) => 
     {
    return useMutation({
-        mutationFn: addTask,
+        mutationFn: ({ taskData, userid }: AddTaskProps) => addTask({taskData,userid}),
         onSuccess: () => {
           setNewTask({
             address: '',
             description: '',
-            userid: null,
+            Supplier_id: null,
             date: null,
-            taskArea: '',
+            city: '',
           });
           setShowAddForm(false);
         },

@@ -1,26 +1,19 @@
 import { suppliers } from '@prisma/client';
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import DeleteModal from '../../../(mini_components)/DeleteModal';
-import { useEffect } from 'react';
 import { useDeleteSupplier } from '@/app/hooks/useDeleteSupplier';
-interface DeleteModalState 
-{
-    isOpen: boolean;
-    Supplier: suppliers | null;
-    isLoading: boolean;
-}
-interface SuppliersTableProps {
-    suppliers: suppliers[];
-    refetch: () => void;
-}
+import { SuppliersTableProps, DeleteModalState } from '@/app/(types)/types';
 
-function SuppliersTable({ suppliers, refetch }: SuppliersTableProps) 
+
+function SuppliersTable({ fillters, refetch }: SuppliersTableProps) 
 {
     const [deleteModal, setDeleteModal] = useState<DeleteModalState>({
         isOpen: false,
         Supplier: null,
         isLoading: false
     });
+
+
     const handleDeleteClick = (Supplier: suppliers) => {
         console.log("Supplier clicked:", Supplier);
         setDeleteModal({
@@ -32,7 +25,6 @@ function SuppliersTable({ suppliers, refetch }: SuppliersTableProps)
     const mutation = useDeleteSupplier();
     const handleDeleteConfirm = async () => {
         if (!deleteModal.Supplier) return;
-
         setDeleteModal(prev => ({ ...prev, isLoading: true }));
 
         mutation.mutate(deleteModal.Supplier.id, {
@@ -48,6 +40,9 @@ function SuppliersTable({ suppliers, refetch }: SuppliersTableProps)
             }
         });
     };
+
+
+
 
     const handleDeleteCancel = () => {
         setDeleteModal({ isOpen: false, Supplier: null, isLoading: false });
@@ -84,7 +79,7 @@ function SuppliersTable({ suppliers, refetch }: SuppliersTableProps)
         </tr>
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
-        {(suppliers?.length || 0) === 0 ? (
+        {(fillters?.length || 0) === 0 ? (
           <tr>
             <td colSpan={7} className="px-6 py-12 text-center">
               <div className="flex flex-col items-center">
@@ -97,7 +92,7 @@ function SuppliersTable({ suppliers, refetch }: SuppliersTableProps)
             </td>
           </tr>
         ) : (
-          (suppliers || []).map((Supplier: suppliers) => (
+          (fillters || []).map((Supplier: suppliers) => (
             <tr key={Supplier.id} className="hover:bg-gray-50 transition-colors">
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">

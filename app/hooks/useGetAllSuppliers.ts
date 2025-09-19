@@ -16,7 +16,8 @@ const getAllSuppliers = async (User_id: number): Promise<suppliers[]> => {
 
 export const useGetAllSuppliers = (User_id: number) => {
     return useQuery({
-        queryKey: ['suppliers'],
+        queryKey: ['suppliers', User_id],
         queryFn: () => getAllSuppliers(User_id),
+        enabled: !!User_id, // Only run query when User_id is available
     });
 };

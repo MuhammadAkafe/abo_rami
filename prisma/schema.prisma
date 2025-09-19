@@ -56,7 +56,7 @@ model tasks {
   supplierid      Int 
   address     String
   description String
-  taskArea    String
+  city    String
   url         String?
   status      Status   @default(PENDING)
   date        DateTime? 

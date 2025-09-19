@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 
 const deleteTask = async (taskId: number) => {
     try {
-        const response = await fetch(`/api/ADMIN/deleteTask`, {
+        const response = await fetch(`/api/ADMIN/DeleteTask`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

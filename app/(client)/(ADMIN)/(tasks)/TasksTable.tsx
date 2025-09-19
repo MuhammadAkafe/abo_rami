@@ -1,30 +1,40 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { tasks } from '@prisma/client'
+import { useEffect } from 'react'
+
+type TaskWithSupplier = tasks & {
+  supplier?: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+  } | null;
+};
 import { getStatusColor, getStatusText } from '../../../styles/taskstyles'
 import DeleteModal from '../../../(mini_components)/DeleteModal';
 import { useDeleteTask } from '@/app/hooks/useDeleteTask';
+import { DeleteModalState, TasksTableProps } from '@/app/(types)/types';
+import { useGetAllTasks } from '@/app/hooks/useGetAllTasks';
+import { useSession } from 'next-auth/react';
 
 
-interface TasksTableProps {
-  title?: string;
-  refetch?: () => void;
-}
-interface DeleteModalState {
-  isOpen: boolean;
-  task: tasks | null;
-  isLoading: boolean;
-}
+
 
 function TasksTable({ title='משימות היום', refetch }: TasksTableProps) 
 {
-  const [tasks] = useState<tasks[]>([]);
   const [deleteModal, setDeleteModal] = useState<DeleteModalState>({
     isOpen: false,
     task: null,
     isLoading: false
   });
   const mutation = useDeleteTask();
+  const { data: session } = useSession();
+  const User_id = session?.user?.id;
+  const { data: tasks, refetch: refetchTasks } = useGetAllTasks(User_id as number);
+
+  useEffect(() => {
+    refetchTasks();
+  }, [refetchTasks]);
 
 
 
@@ -45,7 +55,7 @@ function TasksTable({ title='משימות היום', refetch }: TasksTableProps)
     {
     onSuccess: () => {
       setDeleteModal({ isOpen: false, task: null, isLoading: false });
-      refetch?.();
+      refetchTasks?.();
     },
     onError: () => {
       setDeleteModal({ isOpen: false, task: null, isLoading: false });
@@ -66,7 +76,7 @@ function TasksTable({ title='משימות היום', refetch }: TasksTableProps)
         <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
         <div className="flex items-center space-x-4">
           <button
-            onClick={() => {}}
+            onClick={() => refetchTasks()}
             disabled={false}
             className="flex items-center p-2 text-gray-600 hover:text-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mr-4"
           >
@@ -94,7 +104,7 @@ function TasksTable({ title='משימות היום', refetch }: TasksTableProps)
       </div>
     </div>
 
-    <div className="divide-y divide-gray-200">
+    <div className="overflow-x-auto">
       {tasks?.length === 0 ? (
         <div className="px-6 py-8 text-center">
           <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,35 +114,73 @@ function TasksTable({ title='משימות היום', refetch }: TasksTableProps)
           <p className="mt-1 text-sm text-gray-500">התחל על ידי יצירת משימה חדשה.</p>
         </div>
       ) : (
-        tasks?.map((task: tasks) => (
-          <div key={task.id} className="px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-900">{task.address}</h3>
-                <p className="text-sm text-gray-500 mt-1">{task.description}</p>
-                <div className="mt-2 flex items-center space-x-4">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status || '')}`}>
-                    {getStatusText(task.status || '')}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    נוצר: {new Date(task.createdAt || '').toLocaleDateString('he-IL')}
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleDeleteClick(task)}
-                  className="text-red-600 hover:text-red-900 p-1 rounded-md hover:bg-red-50 transition-colors"
-                  title="מחק משימה"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        ))
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                כתובת
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                תיאור
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                עיר
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                שם ספק
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                מספר טלפון
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                תאריך
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                פעולות
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {tasks?.map((task: TaskWithSupplier) => (
+              <tr key={task.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {task.address}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {task.description}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {task.city}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {task.supplier ? `${task.supplier.firstName} ${task.supplier.lastName}` : 'לא מוגדר'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {task.supplier?.phone || 'לא מוגדר'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {task.date ? new Date(task.date).toLocaleDateString('he-IL') : 'לא מוגדר'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status || '')}`}>
+                      {getStatusText(task.status || '')}
+                    </span>
+                    <button
+                      onClick={() => handleDeleteClick(task)}
+                      className="text-red-600 hover:text-red-900 p-1 rounded-md hover:bg-red-50 transition-colors"
+                      title="מחק משימה"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   </div>
