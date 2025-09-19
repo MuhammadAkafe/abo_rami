@@ -57,9 +57,10 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
           <>
         <nav className="border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex space-x-6 py-3">
+            {/* Mobile Navigation - Horizontal Scroll */}
+            <div className="flex overflow-x-auto py-3 space-x-2 md:space-x-6 scrollbar-hide">
               <button 
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-2 text-xs md:text-sm font-medium rounded-md transition-colors whitespace-nowrap flex-shrink-0 ${
                   activeTab === "/tasksdashboard" 
                     ? "bg-blue-100 text-blue-700 border border-blue-200" 
                     : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
@@ -69,7 +70,7 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
                 לוח המשימות
               </button>
               <button 
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-2 text-xs md:text-sm font-medium rounded-md transition-colors whitespace-nowrap flex-shrink-0 ${
                   activeTab === "/taskmanagement" 
                     ? "bg-blue-100 text-blue-700 border border-blue-200" 
                     : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
@@ -79,7 +80,7 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
                 הוספת משימות
               </button>
               <button 
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-2 text-xs md:text-sm font-medium rounded-md transition-colors whitespace-nowrap flex-shrink-0 ${
                   activeTab === "/customermanagement" 
                     ? "bg-blue-100 text-blue-700 border border-blue-200" 
                     : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
@@ -89,7 +90,7 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
                 הוספת ספק
               </button>
               <button 
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-2 text-xs md:text-sm font-medium rounded-md transition-colors whitespace-nowrap flex-shrink-0 ${
                   activeTab === "/listofcustomers" 
                     ? "bg-blue-100 text-blue-700 border border-blue-200" 
                     : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
@@ -99,7 +100,7 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
                 ניהול ספקים
               </button>
               <button 
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-2 text-xs md:text-sm font-medium rounded-md transition-colors whitespace-nowrap flex-shrink-0 ${
                   activeTab === "/listoftasks" 
                     ? "bg-blue-100 text-blue-700 border border-blue-200" 
                     : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
