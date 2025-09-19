@@ -19,13 +19,21 @@ export default function SuppliersManagement() {
       }
   }, [Suppliers]);
 
-  const fillterSuppliers = (e: React.ChangeEvent<HTMLInputElement>)=>{
+  const fillterSuppliers = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = e.target.value.toLowerCase();
+    if (!searchTerm) {
+      setFilters(Suppliers || []);
+      return;
+    }
+    
     const filteredSuppliers = Suppliers?.filter((supplier: suppliers) => {
-      return supplier.firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
-             supplier.lastName.toLowerCase().includes(e.target.value.toLowerCase()) 
+      return supplier.firstName.toLowerCase().includes(searchTerm) ||
+             supplier.lastName.toLowerCase().includes(searchTerm) ||
+             supplier.email.toLowerCase().includes(searchTerm) ||
+             supplier.phone.includes(searchTerm);
     });
     setFilters(filteredSuppliers || []);
-    }
+  }, [Suppliers]);
 
 
 

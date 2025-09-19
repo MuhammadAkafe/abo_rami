@@ -1,8 +1,9 @@
 "use client"
 
 import React from 'react'
-import TasksTable from '@/app/(client)/(ADMIN)/(tasks)/TasksTable'
+import SupplierTasksTable from './SupplierTasksTable'
 import ControlPanel from '@/app/(mini_components)/controlpanel'
+
 function Taskslist() 
 {
   return (
@@ -10,7 +11,7 @@ function Taskslist()
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
             <div className='space-y-8'>
               <ControlPanel />
-                <TasksTable />
+              <SupplierTasksTable title="המשימות שלי" />
             </div>
         </div>
     </div>

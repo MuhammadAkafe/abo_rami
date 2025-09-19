@@ -3,34 +3,43 @@ import TasksDashbaordDisplay from '@/app/(client)/(ADMIN)/(tasks)/Tasksdashboard
 import Add_task from '@/app/(client)/(ADMIN)/(tasks)/Add_task';
 import AddSuppliers from '@/app/(client)/(ADMIN)/(suppliers)/AddSuppliers';
 import ControlPanel from '@/app/(mini_components)/controlpanel';
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 
 import ListOfCustomers from '@/app/(client)/(ADMIN)/(suppliers)/SuppliersMangement';
 import ListOfTasks from '@/app/(client)/(ADMIN)/(tasks)/TasksMangment';
 import React from 'react';
 
-export  function ParentDashbaord() {
-  const [content, setContent] = useState<React.ReactNode>(<TasksDashbaordDisplay />);
+// Memoized components to prevent unnecessary re-renders
+const MemoizedTasksDashboard = React.memo(TasksDashbaordDisplay);
+const MemoizedAddTask = React.memo(Add_task);
+const MemoizedAddSuppliers = React.memo(AddSuppliers);
+const MemoizedListOfCustomers = React.memo(ListOfCustomers);
+const MemoizedListOfTasks = React.memo(ListOfTasks);
+
+export function ParentDashbaord() {
   const [activeTab, setActiveTab] = useState("/tasksdashboard");
 
-
-  const navigate = (path: string) => {
-    setActiveTab(path);
-    switch(path){
+  // Memoize the content to prevent unnecessary re-renders
+  const content = useMemo(() => {
+    switch(activeTab){
       case "/tasksdashboard":
-        return setContent(<TasksDashbaordDisplay />);
+        return <MemoizedTasksDashboard />;
       case "/taskmanagement":
-        return setContent(<Add_task />);
+        return <MemoizedAddTask />;
       case "/customermanagement":
-        return setContent(<AddSuppliers />);
+        return <MemoizedAddSuppliers />;
       case "/listofcustomers":
-        return setContent(<ListOfCustomers  />);
+        return <MemoizedListOfCustomers />;
       case "/listoftasks":
-        return setContent(<ListOfTasks />);
+        return <MemoizedListOfTasks />;
       default:
-        return setContent(<TasksDashbaordDisplay  />);
+        return <MemoizedTasksDashboard />;
     }
-  }
+  }, [activeTab]);
+
+  const navigate = useCallback((path: string) => {
+    setActiveTab(path);
+  }, []);
 
  
 

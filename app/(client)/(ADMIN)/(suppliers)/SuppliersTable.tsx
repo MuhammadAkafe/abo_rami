@@ -1,5 +1,5 @@
 import { suppliers } from '@prisma/client';
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import DeleteModal from '../../../(mini_components)/DeleteModal';
 import { useDeleteSupplier } from '@/app/hooks/useDeleteSupplier';
 import { SuppliersTableProps, DeleteModalState } from '@/app/(types)/types';
@@ -49,9 +49,7 @@ function SuppliersTable({ fillters, refetch }: SuppliersTableProps)
     };
 
 
-    useEffect(() => {
-        refetch();
-    }, [refetch]);
+    // Removed unnecessary useEffect - refetch is handled by parent component
 
 
 

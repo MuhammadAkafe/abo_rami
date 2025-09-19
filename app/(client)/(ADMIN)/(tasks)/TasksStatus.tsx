@@ -1,8 +1,31 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {  Status, tasks } from '@prisma/client'
+import { useSession } from 'next-auth/react';
+import { useGetAllTasks } from '@/app/hooks/useGetAllTasks';
+
 function TasksStatus() 
 {
-  const [tasks, setTasks] = useState<tasks[]>([]);
+  const { data: session } = useSession();
+  const User_id = session?.user?.id;
+  const { data: tasks, isLoading } = useGetAllTasks(User_id as number);
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-white rounded-lg shadow-sm p-6 animate-pulse">
+            <div className="flex items-center">
+              <div className="flex-1">
+                <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-12"></div>
+              </div>
+              <div className="w-8 h-8 bg-gray-200 rounded-md"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

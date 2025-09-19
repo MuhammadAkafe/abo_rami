@@ -1,19 +1,23 @@
 "use client"
 import React from 'react';
 import TasksTable from './TasksTable';
-import { useSession } from 'next-auth/react';
-import { useGetAllTasks } from '@/app/hooks/useGetAllTasks';
-
+import { TaskFilters } from '@/app/(types)/types';
 
 export default function TasksDashbaordDisplay() {
-  const { data: session } = useSession();
-  const User_id = session?.user?.id;
-  const { data :Tasks,isLoading:isLoadingTasks,error } = useGetAllTasks(User_id as number);
-
+  // Force today's tasks only by setting specific filters
+  const todayFilters: TaskFilters = {
+    status: 'all', // Show all statuses for today
+    startDate: new Date().toISOString().split('T')[0], // Today's date
+    endDate: new Date().toISOString().split('T')[0] // Today's date
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-shadow duration-300">
-          <TasksTable  />
+      <TasksTable 
+        title="משימות היום" 
+        showDeleteButton={false} 
+        filters={todayFilters}
+      />
     </div>
   )
 }

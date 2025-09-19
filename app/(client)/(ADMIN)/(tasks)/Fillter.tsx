@@ -1,18 +1,20 @@
 import React, { useState } from 'react'
 import { TaskFilters } from '@/app/(types)/types'
 
+interface FilterProps {
+  onFilterChange: (filters: TaskFilters) => void;
+}
 
-
-export default function Fillter() {
+export default function Fillter({ onFilterChange }: FilterProps) {
   const [filters, setFilters] = useState<TaskFilters>({
-    status: '',
+    status: 'all',
     startDate: '',
     endDate: ''
   });
 
 
   const searchTasks = () => {
-    console.log(filters);
+    onFilterChange(filters);
   };
 
   const handleFilterChange = (key: keyof TaskFilters, value: string) => {
@@ -26,11 +28,12 @@ export default function Fillter() {
 
   const clearFilters = () => {
     const clearedFilters = {
-      status: '',
+      status: 'all',
       startDate: '',
       endDate: ''
     };
     setFilters(clearedFilters);
+    onFilterChange(clearedFilters);
   };
 
   return (
@@ -46,9 +49,9 @@ export default function Fillter() {
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="all">כל הסטטוסים</option>
-          <option value="pending">ממתין</option>
-          <option value="completed">הושלם</option>
-          <option value="rejected">נדחה</option>
+          <option value="PENDING">ממתין</option>
+          <option value="COMPLETED">הושלם</option>
+          <option value="REJECTED">נדחה</option>
         </select>
       </div>
 
@@ -71,6 +74,7 @@ export default function Fillter() {
           type="date"
           value={filters.endDate}
           onChange={(e) => handleFilterChange('endDate', e.target.value)}
+          min={new Date().toISOString().split('T')[0]}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>

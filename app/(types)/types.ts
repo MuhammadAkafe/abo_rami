@@ -107,4 +107,6 @@ export interface SuppliersTableProps {
 export interface TasksTableProps {
   title?: string;
   refetch?: () => void;
+  filters?: TaskFilters;
+  showDeleteButton?: boolean;
 }

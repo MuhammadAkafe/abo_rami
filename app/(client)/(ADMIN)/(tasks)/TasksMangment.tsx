@@ -1,15 +1,25 @@
 "use client"
-import React from 'react';
+import React, { useState } from 'react';
 import Fillter from './Fillter';
 import TasksTable from './TasksTable';
+import { TaskFilters } from '@/app/(types)/types';
 
 
 export default function TaskManagement() {
+  const [filters, setFilters] = useState<TaskFilters>({
+    status: 'all',
+    startDate: '',
+    endDate: ''
+  });
+
+  const handleFilterChange = (newFilters: TaskFilters) => {
+    setFilters(newFilters);
+  };
 
   return (
     <>
         <div className="w-full">
-          <Fillter />
+          <Fillter onFilterChange={handleFilterChange} />
         </div>
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
       {/* Header */}
@@ -20,7 +30,7 @@ export default function TaskManagement() {
       </div>
 
 
-      <TasksTable  title="ניהול משימות " />
+      <TasksTable title="ניהול משימות" filters={filters} />
     </div>
     </>
   );

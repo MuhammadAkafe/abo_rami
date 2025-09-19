@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { tasks } from '@prisma/client'
 import { useEffect } from 'react'
 
@@ -17,24 +18,84 @@ import { DeleteModalState, TasksTableProps } from '@/app/(types)/types';
 import { useGetAllTasks } from '@/app/hooks/useGetAllTasks';
 import { useSession } from 'next-auth/react';
 
+// Memoized TaskRow component for better performance
+const TaskRow = React.memo(({ task, onDeleteClick, showDeleteButton = true, onRowClick }: { 
+  task: TaskWithSupplier; 
+  onDeleteClick: (task: tasks) => void;
+  showDeleteButton?: boolean;
+  onRowClick?: (task: TaskWithSupplier) => void;
+}) => (
+  <tr 
+    className="hover:bg-gray-50 cursor-pointer transition-colors"
+    onClick={() => onRowClick?.(task)}
+  >
+    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+      {task.address}
+    </td>
+    <td className="px-6 py-4 text-sm text-gray-500">
+      {task.description}
+    </td>
+    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      {task.city}
+    </td>
+    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      {task.supplier ? `${task.supplier.firstName} ${task.supplier.lastName}` : 'לא מוגדר'}
+    </td>
+    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      {task.supplier?.phone || 'לא מוגדר'}
+    </td>
+    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      {task.date ? new Date(task.date).toLocaleDateString('he-IL') : 'לא מוגדר'}
+    </td>
+    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+      <div className="flex items-center gap-2">
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status || '')}`}>
+          {getStatusText(task.status || '')}
+        </span>
+        {showDeleteButton && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent row click when clicking delete button
+              onDeleteClick(task);
+            }}
+            className="text-red-600 hover:text-red-900 p-1 rounded-md hover:bg-red-50 transition-colors"
+            title="מחק משימה"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        )}
+      </div>
+    </td>
+  </tr>
+));
+
+TaskRow.displayName = 'TaskRow';
 
 
 
-function TasksTable({ title='משימות היום', refetch }: TasksTableProps) 
+
+function TasksTable({ title='משימות היום', filters, showDeleteButton = true }: TasksTableProps) 
 {
   const [deleteModal, setDeleteModal] = useState<DeleteModalState>({
     isOpen: false,
     task: null,
     isLoading: false
   });
+  
+  const router = useRouter();
   const mutation = useDeleteTask();
   const { data: session } = useSession();
   const User_id = session?.user?.id;
-  const { data: tasks, refetch: refetchTasks } = useGetAllTasks(User_id as number);
+  const { data: tasks, refetch: refetchTasks } = useGetAllTasks(User_id as number, filters);
 
+  // Optimize refetch to only run when necessary
   useEffect(() => {
-    refetchTasks();
-  }, [refetchTasks]);
+    if (User_id) {
+      refetchTasks();
+    }
+  }, [User_id, refetchTasks]);
 
 
 
@@ -65,6 +126,13 @@ function TasksTable({ title='משימות היום', refetch }: TasksTableProps)
 
   const handleDeleteCancel = () => {
     setDeleteModal({ isOpen: false, task: null, isLoading: false });
+  };
+
+  const handleRowClick = (task: TaskWithSupplier) => {
+    if (task.supplier) {
+      // Navigate to supplier details page with task and supplier data
+      router.push(`/supplier-details?taskId=${task.id}&supplierId=${task.supplierid}`);
+    }
   };
 
   return (<>
@@ -142,57 +210,30 @@ function TasksTable({ title='משימות היום', refetch }: TasksTableProps)
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {tasks?.map((task: TaskWithSupplier) => (
-              <tr key={task.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {task.address}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  {task.description}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {task.city}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {task.supplier ? `${task.supplier.firstName} ${task.supplier.lastName}` : 'לא מוגדר'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {task.supplier?.phone || 'לא מוגדר'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {task.date ? new Date(task.date).toLocaleDateString('he-IL') : 'לא מוגדר'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex items-center gap-2">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status || '')}`}>
-                      {getStatusText(task.status || '')}
-                    </span>
-                    <button
-                      onClick={() => handleDeleteClick(task)}
-                      className="text-red-600 hover:text-red-900 p-1 rounded-md hover:bg-red-50 transition-colors"
-                      title="מחק משימה"
-                    >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
+              <TaskRow 
+                key={task.id} 
+                task={task} 
+                onDeleteClick={handleDeleteClick}
+                showDeleteButton={showDeleteButton}
+                onRowClick={handleRowClick}
+              />
             ))}
           </tbody>
         </table>
       )}
     </div>
   </div>
-  <DeleteModal
-    isOpen={deleteModal.isOpen}
-    onClose={handleDeleteCancel}
-    onConfirm={handleDeleteConfirm}
-    title="מחיקת משימה"
-    message="האם אתה בטוח שברצונך למחוק את המשימה הזו?"
-    itemName={deleteModal.task ? deleteModal.task.address : ''}
-    isLoading={deleteModal.isLoading}
-  />
+  {showDeleteButton && (
+    <DeleteModal
+      isOpen={deleteModal.isOpen}
+      onClose={handleDeleteCancel}
+      onConfirm={handleDeleteConfirm}
+      title="מחיקת משימה"
+      message="האם אתה בטוח שברצונך למחוק את המשימה הזו?"
+      itemName={deleteModal.task ? deleteModal.task.address : ''}
+      isLoading={deleteModal.isLoading}
+    />
+  )}
   </>
   )
 }
