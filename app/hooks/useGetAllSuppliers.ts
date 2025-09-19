@@ -1,7 +1,7 @@
 import { suppliers } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 
-const getAllSuppliers = async (User_id: number): Promise<suppliers[]> => {
+const getAllSuppliers = async (User_id: string): Promise<suppliers[]> => {
     const response = await fetch(`/api/ADMIN/GetAllSuppliers?userid=${User_id}`, {
         method: 'GET',
         headers: {
@@ -14,7 +14,7 @@ const getAllSuppliers = async (User_id: number): Promise<suppliers[]> => {
     return response.json();
 };
 
-export const useGetAllSuppliers = (User_id: number) => {
+export const useGetAllSuppliers = (User_id: string) => {
     return useQuery({
         queryKey: ['suppliers', User_id],
         queryFn: () => getAllSuppliers(User_id),

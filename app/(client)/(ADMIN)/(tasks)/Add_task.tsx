@@ -5,13 +5,14 @@ import { useMemo } from 'react';
 import { useAddTask } from '@/app/hooks/useAddTask';
 import { useGetAllSuppliers } from '@/app/hooks/useGetAllSuppliers';
 import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 import { NewTask } from '@/app/(types)/types';
 
 
 
 export default function Add_task() {
 
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: Session | null };
   const user_id = session?.user?.id;
 
 
@@ -29,7 +30,7 @@ export default function Add_task() {
   const [selectedCity, setSelectedCity] = useState<string>('');
 
 
-  const { data: users = [], isLoading: usersLoading, error: usersError } = useGetAllSuppliers(user_id as number);
+  const { data: users = [], isLoading: usersLoading, error: usersError } = useGetAllSuppliers(user_id as string);
   const { mutate: addTask, isPending, isError, isSuccess, error } = useAddTask(setNewTask, setShowAddForm);
 
 
@@ -83,7 +84,7 @@ export default function Add_task() {
     }
 
 
-    addTask({taskData,userid:user_id as number},{
+    addTask({taskData,userid:user_id as string},{
       onSuccess: () => {
         setShowAddForm(false);
       },

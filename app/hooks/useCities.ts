@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 import { useRouter } from 'next/navigation';
 
 interface City {
@@ -8,7 +9,7 @@ interface City {
 
 export const useCities = () => {
   const [isCheckingExistingCities, setIsCheckingExistingCities] = useState(true);
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSession() as { data: Session | null; status: string };
   const supplierId = session?.user?.id;
   const router = useRouter();
 

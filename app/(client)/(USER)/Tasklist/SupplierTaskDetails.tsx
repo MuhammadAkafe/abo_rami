@@ -2,6 +2,7 @@
 import React from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 
 // Import custom hook and components
 import { useSupplierTaskDetails } from '../../../hooks/useSupplierTaskDetails';
@@ -17,7 +18,7 @@ import { SignatureSection } from '../../../components/SignatureSection';
 export default function SupplierTaskDetails() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: Session | null };
   const taskId = searchParams.get('taskId');
   const supplierId = searchParams.get('supplierId');
   

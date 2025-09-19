@@ -4,11 +4,12 @@ import { useGetAllSuppliers } from '@/app/hooks/useGetAllSuppliers';
 import SuppliersTable from './SuppliersTable';
 import LoadingCompoenent from '@/app/components/Loading/LoadingCompoenent';
 import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 import { suppliers } from '@prisma/client';
 export default function SuppliersManagement() {
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: Session | null };
   const User_id = session?.user?.id;
-  const { data :Suppliers, refetch,isLoading } = useGetAllSuppliers(User_id as number);
+  const { data :Suppliers, refetch,isLoading } = useGetAllSuppliers(User_id as string);
 
   const [filters, setFilters] = useState<suppliers[]>([]);  
 

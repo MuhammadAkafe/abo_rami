@@ -1,6 +1,7 @@
 "use client"
 
 import { useSession } from "next-auth/react"
+import type { Session } from 'next-auth';
 import { ControlPanelProps } from '@/app/(types)/types';
 import { useState } from "react";
 import { logout } from "./logout";
@@ -9,7 +10,7 @@ import LoadingButton from "./Loading/loadingButton";
 
 
 export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) {
-  const { data, status }  = useSession();
+  const { data, status }  = useSession() as { data: Session | null; status: string };
   const [isLoading, setIsLoading] = useState(false);
 
 

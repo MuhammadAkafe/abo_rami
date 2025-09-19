@@ -17,6 +17,7 @@ import { useDeleteTask } from '@/app/hooks/useDeleteTask';
 import { DeleteModalState, TasksTableProps } from '@/app/(types)/types';
 import { useGetAllTasks } from '@/app/hooks/useGetAllTasks';
 import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 
 // Memoized TaskRow component for better performance
 const TaskRow = React.memo(({ task, onDeleteClick, showDeleteButton = true, onRowClick }: { 
@@ -86,9 +87,9 @@ function TasksTable({ title='משימות היום', filters, showDeleteButton =
   
   const router = useRouter();
   const mutation = useDeleteTask();
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: Session | null };
   const User_id = session?.user?.id;
-  const { data: tasks, refetch: refetchTasks } = useGetAllTasks(User_id as number, filters);
+  const { data: tasks, refetch: refetchTasks } = useGetAllTasks(User_id as string, filters);
 
   // Optimize refetch to only run when necessary
   useEffect(() => {

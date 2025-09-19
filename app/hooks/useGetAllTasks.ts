@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { tasks } from "@prisma/client";
 import { TaskFilters } from "@/app/(types)/types";
 
-const getAllTasks = async (User_id: number, filters?: TaskFilters): Promise<tasks[]> => {
+const getAllTasks = async (User_id: string, filters?: TaskFilters): Promise<tasks[]> => {
     const params = new URLSearchParams({
-        userid: User_id.toString()
+        userid: User_id
     });
 
     if (filters) {
@@ -26,7 +26,7 @@ const getAllTasks = async (User_id: number, filters?: TaskFilters): Promise<task
 }
 
 
-export const useGetAllTasks = (User_id: number, filters?: TaskFilters) => {
+export const useGetAllTasks = (User_id: string, filters?: TaskFilters) => {
     const { data, isLoading, error, refetch } = useQuery({
         queryKey: ['tasks', filters],
         queryFn: () => getAllTasks(User_id, filters),

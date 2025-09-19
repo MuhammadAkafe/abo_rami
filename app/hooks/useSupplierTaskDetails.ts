@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { suppliers, tasks, Status } from '@prisma/client';
 import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 
 // Type definitions
 export type TaskWithSupplier = tasks & {
@@ -46,7 +47,7 @@ export const useSupplierTaskDetails = (
   taskId: string | null,
   supplierId: string | null
 ): UseSupplierTaskDetailsReturn => {
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: Session | null };
   
   // State management
   const [task, setTask] = useState<TaskWithSupplier | null>(null);

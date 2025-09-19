@@ -7,7 +7,7 @@ import { NewTask } from "@/app/(types)/types";
 
 interface AddTaskProps {
   taskData: NewTask;
-  userid: number;
+  userid: string;
 }
 
 const addTask = async ({taskData,userid}: AddTaskProps) => {

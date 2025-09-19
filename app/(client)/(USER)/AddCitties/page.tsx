@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { israel_cities as cities } from '@/app/components/israel_cities_names_and__geometric_data';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 import LoadingButton from '@/app/components/Loading/loadingButton';
 import LoadingComponent from '@/app/components/Loading/LoadingCompoenent';
 import ErrorAlert from '@/app/components/ErrorAlert';
@@ -31,7 +32,7 @@ export default function CitiesSelector() {
   
   // Custom hooks
   const { isCheckingExistingCities, addCities, sessionStatus } = useCities();
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: Session | null };
   const router = useRouter();
 
   // Session validation - redirect if not authenticated or wrong role

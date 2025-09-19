@@ -21,7 +21,7 @@ export interface UseSupplierTasksReturn {
  * @param supplierId - The ID of the supplier
  * @returns Object containing tasks, loading state, and error state
  */
-export const useSupplierTasks = (supplierId: number): UseSupplierTasksReturn => {
+export const useSupplierTasks = (supplierId: string): UseSupplierTasksReturn => {
   const [tasks, setTasks] = useState<TaskWithSupplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

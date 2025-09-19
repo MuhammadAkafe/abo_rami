@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { suppliers, tasks } from '@prisma/client';
 import { getStatusColor, getStatusText } from '@/app/styles/taskstyles';
 import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 import Image from 'next/image';
 
 type TaskWithSupplier = tasks & {
@@ -18,7 +19,7 @@ type TaskWithSupplier = tasks & {
 export default function SupplierDetails() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: Session | null };
   const taskId = searchParams.get('taskId');
   const supplierId = searchParams.get('supplierId');
   

@@ -65,8 +65,7 @@ export async function POST(request: Request) {
             lastName: newUser.lastName,
             phone: newUser.phone,
             role: newUser.role,
-            createdAt: newUser.createdAt,
-            updatedAt: newUser.updatedAt
+            createdAt: newUser.createdAt
         };
         
         return NextResponse.json({
