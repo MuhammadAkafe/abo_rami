@@ -163,12 +163,6 @@ function TasksTable({ title='משימות היום', filters, showDeleteButton =
               />
             </svg>
           </button>
-          <Link
-            href="/tasklist"
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-          >
-            צפה בכל המשימות
-          </Link>
         </div>
       </div>
     </div>

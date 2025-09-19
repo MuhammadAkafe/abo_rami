@@ -2,6 +2,8 @@ import React from 'react';
 import { Status } from '@prisma/client';
 import { getStatusColor, getStatusText } from '@/app/styles/taskstyles';
 import { TaskWithSupplier } from '../hooks/useSupplierTasks';
+import { useSession } from 'next-auth/react';
+import { Session } from 'next-auth';
 
 interface TaskDetailsCardProps {
   task: TaskWithSupplier;
@@ -28,6 +30,9 @@ export const TaskDetailsCard: React.FC<TaskDetailsCardProps> = ({
   onStatusUpdate,
   onCancelEdit,
 }) => {
+
+  const {data: session} = useSession() as { data: Session | null };
+  const isAdmin = session?.user?.role === 'ADMIN';
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
@@ -59,7 +64,7 @@ export const TaskDetailsCard: React.FC<TaskDetailsCardProps> = ({
             {task.date ? new Date(task.date).toLocaleDateString('he-IL') : 'לא מוגדר'}
           </span>
         </div>
-        
+        {!isAdmin && (
         <div className="flex justify-between items-center py-3">
           <span className="font-medium text-gray-700">סטטוס:</span>
           <div className="flex items-center gap-3">
@@ -105,6 +110,7 @@ export const TaskDetailsCard: React.FC<TaskDetailsCardProps> = ({
             )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );
