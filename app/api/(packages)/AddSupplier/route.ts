@@ -6,7 +6,7 @@ import { registerSchema } from "@/app/validtion";
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { userid } = body;
+        const { userid, cities } = body;
         if (!userid) {
             return NextResponse.json(
                 { error: "User ID is required" },
@@ -63,6 +63,22 @@ export async function POST(request: Request) {
                 role: role || 'USER'
             }
         });
+
+        // Add cities if provided
+        if (cities && Array.isArray(cities) && cities.length > 0) {
+            try {
+                await prisma.cities.createMany({
+                    data: cities.map((city: { name: string }) => ({
+                        city: city.name,
+                        userid: newUser.userid,
+                        supplierid: newUser.id,
+                    })),
+                });
+            } catch (cityError) {
+                console.error('Error adding cities:', cityError);
+                // Don't fail the entire operation if cities fail
+            }
+        }
 
         // Return success response (exclude password)
         const userWithoutPassword = {
