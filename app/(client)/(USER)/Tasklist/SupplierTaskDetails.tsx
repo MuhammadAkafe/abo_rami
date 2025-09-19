@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import type { Session } from 'next-auth';
@@ -15,7 +15,7 @@ import { SignatureSection } from '../../../components/SignatureSection';
  * Supplier Task Details Component
  * Displays detailed information about a specific task assigned to a supplier
  */
-export default function SupplierTaskDetails() {
+function SupplierTaskDetailsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { data: session } = useSession() as { data: Session | null };
@@ -129,5 +129,25 @@ export default function SupplierTaskDetails() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading component for Suspense fallback
+function SupplierTaskDetailsLoading() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center" dir="rtl">
+      <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="text-center mt-4 text-gray-600">טוען פרטי משימה...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function SupplierTaskDetails() {
+  return (
+    <Suspense fallback={<SupplierTaskDetailsLoading />}>
+      <SupplierTaskDetailsContent />
+    </Suspense>
   );
 }

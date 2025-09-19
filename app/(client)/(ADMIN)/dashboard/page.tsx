@@ -3,7 +3,7 @@ import TasksDashbaordDisplay from '@/app/(client)/(ADMIN)/(tasks)/Tasksdashboard
 import Add_task from '@/app/(client)/(ADMIN)/(tasks)/Add_task';
 import AddSuppliers from '@/app/(client)/(ADMIN)/(suppliers)/AddSuppliers';
 import ControlPanel from '@/app/components/controlpanel';
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 import ListOfCustomers from '@/app/(client)/(ADMIN)/(suppliers)/SuppliersMangement';
@@ -75,4 +75,22 @@ export function ParentDashbaord() {
   )
 }
 
-export default React.memo(ParentDashbaord);
+// Loading component for Suspense fallback
+function DashboardLoading() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center" dir="rtl">
+      <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="text-center mt-4 text-gray-600">טוען דשבורד...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <ParentDashbaord />
+    </Suspense>
+  );
+}
