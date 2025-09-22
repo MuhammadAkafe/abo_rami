@@ -5,6 +5,11 @@ export const sendEmail = async (email: string, otp: number) => {
     try {
         // Check if email credentials are configured
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.warn('Email credentials not configured. Skipping email send.');
+            // In development, we can return success, but in production this should be an error
+            if (process.env.NODE_ENV === 'production') {
+                throw new Error('Email service not configured');
+            }
             return {
                 accepted: [email],
                 rejected: [],

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import redisClient from "../../(lib)/redius";
+import redisClient from "../../(lib)/redis";
 import { generateSecureToken } from "../../(lib)/Otp";
 
 export async function POST(request: Request) {

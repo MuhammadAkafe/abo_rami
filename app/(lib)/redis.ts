@@ -1,7 +1,12 @@
 import { createClient } from 'redis';
 
 const redisClient = createClient({
-    url: 'redis://localhost:6379'
+    url: process.env.REDIS_URL || 'redis://localhost:6379',
+    socket: {
+        // Add timeout settings for Vercel KV
+        connectTimeout: 10000,
+        // commandTimeout: 5000,
+    }
 });
 
 redisClient.on('connect', () => {

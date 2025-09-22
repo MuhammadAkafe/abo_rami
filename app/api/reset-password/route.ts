@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/(lib)/prisma";
-import redisClient from "../../(lib)/redius";
+import redisClient from "../../(lib)/redis";
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {

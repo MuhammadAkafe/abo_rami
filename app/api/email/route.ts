@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/app/(lib)/prisma";
 import { generateOTP } from "../../(lib)/Otp";
 import { sendEmail } from "../../(lib)/sendEmail";
-import redisClient from "../../(lib)/redius";
+import redisClient from "../../(lib)/redis";
 
 const findSupplier = async (email: string) => {
     try {
@@ -72,23 +72,40 @@ export async function POST(request: Request) {
         // Generate OTP
         const otp = await generateOTP();
         
-        // Connect to Redis
-        await redisClient.connect();
-        
-        // Store OTP in Redis with 5-minute expiration
-        const otpKey = `otp:${email}:${userType}`;
-        await redisClient.set(otpKey, otp.toString(), { EX: 300 });
-        
-        // Store user info for verification
-        const userInfoKey = `user_info:${email}:${userType}`;
-        await redisClient.set(userInfoKey, JSON.stringify({ userId, userType }), { EX: 300 });
+        // Connect to Redis (with error handling for production)
+        try {
+            await redisClient.connect();
+            
+            // Store OTP in Redis with 5-minute expiration
+            const otpKey = `otp:${email}:${userType}`;
+            await redisClient.set(otpKey, otp.toString(), { EX: 300 });
+            
+            // Store user info for verification
+            const userInfoKey = `user_info:${email}:${userType}`;
+            await redisClient.set(userInfoKey, JSON.stringify({ userId, userType }), { EX: 300 });
+        } catch (redisError) {
+            console.error('Redis connection failed:', redisError);
+            // In production without Redis, we'll use a fallback or return an error
+            if (process.env.NODE_ENV === 'production' && !process.env.REDIS_URL) {
+                return NextResponse.json({ 
+                    error: 'Service temporarily unavailable. Please try again later.' 
+                }, { status: 503 });
+            }
+            throw redisError;
+        }
         // Send email with OTP
         try {
             await sendEmail(email, otp);
         } 
         catch (emailError) {
             console.error('Email sending failed:', emailError);
-            // Don't fail the request if email fails, but log it
+            // In production, if email fails, we should return an error
+            if (process.env.NODE_ENV === 'production') {
+                return NextResponse.json({ 
+                    error: 'Failed to send email. Please try again later.' 
+                }, { status: 500 });
+            }
+            // In development, we can continue even if email fails
         }
 
         return NextResponse.json({
