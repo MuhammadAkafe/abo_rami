@@ -23,7 +23,8 @@ export default function LoadingComponent({
   spinnerColor = 'PRIMARY',
   showSpinner = true
 }: LoadingComponentProps) {
-  const { loadingMessage } = usePostLoginChecks();
+  // Don't use the hook here to avoid authentication redirects
+  const loadingMessage = '';
   
   // Determine the display message with priority: usePostLoginMessage > message > messageKey > default
   let displayMessage: string = LOADING_MESSAGES.DEFAULT;
@@ -68,10 +69,12 @@ export default function LoadingComponent({
 
 // Export a specialized PostLoginLoading component for convenience
 export function PostLoginLoading() {
+  const { loadingMessage, isChecking } = usePostLoginChecks();
+  
   return (
     <LoadingComponent 
-      isLoading={true} 
-      usePostLoginMessage={true}
+      isLoading={isChecking} 
+      message={loadingMessage}
       fullScreen={true} 
     />
   );

@@ -19,28 +19,26 @@ const ADMIN_API_ROUTES = [
   '/api/ADMIN/GetAllSuppliers'
 ] as const
 
-// Error messages
-const ERROR_MESSAGES = {
-  UNAUTHORIZED: "You are not authorized to access this page",
-  ACCESS_DENIED: "Access denied"
-} as const
+// Error messages (removed as we now use redirects)
 
 // Helper function to check if path matches any of the given patterns
 const matchesAnyPattern = (pathname: string, patterns: readonly string[]): boolean => {
   return patterns.some(pattern => pathname.startsWith(pattern))
 }
 
-// Helper function to create unauthorized response
-const createUnauthorizedResponse = (message: string = ERROR_MESSAGES.UNAUTHORIZED) => {
-  return NextResponse.json({ error: message }, { status: 403 })
-}
+// Helper function to create unauthorized response (removed as we now use redirects)
 
 // Helper function to validate admin access
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const validateAdminAccess = (token: any, pathname: string): NextResponse | null => {
   if (token?.role !== Role.ADMIN) {
     console.log(`Access denied: User is not an admin for path: ${pathname}`)
-    return createUnauthorizedResponse()
+    // Redirect to appropriate login page based on role
+    if (token?.role === Role.USER) {
+      return NextResponse.redirect(new URL('/USER/Login', process.env.NEXTAUTH_URL || 'http://localhost:3000'))
+    } else {
+      return NextResponse.redirect(new URL('/ADMIN/AdminLogin', process.env.NEXTAUTH_URL || 'http://localhost:3000'))
+    }
   }
   return null
 }
@@ -50,7 +48,12 @@ const validateAdminAccess = (token: any, pathname: string): NextResponse | null 
 const validateUserAccess = (token: any, pathname: string): NextResponse | null => {
   if (token?.role !== Role.USER) {
     console.log(`Access denied: User is not authorized for path: ${pathname}`)
-    return createUnauthorizedResponse()
+    // Redirect to appropriate login page based on role
+    if (token?.role === Role.ADMIN) {
+      return NextResponse.redirect(new URL('/ADMIN/AdminLogin', process.env.NEXTAUTH_URL || 'http://localhost:3000'))
+    } else {
+      return NextResponse.redirect(new URL('/USER/Login', process.env.NEXTAUTH_URL || 'http://localhost:3000'))
+    }
   }
   return null
 }

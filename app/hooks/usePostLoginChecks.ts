@@ -26,10 +26,10 @@ export const usePostLoginChecks = () => {
     try {
       setIsChecking(true);
 
-      // Check user role
-      if (userRole !== Role.USER) {
+      // Check user role - only redirect if user is ADMIN trying to access USER pages
+      if (userRole === Role.ADMIN) {
         setLoadingMessage('מפנה לממשק המתאים...');
-        router.push('/USER/Login');
+        router.push('/ADMIN/dashboard');
         return;
       }
 
@@ -68,7 +68,16 @@ export const usePostLoginChecks = () => {
     }
 
     if (status === 'unauthenticated') {
-      router.push('/USER/Login');
+      // Only redirect to login if we're not already on a login page
+      const currentPath = window.location.pathname;
+      if (!currentPath.includes('/Login') && !currentPath.includes('/AdminLogin')) {
+        // Check if we're trying to access admin pages
+        if (currentPath.includes('/ADMIN/')) {
+          router.push('/ADMIN/AdminLogin');
+        } else {
+          router.push('/USER/Login');
+        }
+      }
       return;
     }
 

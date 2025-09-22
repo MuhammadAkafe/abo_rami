@@ -17,7 +17,7 @@ const MemoizedListOfCustomers = React.memo(ListOfCustomers);
 const MemoizedListOfTasks = React.memo(ListOfTasks);
 
 function ParentDashbaord() {
-  const [activeTab, setActiveTab] = useState("/tasksdashboard");
+  const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
 
   // Memoize the content to prevent unnecessary re-renders
   const content = useMemo(() => {

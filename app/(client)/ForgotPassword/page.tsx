@@ -266,13 +266,13 @@ function ForgotPasswordPage() {
           <div className="text-center space-y-2">
             <p className="text-sm text-gray-600">
               זוכרים את הסיסמה?{" "}
-              <Link href={isAdmin ? "/AdminLogin" : "/Login"} className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+              <Link href={isAdmin ? "/ADMIN/AdminLogin" : "/USER/Login"} className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                 התחברו
               </Link>
             </p>
             <p className="text-sm text-gray-600">
               אין לכם חשבון?{" "}
-              <Link href="/Register" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+              <Link href="/USER/Register" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                 הירשמו
               </Link>
             </p>

@@ -1,8 +1,11 @@
 import { prisma } from "@/app/(lib)/prisma"
 import NextAuth from "next-auth/next"
+// import type { NextAuthOptions } from "next-auth/next"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt"
 import { Role } from "@prisma/client"
+
+// Authentication configuration
 
 
 
@@ -51,7 +54,7 @@ const findSupplier = async (email: string, role: Role, password: string) => {
 
 
 
-const handler = NextAuth({
+export const authOptions = {
     providers: [
         CredentialsProvider({
             name: "Credentials",
@@ -75,32 +78,43 @@ const handler = NextAuth({
         }),
     ],
     callbacks: {
-        async jwt({ token, user }) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        async jwt({ token, user }: { token: any; user: any }) {
             if (user && 'role' in user) {
                 token.role = user.role
                 token.id = user.id
             }   
             return token
         },
-        async session({ session, token }) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        async session({ session, token }: { session: any; token: any }) {
             if (token && session.user) {
                 (session.user as { id: string; role: string }).id = token.id as string
                 (session.user as { id: string; role: string }).role = token.role as string
             }
             return session
         },
+        async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
+            // Handle role-based redirects after login
+            if (url.startsWith('/')) {
+                return `${baseUrl}${url}`
+            }
+            return baseUrl
+        },
     },
     secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
     pages: {
-        signIn: '/AdminLogin',
-        signOut: '/Login',
+        signIn: '/',
+        signOut: '/',
     },
     session: {
-        strategy: 'jwt',
+        strategy: 'jwt' as const,
     },
     jwt: {
         secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
     },
-})
+}
+
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }

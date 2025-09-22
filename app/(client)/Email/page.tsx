@@ -65,7 +65,6 @@ function EmailPage() {
     setSuccess(null);
     setErrors({});
     setFieldErrors({});
-    console.log("handleSubmit");
     const validation = validateEmailForm(formData);
     if (!validation.success) {
       setFieldErrors(validation.errors);
@@ -78,7 +77,6 @@ function EmailPage() {
         // Store email and user type for next step
         localStorage.setItem('resetEmail', formData.email);
         localStorage.setItem('isAdmin', formData.isAdmin.toString());
-        console.log("send email success");
         // Navigate to code verification page immediately
         router.push('/code');
       },
