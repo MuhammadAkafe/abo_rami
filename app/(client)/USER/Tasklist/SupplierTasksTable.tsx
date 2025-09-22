@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 
 // Import custom hook and components
 import { useSupplierTasks, TaskWithSupplier } from '../../../hooks/useSupplierTasks';
@@ -19,7 +20,7 @@ interface SupplierTasksTableProps {
  */
 function SupplierTasksTable({ title = 'המשימות שלי' }: SupplierTasksTableProps) {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: Session | null };
   const supplierId = session?.user?.id;
 
   // Don't fetch tasks if no supplier ID

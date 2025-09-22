@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
-import Fillter from './Fillter';
-import TasksTable from './TasksTable';
+import Fillter from '../Fillter/Fillter';
+import TasksTable from '../TasksTable/TasksTable';
 import { TaskFilters } from '@/app/(types)/types';
 
 

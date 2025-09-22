@@ -29,7 +29,7 @@ export const usePostLoginChecks = () => {
       // Check user role
       if (userRole !== Role.USER) {
         setLoadingMessage('מפנה לממשק המתאים...');
-        router.push('/Login');
+        router.push('/USER/Login');
         return;
       }
 
@@ -41,11 +41,11 @@ export const usePostLoginChecks = () => {
       if (response.ok && citiesData.length > 0) {
         // User has cities, redirect to TaskList
         setLoadingMessage('מפנה לרשימת משימות...');
-        router.push('/Tasklist');
+        router.push('/USER/Tasklist');
       } else {
         // User doesn't have cities, redirect to AddCities
         setLoadingMessage('מפנה לבחירת ערים...');
-        router.push('/AddCitties');
+        router.push('/USER/AddCitties');
       }
     } catch (error) 
     {
@@ -53,7 +53,7 @@ export const usePostLoginChecks = () => {
       setLoadingMessage('שגיאה בטעינה...');
       // Fallback to AddCities page
       setTimeout(() => {
-        router.push('/AddCitties');
+        router.push('/USER/AddCitties');
       }, 2000);
     } finally 
     {
@@ -68,7 +68,7 @@ export const usePostLoginChecks = () => {
     }
 
     if (status === 'unauthenticated') {
-      router.push('/Login');
+      router.push('/USER/Login');
       return;
     }
 

@@ -6,7 +6,7 @@ import { useGetAllTasks } from '@/app/hooks/useGetAllTasks';
 
 function TasksStatus() 
 {
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: Session | null };
   const User_id = session?.user?.id;
   const { data: tasks, isLoading } = useGetAllTasks(User_id as string);
 

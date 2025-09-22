@@ -36,12 +36,12 @@ export default function CitiesSelector() {
     if (sessionStatus === 'loading') return; // Still loading session
     
     if (sessionStatus === 'unauthenticated') {
-      router.push('/Login');
+      router.push('/USER/Login');
       return;
     }
     
     if (session?.user && 'role' in session.user && session.user.role !== Role.USER) {
-      router.push('/Login');
+      router.push('/USER/Login');
       return;
     }
   }, [session, sessionStatus, router]);
@@ -154,7 +154,7 @@ export default function CitiesSelector() {
     try {
       await addCities(selectedCities);
       // Success - redirect to TaskList
-      router.push('/Tasklist');
+      router.push('/USER/Tasklist');
     } catch (error) {
       console.error('Error submitting cities:', error);
       setError(error instanceof Error ? error.message : 'שגיאה בהוספת הערים');

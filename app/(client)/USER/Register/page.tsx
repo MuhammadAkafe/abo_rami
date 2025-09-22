@@ -101,7 +101,7 @@ export default function RegisterPage() {
           role: Role.USER
         });
         // Redirect after a short delay
-          router.push('/Login');
+          router.push('/USER/Login');
       },
       onError: (error) => {
         console.error('Registration error:', error);
@@ -342,7 +342,7 @@ export default function RegisterPage() {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               יש לכם כבר חשבון?{" "}
-              <Link href="/Login" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
+              <Link href="/USER/Login" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
                 התחברו
               </Link>
             </p>

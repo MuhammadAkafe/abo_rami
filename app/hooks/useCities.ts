@@ -32,7 +32,7 @@ export const useCities = () => {
         
         if (response.ok && data.length > 0) {
           // Redirect to task list if cities already exist
-          router.push('/Tasklist');
+          router.push('/USER/Tasklist');
           return;
         }
       } catch (error) {

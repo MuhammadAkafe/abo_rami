@@ -1,94 +1,66 @@
 "use client"
-import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import LoadingButton from "@/app/components/loadingButton";
 import React from "react";
 import BackUpBtn from "@/app/components/backUpBtn";
-import { Role } from "@prisma/client";
+import { useAdminSignUp } from "@/app/hooks/useAdminSignUp";
 
 
-
-const sign_in_user = async (email: string, password: string, setError: (error: string) => void, 
-setIsLoading: (loading: boolean) => void) => {
-  try {
-    const result = await signIn('credentials', {
-      email,
-      password,
-      role: Role.USER,
-      redirect: false,
-    });
-    
-    if (result?.error) {
-      setError('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
-      return null;
-    } 
-    
-    if (result?.ok) {
-      // Get the user data to determine redirect
-      try {
-        const response = await fetch('/api/auth/session');
-        if (!response.ok) {
-          throw new Error('Failed to fetch session');
-        }
-        const sessionData = await response.json();
-        return sessionData;
-      } catch (sessionError) {
-        console.error('Error fetching session:', sessionError);
-        setError('שגיאה בטעינת נתוני המשתמש');
-        return null;
-      }
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Sign in error:', error);
-    setError('שגיאה בחיבור לשרת');
-    return null;
-  } finally {
-    setIsLoading(false);
-  }
-}
-
-
-
-function LoginPage() {
+function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const mutation = useAdminSignUp();
+
+  const clearError = () => {
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    const sessionData = await sign_in_user(email, password, setError, setIsLoading);
-    if (sessionData?.user?.role === Role.USER) {
-      router.push('/AddCitties');
-    } else if (sessionData?.user?.role === 'ADMIN') {
-      router.push('/dashboard');
-    } else {
-      setError('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
-    }
+
+    mutation.mutate({email, password}, {
+      onSuccess: (result) => {
+        if (result?.error) {
+          // Display the actual error from the response
+          setError(result.error);
+          setIsLoading(false);
+        } else {
+          // Successful login
+          setIsLoading(false);
+          router.push('/ADMIN/dashboard');
+        }
+      },
+      onError: (error: Error) => {
+        // Display error from the mutation error
+        setError(error?.message || 'שגיאה בהתחברות - בדקו את פרטי ההתחברות');
+        setIsLoading(false);
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
+    });
+
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4 relative">
-      {/* Back Button - Top Middle */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <BackUpBtn />
-      
       <div className="max-w-md w-full space-y-8">
-
         {/* Header */}
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-          כניסה ספקים
+          כניסה מנהלים
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            התחברו לחשבון שלכם
+            התחברו לחשבון שלכם כמנהל
           </p>
         </div>
 
@@ -114,6 +86,7 @@ function LoginPage() {
                 type="email"
                 autoComplete="email"
                 required
+                onChange={clearError}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 placeholder="הזינו את כתובת האימייל שלכם"
               />
@@ -130,6 +103,7 @@ function LoginPage() {
                 type="password"
                 autoComplete="current-password"
                 required
+                onChange={clearError}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 placeholder="הזינו את הסיסמה שלכם"
               />
@@ -138,14 +112,17 @@ function LoginPage() {
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
               <div className="text-sm">
-                <Link  href="/Email" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+                <a href="/Email" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                   שכחתם סיסמה?
-                </Link>
+                </a>
               </div>
             </div>
 
             {/* Submit Button */}
-            <LoadingButton loading={isLoading} text="התחברו" />
+            <LoadingButton
+              loading={isLoading}
+              text="התחברו"
+            />
           </form>
 
           {/* Divider */}
@@ -154,24 +131,13 @@ function LoginPage() {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">או התחברו באמצעות</span>
             </div>
           </div>
 
-
-          {/* Sign Up Link */}
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              אין לכם חשבון?{" "}
-              <Link href="/Register" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
-                הירשמו
-              </Link>
-            </p>
-          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export default React.memo(LoginPage);
+export default React.memo(AdminLoginPage);

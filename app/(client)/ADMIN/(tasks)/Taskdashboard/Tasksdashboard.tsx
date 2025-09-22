@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import TasksTable from './TasksTable';
+import TasksTable from '../TasksTable/TasksTable';
 import { TaskFilters } from '@/app/(types)/types';
 
 export default function TasksDashbaordDisplay() {
