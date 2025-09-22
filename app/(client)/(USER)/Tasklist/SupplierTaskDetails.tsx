@@ -2,7 +2,6 @@
 import React, { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import type { Session } from 'next-auth';
 
 // Import custom hook and components
 import { useSupplierTaskDetails } from '../../../hooks/useSupplierTaskDetails';
@@ -18,13 +17,13 @@ import { SignatureSection } from '../../../components/SignatureSection';
 function SupplierTaskDetailsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { data: session } = useSession() as { data: Session | null };
+  const { data: session } = useSession();
   const taskId = searchParams.get('taskId');
   const supplierId = searchParams.get('supplierId');
   
   // Determine if user is admin or supplier
-  const isAdmin = session?.user?.role === 'ADMIN';
-  const isSupplier = session?.user?.role === 'USER';
+  const isAdmin = session?.user && 'role' in session.user && session.user.role === 'ADMIN';
+  const isSupplier = session?.user && 'role' in session.user && session.user.role === 'USER';
   
   // Use custom hook for data management
   const {

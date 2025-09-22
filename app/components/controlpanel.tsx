@@ -5,7 +5,7 @@ import type { Session } from 'next-auth';
 import { ControlPanelProps } from '@/app/(types)/types';
 import { useState } from "react";
 import { logout } from "./logout";
-import LoadingButton from "./Loading/loadingButton";
+import LoadingButton from "./loadingButton";
 
 
 

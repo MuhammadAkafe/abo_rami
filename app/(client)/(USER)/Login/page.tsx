@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import LoadingButton from "@/app/components/Loading/loadingButton";
+import LoadingButton from "@/app/components/loadingButton";
 import React from "react";
 import BackUpBtn from "@/app/components/backUpBtn";
 import { Role } from "@prisma/client";
@@ -19,22 +19,34 @@ setIsLoading: (loading: boolean) => void) => {
       role: Role.USER,
       redirect: false,
     });
+    
     if (result?.error) {
       setError('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
+      return null;
     } 
-    else if (result?.ok) {
+    
+    if (result?.ok) {
       // Get the user data to determine redirect
-      const response = await fetch('/api/auth/session');
-      const sessionData = await response.json();
-      return sessionData;
-
+      try {
+        const response = await fetch('/api/auth/session');
+        if (!response.ok) {
+          throw new Error('Failed to fetch session');
+        }
+        const sessionData = await response.json();
+        return sessionData;
+      } catch (sessionError) {
+        console.error('Error fetching session:', sessionError);
+        setError('שגיאה בטעינת נתוני המשתמש');
+        return null;
+      }
     }
-  } catch 
-  {
+    
+    return null;
+  } catch (error) {
+    console.error('Sign in error:', error);
     setError('שגיאה בחיבור לשרת');
-  } 
-  finally 
-  {
+    return null;
+  } finally {
     setIsLoading(false);
   }
 }
@@ -54,9 +66,12 @@ function LoginPage() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     const sessionData = await sign_in_user(email, password, setError, setIsLoading);
-    if (sessionData) {
-      const redirectTo = sessionData.user?.role === Role.USER ? '/components/Loading' : '/Login';
-      router.push(redirectTo);
+    if (sessionData?.user?.role === Role.USER) {
+      router.push('/AddCitties');
+    } else if (sessionData?.user?.role === 'ADMIN') {
+      router.push('/dashboard');
+    } else {
+      setError('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
     }
   };
 
@@ -123,9 +138,9 @@ function LoginPage() {
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
               <div className="text-sm">
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+                <Link  href="/Email" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                   שכחתם סיסמה?
-                </a>
+                </Link>
               </div>
             </div>
 

@@ -7,7 +7,7 @@ import { Role } from "@prisma/client";
 import { RegisterFormData } from "@/app/validtion";
 import { useRouter } from "next/navigation";
 import { useAddSupplier } from "@/app/hooks/useSupplier";
-import LoadingButton from "@/app/components/Loading/loadingButton";
+import LoadingButton from "@/app/components/loadingButton";
 import { users } from "@prisma/client";
 import BackUpBtn from "@/app/components/backUpBtn";
 
@@ -31,11 +31,20 @@ export default function RegisterPage() {
   const router = useRouter()
   const mutation = useAddSupplier();
   const [users, setUsers] = useState<users[] | null>(null);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [usersError, setUsersError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        setUsersLoading(true);
+        setUsersError(null);
         const response = await fetch('/api/SystemPermission/GetAllUsers');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
+        }
+        
         const data = await response.json();
         
         // Handle the new API response structure
@@ -47,10 +56,14 @@ export default function RegisterPage() {
         } else {
           console.error('Invalid users data format:', data);
           setUsers([]);
+          setUsersError('פורמט נתונים לא תקין');
         }
       } catch (error) {
         console.error('Error fetching users:', error);
         setUsers([]);
+        setUsersError('שגיאה בטעינת רשימת המעסיקים');
+      } finally {
+        setUsersLoading(false);
       }
     };
     fetchUsers();
@@ -58,7 +71,6 @@ export default function RegisterPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    console.log(name, value);
     setFormData(prev => ({ ...prev, [name]: value }));
     // Clear field error when user starts typing
     if (fieldErrors[name]) {
@@ -300,13 +312,19 @@ export default function RegisterPage() {
                     name="userid"
                     value={formData.userid ?? ""}
                     onChange={handleInputChange}
+                    disabled={usersLoading || mutation.isPending}
                     required
                   >
-                    <option value="">בחרו מנהל</option>
+                    <option value="">
+                      {usersLoading ? 'טוען מעסיקים...' : usersError ? 'שגיאה בטעינה' : 'בחרו מעסיק'}
+                    </option>
                     {users?.map((user) => (
                       <option key={user.id} value={user.id}>{user.firstName} {user.lastName}</option>
                     ))}
                   </select>
+                  {usersError && (
+                    <p className="mt-1 text-sm text-red-600">{usersError}</p>
+                  )}
                 </div>
 
                 {/* Submit Button */}

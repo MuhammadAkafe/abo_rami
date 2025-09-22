@@ -3,9 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { israel_cities as cities } from '@/app/components/israel_cities_names_and__geometric_data';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import type { Session } from 'next-auth';
-import LoadingButton from '@/app/components/Loading/loadingButton';
-import LoadingComponent from '@/app/components/Loading/LoadingCompoenent';
+import LoadingButton from '@/app/components/loadingButton';
+import LoadingComponent from '@/app/components/LoadingCompoenent';
 import ErrorAlert from '@/app/components/ErrorAlert';
 import { useCities } from '@/app/hooks/useCities';
 import { Role } from '@prisma/client';
@@ -13,9 +12,6 @@ import { Role } from '@prisma/client';
 interface City {
   name: string;
 }
-
-
-
 
 export default function CitiesSelector() {
   // State management
@@ -32,7 +28,7 @@ export default function CitiesSelector() {
   
   // Custom hooks
   const { isCheckingExistingCities, addCities, sessionStatus } = useCities();
-  const { data: session } = useSession() as { data: Session | null };
+  const { data: session } = useSession();
   const router = useRouter();
 
   // Session validation - redirect if not authenticated or wrong role
@@ -44,22 +40,26 @@ export default function CitiesSelector() {
       return;
     }
     
-    if (session?.user?.role !== Role.USER) {
+    if (session?.user && 'role' in session.user && session.user.role !== Role.USER) {
       router.push('/Login');
       return;
     }
   }, [session, sessionStatus, router]);
 
-  // Filter cities based on search term
+  // Filter cities based on search term with debouncing
   useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredCities(cities);
-    } else {
-      const filtered = cities.filter(city =>
-        city.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredCities(filtered);
-    }
+    const timeoutId = setTimeout(() => {
+      if (searchTerm.trim() === '') {
+        setFilteredCities(cities);
+      } else {
+        const filtered = cities.filter(city =>
+          city.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredCities(filtered);
+      }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
   // Close dropdown when clicking outside
@@ -77,7 +77,6 @@ export default function CitiesSelector() {
     };
   }, []);
 
-
   // Show loading component while checking session or existing cities
   // Always show loading until all checks are complete
   if (sessionStatus === 'loading' || isCheckingExistingCities) {
@@ -89,7 +88,7 @@ export default function CitiesSelector() {
   }
 
   // If session is not authenticated or wrong role, show loading while redirecting
-  if (sessionStatus === 'unauthenticated' || (session?.user?.role !== Role.USER)) {
+  if (sessionStatus === 'unauthenticated' || (session?.user && 'role' in session.user && session.user.role !== Role.USER)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <LoadingComponent isLoading={true} />
@@ -127,6 +126,13 @@ export default function CitiesSelector() {
     const value = e.target.value;
     setSearchTerm(value);
     setIsDropdownOpen(true);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      setIsDropdownOpen(false);
+      setSearchTerm('');
+    }
   };
 
   const handleClearAll = () => {
@@ -195,6 +201,8 @@ export default function CitiesSelector() {
                         onClick={() => handleRemoveCity(city)}
                         className="text-green-600 hover:text-green-800 focus:outline-none"
                         disabled={isLoading}
+                        title={`הסר ${city.name}`}
+                        aria-label={`הסר ${city.name}`}
                       >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -211,9 +219,11 @@ export default function CitiesSelector() {
                   type="text"
                   value={searchTerm}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   onClick={handleInputClick}
                   placeholder="בחר ערים או חפש..."
                   className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-10 text-right"
+                  autoComplete="off"
                 />
                 
                 {/* Dropdown arrow */}
@@ -231,7 +241,11 @@ export default function CitiesSelector() {
 
               {/* Dropdown menu */}
               {isDropdownOpen && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                <div 
+                  className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+                  role="listbox"
+                  aria-label="רשימת ערים"
+                >
                   {filteredCities.length === 0 ? (
                     <div className="px-3 py-2 text-sm text-gray-500 text-center">
                       לא נמצאו ערים
@@ -243,7 +257,16 @@ export default function CitiesSelector() {
                         <div
                           key={`${city.name}-${index}`}
                           onClick={() => handleCitySelect(city)}
-                          className="px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 cursor-pointer flex justify-between items-center border-b border-gray-100 last:border-b-0"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleCitySelect(city);
+                            }
+                          }}
+                          className="px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 cursor-pointer flex justify-between items-center border-b border-gray-100 last:border-b-0 focus:outline-none focus:bg-gray-100"
+                          tabIndex={0}
+                          role="option"
+                          aria-selected={false}
                         >
                           <span className="text-right">{city.name}</span>
                           <span className="text-xs text-gray-500 text-left">{city.name}</span>

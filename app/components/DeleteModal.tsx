@@ -1,6 +1,6 @@
 import React from 'react';
 import { DeleteModalProps } from '@/app/(types)/types';
-import LoadingButton from './Loading/loadingButton';
+import LoadingButton from './loadingButton';
 
 
 

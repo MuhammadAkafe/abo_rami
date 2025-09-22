@@ -19,7 +19,7 @@ type TaskWithSupplier = tasks & {
 function SupplierDetailsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { data: session } = useSession() as { data: Session | null };
+  const { data: session } = useSession();
   const taskId = searchParams.get('taskId');
   const supplierId = searchParams.get('supplierId');
   
@@ -30,7 +30,7 @@ function SupplierDetailsContent() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!taskId || !supplierId || !session?.user?.id) {
+      if (!taskId || !supplierId || !session?.user || !('id' in session.user)) {
         setError('Missing required parameters');
         setLoading(false);
         return;
@@ -68,10 +68,10 @@ function SupplierDetailsContent() {
       }
     };
 
-    if (session?.user?.id) {
+    if (session?.user && 'id' in session.user) {
       fetchData();
     }
-  }, [taskId, supplierId, session?.user?.id]);
+  }, [taskId, supplierId, session?.user]);
 
   if (loading) {
     return (

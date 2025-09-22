@@ -47,14 +47,16 @@ export const usePostLoginChecks = () => {
         setLoadingMessage('מפנה לבחירת ערים...');
         router.push('/AddCitties');
       }
-    } catch (error) {
+    } catch (error) 
+    {
       console.error('Error during post-login checks:', error);
       setLoadingMessage('שגיאה בטעינה...');
       // Fallback to AddCities page
       setTimeout(() => {
         router.push('/AddCitties');
       }, 2000);
-    } finally {
+    } finally 
+    {
       setIsChecking(false);
     }
   }, [userRole, userId, router]);

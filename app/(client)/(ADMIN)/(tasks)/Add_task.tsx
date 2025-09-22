@@ -60,15 +60,24 @@ export default function Add_task() {
 
 
   useEffect(() => {
-
     const fetchExistingCities = async () => {
       if (!newTask.Supplier_id) {
         return;
       }
-      const response = await fetch(`/api/GetAllCities?supplier_id=${newTask.Supplier_id}`);
-      const data = await response.json();
-      setTaskCities(data);
-    }
+      
+      try {
+        const response = await fetch(`/api/GetAllCities?supplier_id=${newTask.Supplier_id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch cities');
+        }
+        const data = await response.json();
+        setTaskCities(data);
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+        setTaskCities([]);
+      }
+    };
+    
     fetchExistingCities();
   }, [newTask.Supplier_id]);
 
@@ -99,12 +108,14 @@ export default function Add_task() {
     
     // Validate all required fields
     if (!newTask.Supplier_id || !newTask.address || !newTask.description || !newTask.date || !selectedCity || !user_id) {
+      console.error('Missing required fields for task creation');
       return;
     }
 
     const taskData: NewTask = { ...newTask, city: selectedCity };
 
-    if(!user_id){
+    if (!user_id) {
+      console.error('User not authenticated');
       return;
     }
 

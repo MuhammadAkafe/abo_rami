@@ -26,7 +26,7 @@ export default function AddSuppliers() {
   // ============================================================================
   
   const { data: session } = useSession();
-  const user_id = (session?.user as { id?: number })?.id;
+  const user_id = session?.user && 'id' in session.user ? Number(session.user.id) : null;
   const mutation = useAddSupplier();
 
   // ============================================================================

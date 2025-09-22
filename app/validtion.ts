@@ -40,14 +40,92 @@ export const registerSchema = z.object({
   path: ["confirmPassword"],
 });
 
+export const emailSchema = z.object({
+  email: z.string().email("כתובת אימייל לא תקינה"),
+  isAdmin: z.boolean(),
+});
+
+export const otpSchema = z.object({
+  code: z.string().length(6, "קוד האימות חייב להכיל 6 ספרות"),
+});
+
+export const passwordResetSchema = z.object({
+  password: z
+    .string()
+    .min(6, "סיסמה חייבת להכיל לפחות 6 תווים")
+    .max(50, "סיסמה ארוכה מדי"),
+  confirmPassword: z
+    .string()
+    .min(6, "אישור סיסמה חייב להכיל לפחות 6 תווים"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "הסיסמאות אינן תואמות",
+  path: ["confirmPassword"],
+});
 
 // Type for TypeScript
 export type RegisterFormData = z.infer<typeof registerSchema>;
+export type EmailFormData = z.infer<typeof emailSchema>;
+export type OTPFormData = z.infer<typeof otpSchema>;
+export type PasswordResetFormData = z.infer<typeof passwordResetSchema>;
+
+
 
 // Simple validation function
 export const validateRegisterForm = (data: RegisterFormData) => {
   try {
     registerSchema.parse(data);
+    return { success: true, errors: {} };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors: Record<string, string> = {};
+      error.issues.forEach((err) => {
+        const field = err.path[0] as string;
+        errors[field] = err.message;
+      });
+      return { success: false, errors };
+    }
+    return { success: false, errors: { general: "שגיאה" } };
+  }
+};
+
+export const validateEmailForm = (data: EmailFormData) => {
+  try {
+    emailSchema.parse(data);
+    return { success: true, errors: {}, data };
+  } catch (error) {
+
+    if (error instanceof z.ZodError) {
+      const errors: Record<string, string> = {};
+      error.issues.forEach((err) => {
+        const field = err.path[0] as string;
+        errors[field] = err.message;
+      });
+      return { success: false, errors, data: null };
+    }
+    return { success: false, errors: { general: "שגיאה" }, data: null };
+  }
+};
+
+export const validateOTPForm = (data: OTPFormData) => {
+  try {
+    otpSchema.parse(data);
+    return { success: true, errors: {} };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors: Record<string, string> = {};
+      error.issues.forEach((err) => {
+        const field = err.path[0] as string;
+        errors[field] = err.message;
+      });
+      return { success: false, errors };
+    }
+    return { success: false, errors: { general: "שגיאה" } };
+  }
+};
+
+export const validatePasswordResetForm = (data: PasswordResetFormData) => {
+  try {
+    passwordResetSchema.parse(data);
     return { success: true, errors: {} };
   } catch (error) {
     if (error instanceof z.ZodError) {

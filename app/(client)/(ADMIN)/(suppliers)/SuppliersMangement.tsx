@@ -2,25 +2,23 @@
 import React, { useEffect, useState } from 'react';
 import { useGetAllSuppliers } from '@/app/hooks/useGetAllSuppliers';
 import SuppliersTable from './SuppliersTable';
-import LoadingCompoenent from '@/app/components/Loading/LoadingCompoenent';
+import LoadingComponent from '@/app/components/LoadingCompoenent';
 import { useSession } from 'next-auth/react';
-import type { Session } from 'next-auth';
 import { suppliers } from '@prisma/client';
 export default function SuppliersManagement() {
-  const { data: session } = useSession() as { data: Session | null };
-  const User_id = session?.user?.id;
-  const { data :Suppliers, refetch,isLoading } = useGetAllSuppliers(User_id as string);
+  const { data: session } = useSession();
+  const User_id = session?.user && 'id' in session.user ? session.user.id : undefined;
+  const { data: Suppliers, refetch, isLoading, error } = useGetAllSuppliers(User_id as string);
 
   const [filters, setFilters] = useState<suppliers[]>([]);  
 
-  useEffect(() => 
-    { 
-      if(Suppliers){
-      setFilters(Suppliers || []);
-      }
+  useEffect(() => {
+    if (Suppliers) {
+      setFilters(Suppliers);
+    }
   }, [Suppliers]);
 
-  const fillterSuppliers = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const filterSuppliers = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = e.target.value.toLowerCase();
     if (!searchTerm) {
       setFilters(Suppliers || []);
@@ -36,18 +34,6 @@ export default function SuppliersManagement() {
     setFilters(filteredSuppliers || []);
   }, [Suppliers]);
 
-
-
-
-
-
-
-
-
-
-
-
-
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
       {/* Header */}
@@ -56,7 +42,7 @@ export default function SuppliersManagement() {
           <h2 className="text-2xl font-bold text-gray-900">טבלת ספקים</h2>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <input onChange={fillterSuppliers}
+              <input onChange={filterSuppliers}
                 type="text"
                 placeholder="חיפוש ספקים..."
                 className="w-64 px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -72,7 +58,8 @@ export default function SuppliersManagement() {
             </div>
             <button
               className="text-gray-600 hover:text-gray-900 transition-colors"
-              title="רענן"
+              title="רענן רשימת ספקים"
+              aria-label="רענן רשימת ספקים"
               onClick={() => refetch()}
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,9 +71,22 @@ export default function SuppliersManagement() {
       </div>
 
       {/* Table */}
-      {isLoading ? <LoadingCompoenent isLoading={isLoading} /> : 
-      <SuppliersTable  fillters={filters} refetch={refetch} />
-      }
+      {isLoading ? (
+        <LoadingComponent isLoading={isLoading} messageKey="LOADING_SUPPLIERS" />
+      ) : error ? (
+        <div className="p-8 text-center">
+          <div className="text-red-600 text-lg mb-2">שגיאה בטעינת הספקים</div>
+          <p className="text-gray-600 mb-4">{error.message || 'אירעה שגיאה לא צפויה'}</p>
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            נסה שוב
+          </button>
+        </div>
+      ) : (
+        <SuppliersTable filters={filters} refetch={refetch} />
+      )}
     </div>
   );
 }

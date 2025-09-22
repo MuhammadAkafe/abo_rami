@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { tasks } from '@prisma/client'
 import { useEffect } from 'react'
@@ -17,7 +16,6 @@ import { useDeleteTask } from '@/app/hooks/useDeleteTask';
 import { DeleteModalState, TasksTableProps } from '@/app/(types)/types';
 import { useGetAllTasks } from '@/app/hooks/useGetAllTasks';
 import { useSession } from 'next-auth/react';
-import type { Session } from 'next-auth';
 
 // Memoized TaskRow component for better performance
 const TaskRow = React.memo(({ task, onDeleteClick, showDeleteButton = true, onRowClick }: { 
@@ -87,13 +85,13 @@ function TasksTable({ title='משימות היום', filters, showDeleteButton =
   
   const router = useRouter();
   const mutation = useDeleteTask();
-  const { data: session } = useSession() as { data: Session | null };
-  const User_id = session?.user?.id;
+  const { data: session } = useSession();
+  const User_id = session?.user && 'id' in session.user ? session.user.id : undefined;
   const { data: tasks, refetch: refetchTasks } = useGetAllTasks(User_id as string, filters);
 
   // Optimize refetch to only run when necessary
   useEffect(() => {
-    if (User_id) {
+    if (User_id && refetchTasks) {
       refetchTasks();
     }
   }, [User_id, refetchTasks]);
@@ -137,17 +135,17 @@ function TasksTable({ title='משימות היום', filters, showDeleteButton =
   };
 
   return (<>
-<div className="bg-white rounded-lg shadow-sm">
-</div>
     <div className="bg-white rounded-lg shadow-sm">
     <div className="px-6 py-4 border-b border-gray-200">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
         <div className="flex items-center space-x-4">
           <button
-            onClick={() => refetchTasks()}
+            onClick={() => refetchTasks?.()}
             disabled={false}
             className="flex items-center p-2 text-gray-600 hover:text-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mr-4"
+            title="רענן רשימת משימות"
+            aria-label="רענן רשימת משימות"
           >
             <svg 
               className={`w-5 h-5 cursor-pointer ${false ? 'animate-spin' : ''}`} 

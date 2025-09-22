@@ -31,8 +31,8 @@ export const useCities = () => {
         const data = await response.json();
         
         if (response.ok && data.length > 0) {
-          // Redirect to Loading page to perform proper checks if cities exist
-          router.push('/Loading');
+          // Redirect to task list if cities already exist
+          router.push('/Tasklist');
           return;
         }
       } catch (error) {

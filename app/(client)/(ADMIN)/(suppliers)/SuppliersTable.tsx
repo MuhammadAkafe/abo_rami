@@ -5,7 +5,7 @@ import { useDeleteSupplier } from '@/app/hooks/useDeleteSupplier';
 import { SuppliersTableProps, DeleteModalState } from '@/app/(types)/types';
 
 
-function SuppliersTable({ fillters, refetch }: SuppliersTableProps) 
+function SuppliersTable({ filters, refetch }: SuppliersTableProps) 
 {
     const [deleteModal, setDeleteModal] = useState<DeleteModalState>({
         isOpen: false,
@@ -77,7 +77,7 @@ function SuppliersTable({ fillters, refetch }: SuppliersTableProps)
         </tr>
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
-        {(fillters?.length || 0) === 0 ? (
+        {(filters?.length || 0) === 0 ? (
           <tr>
             <td colSpan={7} className="px-6 py-12 text-center">
               <div className="flex flex-col items-center">
@@ -90,7 +90,7 @@ function SuppliersTable({ fillters, refetch }: SuppliersTableProps)
             </td>
           </tr>
         ) : (
-          (fillters || []).map((Supplier: suppliers) => (
+          (filters || []).map((Supplier: suppliers) => (
             <tr key={Supplier.id} className="hover:bg-gray-50 transition-colors">
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">

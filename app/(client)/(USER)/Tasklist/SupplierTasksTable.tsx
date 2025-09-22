@@ -1,7 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import type { Session } from 'next-auth';
 
 // Import custom hook and components
 import { useSupplierTasks, TaskWithSupplier } from '../../../hooks/useSupplierTasks';
@@ -20,10 +19,11 @@ interface SupplierTasksTableProps {
  */
 function SupplierTasksTable({ title = 'המשימות שלי' }: SupplierTasksTableProps) {
   const router = useRouter();
-  const { data: session } = useSession() as { data: Session | null };
+  const { data: session } = useSession();
   const supplierId = session?.user?.id;
 
-  const { tasks, loading, error } = useSupplierTasks(supplierId as string);
+  // Don't fetch tasks if no supplier ID
+  const { tasks, loading, error } = useSupplierTasks(supplierId ? supplierId as string : '');
 
   /**
    * Handle row click to navigate to task details
@@ -40,6 +40,15 @@ function SupplierTasksTable({ title = 'המשימות שלי' }: SupplierTasksTa
   // Show error state
   if (error) {
     return <ErrorState error={error} />;
+  }
+
+  // Show message if no session
+  if (!supplierId) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+        <p className="text-gray-600">יש להתחבר כדי לראות את המשימות</p>
+      </div>
+    );
   }
 
   return (

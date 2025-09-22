@@ -99,7 +99,7 @@ export interface DeleteModalState
     task?: tasks | null;
 }
 export interface SuppliersTableProps {
-    fillters: suppliers[];
+    filters: suppliers[];
     refetch: () => void;
 }
 

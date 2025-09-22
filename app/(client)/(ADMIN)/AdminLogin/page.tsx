@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import LoadingButton from "@/app/components/Loading/loadingButton";
+import LoadingButton from "@/app/components/loadingButton";
 import React from "react";
 import BackUpBtn from "@/app/components/backUpBtn";
 import { useAdminSignUp } from "@/app/hooks/useAdminSignUp";
@@ -112,7 +112,7 @@ function AdminLoginPage() {
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
               <div className="text-sm">
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+                <a href="/Email" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                   שכחתם סיסמה?
                 </a>
               </div>
