@@ -55,6 +55,7 @@ const validateUserAccess = (token: any, pathname: string): NextResponse | null =
       return NextResponse.redirect(new URL('/USER/Login', process.env.NEXTAUTH_URL || 'http://localhost:3000'))
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return null
 }
 
