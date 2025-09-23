@@ -10,7 +10,7 @@ import { Role } from "@prisma/client";
 
 
 
-const sign_in_user = async (email: string, password: string, setError: (error: string) => void, 
+const SupplierSignIn = async (email: string, password: string, setError: (error: string) => void, 
 setIsLoading: (loading: boolean) => void) => {
   try {
     const result = await signIn('credentials', {
@@ -24,7 +24,6 @@ setIsLoading: (loading: boolean) => void) => {
       setError('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
       return null;
     } 
-    
     if (result?.ok) {
       // Get the user data to determine redirect
       try {
@@ -34,15 +33,18 @@ setIsLoading: (loading: boolean) => void) => {
         }
         const sessionData = await response.json();
         return sessionData;
-      } catch (sessionError) {
+      } 
+      catch (sessionError)
+       {
         console.error('Error fetching session:', sessionError);
         setError('שגיאה בטעינת נתוני המשתמש');
         return null;
       }
     }
-    
     return null;
-  } catch (error) {
+  } 
+  catch (error) 
+  {
     console.error('Sign in error:', error);
     setError('שגיאה בחיבור לשרת');
     return null;
@@ -65,15 +67,11 @@ function LoginPage() {
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    const sessionData = await sign_in_user(email, password, setError, setIsLoading);
-    if (sessionData?.user?.role === Role.USER) {
-      router.push('/USER/AddCitties');
-    } else if (sessionData?.user?.role === 'ADMIN') 
+    const sessionData = await SupplierSignIn(email, password, setError, setIsLoading);
+    if (sessionData && sessionData.user?.role === Role.USER) 
       {
-      router.push('/ADMIN/dashboard');
-    } else {
-      setError('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
-    }
+      router.push('/USER/AddCitties');
+    }   
   };
 
   return (
