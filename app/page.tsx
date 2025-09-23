@@ -18,7 +18,7 @@ export default function Home() {
         {/* Navigation Cards */}
         <div className="space-y-4">
           <Link 
-            href="/ADMIN/AdminLogin"
+            href="/AdminLogin"
             className="block w-full bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 transform hover:scale-105 border border-gray-100"
           >
             <div className="text-center">
@@ -35,7 +35,7 @@ export default function Home() {
 
           <div className="space-y-4">
           <Link 
-            href="/USER/Login"
+            href="/SupplierLogin"
             className="block w-full bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 transform hover:scale-105 border border-gray-100"
           >
             <div className="text-center">
@@ -50,7 +50,7 @@ export default function Home() {
           </Link>
 
           <Link 
-            href="/USER/Register"
+            href="/SupplierRegister"
             className="block w-full bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 transform hover:scale-105 border border-gray-100"
           >
             <div className="text-center">

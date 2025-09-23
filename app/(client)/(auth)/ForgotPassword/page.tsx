@@ -11,13 +11,15 @@ import LoadingButton from "@/app/components/loadingButton";
 // TYPES & INTERFACES
 // ============================================================================
 
-interface CodeFormData {
-  code: string;
+interface ForgotPasswordFormData {
+  password: string;
+  confirmPassword: string;
 }
 
-interface VerifyOTPData {
+interface ResetPasswordData {
   email: string;
-  otp: string;
+  newPassword: string;
+  resetToken: string;
   isAdmin: boolean;
 }
 
@@ -25,10 +27,10 @@ interface VerifyOTPData {
 // MAIN COMPONENT
 // ============================================================================
 
-// API functions
-const verifyOTP = async (data: VerifyOTPData) => {
+// API function
+const resetPassword = async (data: ResetPasswordData) => {
   try {
-    const response = await fetch('/api/verify-otp', {
+    const response = await fetch('/api/reset-password', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -43,82 +45,59 @@ const verifyOTP = async (data: VerifyOTPData) => {
     
     return response.json();
   } catch (error) {
-    console.error('OTP verification error:', error);
+    console.error('Password reset error:', error);
     throw error;
   }
 };
 
-const resendOTP = async (data: { email: string; isAdmin: boolean }) => {
-  try {
-    const response = await fetch('/api/email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-    }
-    
-    return response.json();
-  } catch (error) {
-    console.error('Resend OTP error:', error);
-    throw error;
-  }
-};
-
-function CodePage() {
-  const [formData, setFormData] = useState<CodeFormData>({
-    code: ''
+function ForgotPasswordPage() {
+  const router = useRouter();
+  const [formData, setFormData] = useState<ForgotPasswordFormData>({
+    password: '',
+    confirmPassword: ''
   });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState<string | null>(null);
   const [email, setEmail] = useState<string>('');
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const router = useRouter();
+  const [resetToken, setResetToken] = useState<string>('');
 
-  // Get stored email and user type
+  // Get stored data
   useEffect(() => {
     const storedEmail = localStorage.getItem('resetEmail');
     const storedIsAdmin = localStorage.getItem('isAdmin');
+    const storedResetToken = localStorage.getItem('resetToken');
     
-    if (!storedEmail) {
+    if (!storedEmail || !storedResetToken) {
       router.push('/Email');
       return;
-    }  
+    }
+    
     setEmail(storedEmail);
     setIsAdmin(storedIsAdmin === 'true');
+    setResetToken(storedResetToken);
   }, [router]);
 
   // ============================================================================
   // EVENT HANDLERS
   // ============================================================================
 
-  // Mutations
-  const verifyMutation = useMutation({
-    mutationFn: verifyOTP,
-  });
-
-  const resendMutation = useMutation({
-    mutationFn: resendOTP,
+  // Mutation
+  const resetMutation = useMutation({
+    mutationFn: resetPassword,
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // Only allow numbers and limit to 6 digits
-    const numericValue = value.replace(/\D/g, '').slice(0, 6);
-    
     setFormData(prev => ({
       ...prev,
-      [name]: numericValue
+      [name]: value
     }));
     
-    // Clear errors when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
+    // Clear field error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({
         ...prev,
         [name]: ''
       }));
@@ -128,18 +107,25 @@ function CodePage() {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    // Code validation
-    if (!formData.code) {
-      newErrors.code = 'קוד האימות נדרש';
-    } else if (formData.code.length !== 6) {
-      newErrors.code = 'קוד האימות חייב להכיל 6 ספרות';
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = 'סיסמה נדרשת';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'סיסמה חייבת להכיל לפחות 6 תווים';
     }
 
-    setErrors(newErrors);
+    // Confirm password validation
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'אישור סיסמה נדרש';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'הסיסמאות אינן תואמות';
+    }
+
+    setFieldErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -149,39 +135,28 @@ function CodePage() {
     setSuccess(null);
     setErrors({});
 
-    verifyMutation.mutate(
-      { email, otp: formData.code, isAdmin: isAdmin },
+    resetMutation.mutate(
       {
-        onSuccess: (data) => {
-          setSuccess('קוד האימות אומת בהצלחה!');
-          // Store reset token for password reset
-          localStorage.setItem('resetToken', data.resetToken);
-          // Redirect to forgot password page after 2 seconds
-          setTimeout(() => {
-            router.push('/ForgotPassword');
-          }, 1000);
-        },
-        onError: (error: Error) => {
-          console.error('Code verification error:', error);
-          setErrors({ code: error.message || 'קוד האימות שגוי. אנא נסו שוב' });
-        },
-      }
-    );
-  };
-
-  const handleResendCode = async () => {
-    setSuccess(null);
-    setErrors({});
-
-    resendMutation.mutate(
-      { email, isAdmin: isAdmin },
+        email,
+        newPassword: formData.password,
+        resetToken,
+        isAdmin
+      },
       {
         onSuccess: () => {
-          setSuccess('קוד חדש נשלח לכתובת האימייל שלכם');
+          setSuccess('הסיסמה עודכנה בהצלחה!');
+          // Clear stored data
+          localStorage.removeItem('resetEmail');
+          localStorage.removeItem('isAdmin');
+          localStorage.removeItem('resetToken');
+          // Redirect to login page after 3 seconds
+          setTimeout(() => {
+            router.push('/Login');
+          }, 3000);
         },
         onError: (error: Error) => {
-          console.error('Resend code error:', error);
-          setErrors({ general: error.message || 'שגיאה בשליחת קוד חדש' });
+          console.error('Password reset error:', error);
+          setErrors({ general: error.message || 'שגיאה בעדכון הסיסמה. אנא נסו שוב.' });
         },
       }
     );
@@ -200,10 +175,10 @@ function CodePage() {
         {/* Header */}
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            אימות קוד
+            שחזור סיסמה
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            הזינו את קוד האימות שנשלח לכתובת האימייל שלכם
+            הזינו את הסיסמה החדשה
           </p>
         </div>
 
@@ -221,50 +196,61 @@ function CodePage() {
           </div>
         )}
 
-        {/* Code Form */}
+        {/* Forgot Password Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6" dir="rtl">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Code Field */}
+            {/* Password Field */}
             <div>
-              <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-2">
-                קוד אימות
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                סיסמה
               </label>
               <input
-                id="code"
-                name="code"
-                type="text"
-                value={formData.code}
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
                 onChange={handleInputChange}
+                autoComplete="new-password"
                 required
-                maxLength={6}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 text-center text-2xl tracking-widest ${
-                  errors.code ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
+                  fieldErrors.password ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="000000"
+                placeholder="הזינו סיסמה"
               />
-              {errors.code && (
-                <p className="mt-1 text-sm text-red-600">{errors.code}</p>
+              {fieldErrors.password && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
+              )}
+            </div>
+
+            {/* Confirm Password Field */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                אישור סיסמה
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                autoComplete="new-password"
+                required
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
+                  fieldErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="הזינו שוב את הסיסמה"
+              />
+              {fieldErrors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.confirmPassword}</p>
               )}
             </div>
 
             {/* Submit Button */}
             <LoadingButton 
-              loading={verifyMutation.isPending} 
-              text="אמת קוד" 
+              loading={resetMutation.isPending} 
+              text="עדכן סיסמה" 
             />
           </form>
-
-          {/* Resend Code */}
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={handleResendCode}
-              disabled={resendMutation.isPending}
-              className="text-sm text-blue-600 hover:text-blue-500 transition-colors disabled:opacity-50"
-            >
-              {resendMutation.isPending ? 'שולח...' : 'לא קיבלתם קוד? שלחו שוב'}
-            </button>
-          </div>
 
           {/* Divider */}
           <div className="relative">
@@ -280,13 +266,13 @@ function CodePage() {
           <div className="text-center space-y-2">
             <p className="text-sm text-gray-600">
               זוכרים את הסיסמה?{" "}
-              <Link href={isAdmin ? "/AdminLogin" : "/Login"} className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+              <Link href={isAdmin ? "/ADMIN/AdminLogin" : "/SupplierLogin"} className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                 התחברו
               </Link>
             </p>
             <p className="text-sm text-gray-600">
               אין לכם חשבון?{" "}
-              <Link href="/Register" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+              <Link href="/SupplierRegister" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                 הירשמו
               </Link>
             </p>
@@ -297,4 +283,4 @@ function CodePage() {
   );
 }
 
-export default React.memo(CodePage);
+export default React.memo(ForgotPasswordPage);
