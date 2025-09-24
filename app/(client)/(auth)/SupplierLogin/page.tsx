@@ -1,17 +1,15 @@
 "use client"
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import LoadingButton from "@/app/components/loadingButton";
 import React from "react";
 import BackUpBtn from "@/app/components/backUpBtn";
 import { Role } from "@prisma/client";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 
-
-const SupplierSignIn = async (email: string, password: string, setError: (error: string) => void, 
-setIsLoading: (loading: boolean) => void) => {
+const SupplierSignIn = async (email: string, password: string) => {
   try {
     const result = await signIn('credentials', {
       email,
@@ -21,9 +19,9 @@ setIsLoading: (loading: boolean) => void) => {
     });
     
     if (result?.error) {
-      setError('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
-      return null;
+      throw new Error('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
     } 
+    
     if (result?.ok) {
       // Get the user data to determine redirect
       try {
@@ -33,45 +31,44 @@ setIsLoading: (loading: boolean) => void) => {
         }
         const sessionData = await response.json();
         return sessionData;
-      } 
-      catch (sessionError)
-       {
+      } catch (sessionError) {
         console.error('Error fetching session:', sessionError);
-        setError('שגיאה בטעינת נתוני המשתמש');
-        return null;
+        throw new Error('שגיאה בטעינת נתוני המשתמש');
       }
     }
-    return null;
-  } 
-  catch (error) 
-  {
+    
+    throw new Error('שגיאה בהתחברות - בדקו את פרטי ההתחברות');
+  } catch (error) {
     console.error('Sign in error:', error);
-    setError('שגיאה בחיבור לשרת');
-    return null;
-  } finally {
-    setIsLoading(false);
+    throw error;
   }
 }
 
 
 
 function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const mutation = useMutation({
+    mutationFn: ({email, password}: {email: string, password: string}) => SupplierSignIn(email, password),
+    onSuccess: (result) => {
+      if (result && result.user?.role === Role.USER) {
+        router.push('/Loading');
+      }
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    const sessionData = await SupplierSignIn(email, password, setError, setIsLoading);
-    if (sessionData && sessionData.user?.role === Role.USER) 
-      {
-      router.push('/USER/AddCitties');
-    }   
+    
+    try {
+      await mutation.mutateAsync({email, password});
+    } catch (error) {
+      // Error is already handled by the mutation
+      console.error('Login error:', error);
+    }
   };
 
   return (
@@ -93,9 +90,9 @@ function LoginPage() {
 
 
         {/* Error Message */}
-        {error && (
+        {mutation.error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center">
-            <p className="font-medium">{error}</p>
+            <p className="font-medium">{mutation.error.message}</p>
           </div>
         )}
 
@@ -144,7 +141,7 @@ function LoginPage() {
             </div>
 
             {/* Submit Button */}
-            <LoadingButton loading={isLoading} text="התחברו" />
+            <LoadingButton loading={mutation.isPending} text="התחברו" />
           </form>
 
           {/* Divider */}

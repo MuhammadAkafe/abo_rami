@@ -13,8 +13,6 @@ export default function ControlPanel({ navigate, activeTab}: ControlPanelProps) 
   const { data, status }  = useSession() as { data: Session | null; status: string };
   const [isLoading, setIsLoading] = useState(false);
 
-
-
     return (
         <div className="mb-6">
         <header className="border-b border-gray-200">

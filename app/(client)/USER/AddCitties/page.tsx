@@ -2,16 +2,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { israel_cities as cities } from '@/app/components/israel_cities_names_and__geometric_data';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import LoadingButton from '@/app/components/loadingButton';
-import LoadingComponent from '@/app/components/LoadingCompoenent';
 import ErrorAlert from '@/app/components/ErrorAlert';
 import { useCities } from '@/app/hooks/useCities';
-import { Role } from '@prisma/client';
 
 interface City {
   name: string;
 }
+
 
 export default function CitiesSelector() {
   // State management
@@ -21,30 +19,15 @@ export default function CitiesSelector() {
   const [filteredCities, setFilteredCities] = useState<City[]>(cities);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { addCities } = useCities();
   
   // Refs
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
-  // Custom hooks
-  const { isCheckingExistingCities, addCities, sessionStatus } = useCities();
-  const { data: session } = useSession();
+
   const router = useRouter();
 
-  // Session validation - redirect if not authenticated or wrong role
-  useEffect(() => {
-    if (sessionStatus === 'loading') return; // Still loading session
-    
-    if (sessionStatus === 'unauthenticated') {
-      router.push('/USER/Login');
-      return;
-    }
-    
-    if (session?.user && 'role' in session.user && session.user.role !== Role.USER) {
-      router.push('/USER/Login');
-      return;
-    }
-  }, [session, sessionStatus, router]);
 
   // Filter cities based on search term with debouncing
   useEffect(() => {
@@ -77,24 +60,8 @@ export default function CitiesSelector() {
     };
   }, []);
 
-  // Show loading component while checking session or existing cities
-  // Always show loading until all checks are complete
-  if (sessionStatus === 'loading' || isCheckingExistingCities) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <LoadingComponent isLoading={true} />
-      </div>
-    );
-  }
 
-  // If session is not authenticated or wrong role, show loading while redirecting
-  if (sessionStatus === 'unauthenticated' || (session?.user && 'role' in session.user && session.user.role !== Role.USER)) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <LoadingComponent isLoading={true} />
-      </div>
-    );
-  }
+
 
 
 
@@ -149,7 +116,6 @@ export default function CitiesSelector() {
       setError('אנא בחר לפחות עיר אחת');
       return;
     }
-
     setIsLoading(true);
     try {
       await addCities(selectedCities);
@@ -158,7 +124,8 @@ export default function CitiesSelector() {
     } catch (error) {
       console.error('Error submitting cities:', error);
       setError(error instanceof Error ? error.message : 'שגיאה בהוספת הערים');
-    } finally {
+    } 
+    finally {
       setIsLoading(false);
     }
   };
