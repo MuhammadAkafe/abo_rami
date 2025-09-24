@@ -24,10 +24,23 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
         }
 
-        // Get tasks assigned to this supplier
+        // Calculate date range: last week to today
+        const today = new Date();
+        const lastWeek = new Date();
+        lastWeek.setDate(today.getDate() - 7);
+        
+        // Set time to start of day for last week and end of day for today
+        lastWeek.setHours(0, 0, 0, 0);
+        today.setHours(23, 59, 59, 999);
+
+        // Get tasks assigned to this supplier within the date range
         const tasks = await prisma.tasks.findMany({
             where: {
-                supplierid: supplierIdNum
+                supplierid: supplierIdNum,
+                date: {
+                    gte: lastWeek,
+                    lte: today
+                }
             },
             include: {
                 supplier: {
@@ -39,7 +52,7 @@ export async function GET(request: Request) {
                 }
             },
             orderBy: {
-                date: 'asc'
+                date: 'desc'
             }
         });
 
