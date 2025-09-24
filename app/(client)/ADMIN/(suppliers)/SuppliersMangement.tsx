@@ -72,7 +72,7 @@ export default function SuppliersManagement() {
 
       {/* Table */}
       {isLoading ? (
-        <LoadingComponent isLoading={isLoading} messageKey="LOADING_SUPPLIERS" />
+        <LoadingComponent message="טוען ספקים..." />
       ) : error ? (
         <div className="p-8 text-center">
           <div className="text-red-600 text-lg mb-2">שגיאה בטעינת הספקים</div>

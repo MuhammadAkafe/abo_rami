@@ -9,17 +9,12 @@ import FormField from './FormField';
 // TYPES & INTERFACES
 // ============================================================================
 
-interface City {
-  name: string;
-}
 
 interface SupplierFormProps {
   supplier: NewSupplier;
-  selectedCities: City[];
   fieldErrors: Record<string, string>;
   isLoading: boolean;
   onSupplierChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-  onCitiesChange: (cities: City[]) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
 }
@@ -30,11 +25,9 @@ interface SupplierFormProps {
 
 export default function SupplierForm({
   supplier,
-  selectedCities,
   fieldErrors,
   isLoading,
   onSupplierChange,
-  onCitiesChange,
   onSubmit,
   onCancel
 }: SupplierFormProps) {

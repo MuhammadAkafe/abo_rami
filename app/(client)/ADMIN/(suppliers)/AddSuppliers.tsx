@@ -12,9 +12,6 @@ import SupplierForm from '@/app/components/SupplierForm';
 // TYPES & INTERFACES
 // ============================================================================
 
-interface City {
-  name: string;
-}
 
 // ============================================================================
 // MAIN COMPONENT
@@ -45,7 +42,6 @@ export default function AddSuppliers() {
     role: Role.USER
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [selectedCities, setSelectedCities] = useState<City[]>([]);
 
   // ============================================================================
   // EVENT HANDLERS
@@ -78,7 +74,6 @@ export default function AddSuppliers() {
       confirmPassword: '',
       role: Role.USER
     });
-    setSelectedCities([]);
     setFieldErrors({});
   };
 
@@ -101,11 +96,10 @@ export default function AddSuppliers() {
       return;
     }
 
-    // Prepare submission data with cities
+    // Prepare submission data
     const submissionData = {
       ...newSupplier, 
-      userid: user_id as number || null,
-      cities: selectedCities
+      userid: user_id as number || null
     };
 
     // Submit data
@@ -164,11 +158,9 @@ export default function AddSuppliers() {
       {showAddForm && (
         <SupplierForm
           supplier={newSupplier}
-          selectedCities={selectedCities}
           fieldErrors={fieldErrors}
           isLoading={mutation.isPending}
           onSupplierChange={handleFormInputChange}
-          onCitiesChange={setSelectedCities}
           onSubmit={handleFormSubmit}
           onCancel={handleFormCancel}
         />

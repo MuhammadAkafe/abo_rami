@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import redisClient from "../../(lib)/redis";
-import { generateSecureToken } from "../../(lib)/Otp";
+import redisClient from "@/app/lib/redis";
+import { generateSecureToken } from "@/app/lib/Otp";
 
 export async function POST(request: Request) {
     try {

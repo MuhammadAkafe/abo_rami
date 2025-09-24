@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/app/(lib)/prisma";
-import { generateOTP } from "../../../(lib)/Otp";
-import { sendEmail } from "../../../(lib)/sendEmail";
-import redisClient from "../../../(lib)/redis";
+import { prisma } from "@/app/lib/prisma";
+import { generateOTP } from "../../../lib/Otp";
+import { sendEmail } from "../../../lib/sendEmail";
+import redisClient from "../../../lib/redis";
 
 const findSupplier = async (email: string) => {
     try {

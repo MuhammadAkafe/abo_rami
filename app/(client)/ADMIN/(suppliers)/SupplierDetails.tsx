@@ -4,7 +4,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { suppliers, tasks } from '@prisma/client';
 import { getStatusColor, getStatusText } from '@/app/styles/taskstyles';
 import { useSession } from 'next-auth/react';
-import type { Session } from 'next-auth';
 import Image from 'next/image';
 
 type TaskWithSupplier = tasks & {

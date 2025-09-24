@@ -1,7 +1,16 @@
 import { createClient } from 'redis';
 
+// Check if REDIS_URL is valid, otherwise use localhost fallback
+const getRedisUrl = () => {
+    const redisUrl = process.env.REDIS_URL;
+    if (!redisUrl || redisUrl === 'database_provisioning_in_progress' || !redisUrl.startsWith('redis://')) {
+        return 'redis://localhost:6379';
+    }
+    return redisUrl;
+};
+
 const redisClient = createClient({
-    url: process.env.REDIS_URL || 'redis://localhost:6379',
+    url: getRedisUrl(),
     socket: {
         // Add timeout settings for Vercel KV
         connectTimeout: 10000,
