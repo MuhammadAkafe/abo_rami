@@ -1,5 +1,5 @@
 import SupplierDetails from '@/app/(client)/ADMIN/(suppliers)/SupplierDetails';
 
-export default function SupplierDetailsPage() {
+export default async function SupplierDetailsPage() {
   return <SupplierDetails />;
 }

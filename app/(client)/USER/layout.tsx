@@ -3,6 +3,7 @@ import { authOptions } from "@/app/lib/auth";
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { Role } from "@prisma/client";
+import Permission from "@/app/components/permission";
 
 
 export default async function UserLayout({ children }: { children: React.ReactNode }) {
@@ -15,9 +16,7 @@ export default async function UserLayout({ children }: { children: React.ReactNo
     if (session.user?.role !== Role.USER) 
       {
        return <>
-       <div className="flex justify-center items-center h-screen">
-        <h1>You are not authorized to access this page</h1>
-       </div>
+       <Permission />
        </>
     }
 

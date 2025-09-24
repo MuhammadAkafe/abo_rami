@@ -17,6 +17,8 @@ interface UserDetailsCardProps {
  * User Details Card Component
  * Displays user (admin) information
  */
+
+
 export const UserDetailsCard: React.FC<UserDetailsCardProps> = ({ supplier }) => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
