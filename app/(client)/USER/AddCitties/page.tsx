@@ -4,7 +4,7 @@ import { israel_cities as cities } from '@/app/components/israel_cities_names_an
 import { useRouter } from 'next/navigation';
 import LoadingButton from '@/app/components/loadingButton';
 import ErrorAlert from '@/app/components/ErrorAlert';
-import { useCities } from '@/app/hooks/useCities';
+import { useAddCities } from '@/app/hooks/useAddCities';
 
 interface City {
   name: string;
@@ -16,10 +16,9 @@ export default function CitiesSelector() {
   const [selectedCities, setSelectedCities] = useState<City[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredCities, setFilteredCities] = useState<City[]>(cities);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { addCities } = useCities();
+  const [filteredCities, setFilteredCities] = useState<City[]>(cities);
+  const { mutation } = useAddCities();
   
   // Refs
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -110,15 +109,14 @@ export default function CitiesSelector() {
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setError(null);
     
     if (selectedCities.length === 0) {
       setError('אנא בחר לפחות עיר אחת');
       return;
     }
-    setIsLoading(true);
+    
     try {
-      await addCities(selectedCities);
+      await mutation.mutateAsync(selectedCities);
       // Success - redirect to TaskList
       router.push('/USER/Tasklist');
     } catch (error) {
@@ -126,7 +124,7 @@ export default function CitiesSelector() {
       setError(error instanceof Error ? error.message : 'שגיאה בהוספת הערים');
     } 
     finally {
-      setIsLoading(false);
+      setError(null);  
     }
   };
 
@@ -167,7 +165,7 @@ export default function CitiesSelector() {
                       <button
                         onClick={() => handleRemoveCity(city)}
                         className="text-green-600 hover:text-green-800 focus:outline-none"
-                        disabled={isLoading}
+                        disabled={mutation.isPending}
                         title={`הסר ${city.name}`}
                         aria-label={`הסר ${city.name}`}
                       >
@@ -250,12 +248,12 @@ export default function CitiesSelector() {
               <button
                 onClick={handleClearAll}
                 className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                disabled={isLoading}
+                disabled={mutation.isPending}
               >
                 נקה הכל
               </button>
               <LoadingButton 
-                loading={isLoading} 
+                loading={mutation.isPending} 
                 text="אישור" 
                 handleClick={handleSubmit}
               />

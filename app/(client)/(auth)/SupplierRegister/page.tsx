@@ -6,7 +6,7 @@ import { validateRegisterForm } from "@/app/validtion";
 import { Role } from "@prisma/client";
 import { RegisterFormData } from "@/app/validtion";
 import { useRouter } from "next/navigation";
-import { useAddSupplier } from "@/app/hooks/useSupplier";
+import { useAddSupplier } from "@/app/hooks/useAddSupplier";
 import LoadingButton from "@/app/components/loadingButton";
 import { users } from "@prisma/client";
 import BackUpBtn from "@/app/components/backUpBtn";

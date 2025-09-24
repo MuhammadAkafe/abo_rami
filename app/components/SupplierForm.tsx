@@ -4,7 +4,6 @@ import React from 'react';
 import { Role } from '@prisma/client';
 import { NewSupplier } from '@/app/(types)/types';
 import FormField from './FormField';
-import CitiesSelector from './CitiesSelector';
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -137,14 +136,7 @@ export default function SupplierForm({
         />
       </div>
 
-      {/* Cities Selection */}
-      <CitiesSelector
-        selectedCities={selectedCities}
-        onCitiesChange={onCitiesChange}
-        label="ערים (אופציונלי)"
-        placeholder="בחר ערים או חפש..."
-        required={false}
-      />
+
       
       {/* Form Actions */}
       <div className="mt-6 flex justify-end space-x-3">

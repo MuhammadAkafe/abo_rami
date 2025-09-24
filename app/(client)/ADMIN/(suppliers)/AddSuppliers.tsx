@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Role } from '@prisma/client';
 import { validateRegisterForm } from '@/app/validtion';
-import { useAddSupplier } from '@/app/hooks/useSupplier';
+import { useAddSupplier } from '@/app/hooks/useAddSupplier';
 import { useSession } from 'next-auth/react';
 import { NewSupplier } from '@/app/(types)/types';
 import SupplierForm from '@/app/components/SupplierForm';
