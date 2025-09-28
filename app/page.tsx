@@ -49,7 +49,7 @@ export default function Home() {
             </div>
           </Link>
 
-          <Link 
+          {/* <Link 
             href="/SupplierRegister"
             className="block w-full bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 transform hover:scale-105 border border-gray-100"
           >
@@ -62,7 +62,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-gray-900 mb-2">הירשמו</h3>
               <p className="text-gray-600">צרו חשבון חדש</p>
             </div>
-          </Link>
+          </Link> */}
         </div>
 
       </div>

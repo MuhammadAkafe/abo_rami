@@ -156,14 +156,14 @@ function LoginPage() {
 
 
           {/* Sign Up Link */}
-          <div className="text-center">
+          {/* <div className="text-center">
             <p className="text-sm text-gray-600">
               אין לכם חשבון?{" "}
               <Link href="/SupplierRegister" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                 הירשמו
               </Link>
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
