@@ -16,6 +16,7 @@ interface SupplierFormData extends RegisterFormData {
 }
 
 
+
 export default function RegisterPage() {
   const [formData, setFormData] = useState<SupplierFormData>({
     userid: null,
