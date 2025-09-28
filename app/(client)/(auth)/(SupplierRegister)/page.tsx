@@ -354,3 +354,6 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
