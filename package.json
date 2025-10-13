@@ -7,6 +7,9 @@
     "build": "npx prisma generate && next build",
     "postinstall": "npx prisma generate",
     "start": "next start",
+    "prisma": {
+      "schema": "./prisma"
+    },
     "lint": "eslint",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

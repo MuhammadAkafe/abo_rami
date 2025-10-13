@@ -43,13 +43,6 @@ export default function AddSuppliers() {
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  // ============================================================================
-  // EVENT HANDLERS
-  // ============================================================================
-  
-  /**
-   * Handle form input changes
-   */
   const handleFormInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNewSupplier(prev => ({ ...prev, [name]: value }));

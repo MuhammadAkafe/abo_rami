@@ -5,7 +5,7 @@ import { Role } from "@prisma/client"
 
 const findUser = async (email: string, role: Role, password: string) => {
     const user = await prisma.users.findUnique({
-        where: { email: email },
+        where: { email: email.toLowerCase() },
     })
     if (!user) {
         console.log('User not found:', email)
