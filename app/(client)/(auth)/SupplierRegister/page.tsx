@@ -355,5 +355,4 @@ export default function RegisterPage() {
   );
 }
 
-// Force dynamic rendering
-export const dynamic = 'force-dynamic';
+// Client component - no need for dynamic export

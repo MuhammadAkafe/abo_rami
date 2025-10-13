@@ -2,7 +2,6 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center space-y-8">
         {/* Header */}
@@ -63,10 +62,10 @@ export default function Home() {
               <p className="text-gray-600">צרו חשבון חדש</p>
             </div>
           </Link> */}
+          </div>
         </div>
 
       </div>
-    </div>
     </div>
   );
 }
