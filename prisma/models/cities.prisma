@@ -1,8 +1,0 @@
-model cities {
-  id Int  @id @default(autoincrement())
-  userid Int
-  supplierid Int
-  city String
-  supplier    suppliers    @relation(fields: [supplierid], references: [id], onDelete: Cascade)
-  @@index([userid,supplierid])
-}
