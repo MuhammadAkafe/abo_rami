@@ -4,8 +4,9 @@ import bcrypt from "bcrypt"
 import { Role } from "@prisma/client"
 
 const findUser = async (email: string, role: Role, password: string) => {
+
     const user = await prisma.users.findUnique({
-        where: { email: email.toLowerCase() },
+        where: { email: email },
     })
     if (!user) {
         console.log('User not found:', email)
@@ -57,11 +58,12 @@ export const authOptions = {
                     console.log('Missing credentials')
                     return null
                 }
+                const emailLowerCase = credentials.email.toLowerCase()
                     if (credentials.role === Role.ADMIN) {
-                        return await findUser(credentials.email, credentials.role as Role, credentials.password)
+                        return await findUser(emailLowerCase, credentials.role as Role, credentials.password)
                     }
                     else {
-                        return await findSupplier(credentials.email, credentials.role as Role, credentials.password)
+                        return await findSupplier(emailLowerCase, credentials.role as Role, credentials.password)
                     }
             },
         }),
