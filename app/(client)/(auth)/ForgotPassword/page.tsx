@@ -72,6 +72,7 @@ function ForgotPasswordPage() {
       router.push('/Email');
       return;
     }
+    
     setEmail(storedEmail);
     setIsAdmin(storedIsAdmin === 'true');
     setResetToken(storedResetToken);
