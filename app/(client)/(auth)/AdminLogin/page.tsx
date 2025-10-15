@@ -1,10 +1,10 @@
 "use client"
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import LoadingButton from "@/app/components/loadingButton";
+import LoadingButton from "@/app/components/Loading/loadingButton";
 import React from "react";
 import BackUpBtn from "@/app/components/backUpBtn";
-import { useAdminSignUp } from "@/app/hooks/useAdminSignUp";
+import { useAdminSignUp } from "@/hooks/useAdminSignUp";
 
 
 function AdminLoginPage() {

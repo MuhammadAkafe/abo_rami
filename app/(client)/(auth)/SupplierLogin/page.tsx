@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import LoadingButton from "@/app/components/loadingButton";
+import LoadingButton from "@/app/components/Loading/loadingButton";
 import React from "react";
 import BackUpBtn from "@/app/components/backUpBtn";
 import { Role } from "@prisma/client";

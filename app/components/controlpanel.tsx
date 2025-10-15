@@ -2,10 +2,10 @@
 
 import { useSession } from "next-auth/react"
 import type { Session } from 'next-auth';
-import { ControlPanelProps } from '@/app/(types)/types';
+import { ControlPanelProps } from '@/types/types';
 import { useState } from "react";
 import { logout } from "./logout";
-import LoadingButton from "./loadingButton";
+import LoadingButton from "./Loading/loadingButton";
 
 
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Status } from '@prisma/client';
-import { getStatusColor, getStatusText } from '@/app/styles/taskstyles';
-import { TaskWithSupplier } from '../hooks/useSupplierTasks';
+import { getStatusColor, getStatusText } from '@/styles/taskstyles';
+import { TaskWithSupplier } from '@/hooks/useSupplierTasks';
 import { useSession } from 'next-auth/react';
 import { Session } from 'next-auth';
 

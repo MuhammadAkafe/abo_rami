@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import BackUpBtn from "@/app/components/backUpBtn";
 import { useMutation } from "@tanstack/react-query";
-import LoadingButton from "@/app/components/loadingButton";
+import LoadingButton from "@/app/components/Loading/loadingButton";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -72,7 +72,7 @@ function ForgotPasswordPage() {
       router.push('/Email');
       return;
     }
-    
+
     setEmail(storedEmail);
     setIsAdmin(storedIsAdmin === 'true');
     setResetToken(storedResetToken);

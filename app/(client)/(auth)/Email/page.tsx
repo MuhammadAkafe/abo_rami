@@ -5,7 +5,7 @@ import React from "react";
 import BackUpBtn from "@/app/components/backUpBtn";
 import { useMutation } from "@tanstack/react-query";
 import { validateEmailForm, type EmailFormData } from "@/app/validtion";
-import LoadingButton from "@/app/components/loadingButton";
+import LoadingButton from "@/app/components/Loading/loadingButton";
 
 const sendEmail = async (formData: EmailFormData) => {
   try {

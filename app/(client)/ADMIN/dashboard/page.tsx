@@ -1,12 +1,12 @@
 "use client"
-import TasksDashbaordDisplay from '@/app/(client)/ADMIN/(tasks)/Taskdashboard/Tasksdashboard';
-import Add_task from '@/app/(client)/ADMIN/(tasks)/Add_task/Add_task';
-import AddSuppliers from '@/app/(client)/ADMIN/(suppliers)/AddSuppliers';
+import TasksDashbaordDisplay from '@/app/(client)/ADMIN/tasks/Tasksdashboard';
+import Add_task from '@/app/(client)/ADMIN/tasks/Add_task';
+import AddSuppliers from '@/app/(client)/ADMIN/suppliers/AddSuppliers';
 import ControlPanel from '@/app/components/controlpanel';
 import { useState, useMemo, useCallback, Suspense } from 'react';
 
-import ListOfCustomers from '@/app/(client)/ADMIN/(suppliers)/SuppliersMangement';
-import ListOfTasks from '@/app/(client)/ADMIN/(tasks)/TasksMangment/TasksMangment';
+import ListOfCustomers from '@/app/(client)/ADMIN/suppliers/SuppliersMangement';
+import ListOfTasks from '@/app/(client)/ADMIN/tasks/TasksMangment';
 import React from 'react';
 
 // Memoized components to prevent unnecessary re-renders

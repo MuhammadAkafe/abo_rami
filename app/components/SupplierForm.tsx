@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Role } from '@prisma/client';
-import { NewSupplier } from '@/app/(types)/types';
+import { NewSupplier } from '@/types/types';
 import FormField from './FormField';
 
 // ============================================================================

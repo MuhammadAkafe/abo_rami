@@ -1,7 +1,7 @@
 "use client";
 
-import LoadingComponent from "@/app/components/LoadingCompoenent";
-import { useGetAllCities } from "@/app/hooks/UseGetAllCities";
+import LoadingComponent from "@/app/components/Loading/LoadingComponent";
+import { useGetAllCities } from "@/hooks/UseGetAllCities";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 

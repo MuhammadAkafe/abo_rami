@@ -2,9 +2,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { israel_cities as cities } from '@/app/components/israel_cities_names_and__geometric_data';
 import { useRouter } from 'next/navigation';
-import LoadingButton from '@/app/components/loadingButton';
+import LoadingButton from '@/app/components/Loading/loadingButton';
 import ErrorAlert from '@/app/components/ErrorAlert';
-import { useAddCities } from '@/app/hooks/useAddCities';
+import { useAddCities } from '@/hooks/useAddCities';
 
 interface City {
   name: string;

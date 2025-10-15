@@ -4,9 +4,9 @@ import { useSession } from 'next-auth/react';
 import type { Session } from 'next-auth';
 
 // Import custom hook and components
-import { useSupplierTasks, TaskWithSupplier } from '../../../hooks/useSupplierTasks';
+import { useSupplierTasks, TaskWithSupplier } from '@/hooks/useSupplierTasks';
 import { TaskRow } from '../../../components/TaskRow';
-import { LoadingState } from '../../../components/LoadingState';
+import { LoadingState } from '../../../components/Loading/LoadingState';
 import { ErrorState } from '../../../components/ErrorState';
 import { EmptyState } from '../../../components/EmptyState';
 
