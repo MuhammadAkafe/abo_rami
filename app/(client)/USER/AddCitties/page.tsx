@@ -33,7 +33,9 @@ export default function CitiesSelector() {
     const timeoutId = setTimeout(() => {
       if (searchTerm.trim() === '') {
         setFilteredCities(cities);
-      } else {
+      } 
+      else 
+      {
         const filtered = cities.filter(city =>
           city.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
@@ -58,11 +60,6 @@ export default function CitiesSelector() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
-
-
-
-
 
 
 
@@ -119,7 +116,9 @@ export default function CitiesSelector() {
       await mutation.mutateAsync(selectedCities);
       // Success - redirect to TaskList
       router.push('/USER/Tasklist');
-    } catch (error) {
+    } 
+    catch (error) 
+    {
       console.error('Error submitting cities:', error);
       setError(error instanceof Error ? error.message : 'שגיאה בהוספת הערים');
     } 

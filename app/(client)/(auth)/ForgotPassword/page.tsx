@@ -68,12 +68,10 @@ function ForgotPasswordPage() {
     const storedEmail = localStorage.getItem('resetEmail');
     const storedIsAdmin = localStorage.getItem('isAdmin');
     const storedResetToken = localStorage.getItem('resetToken');
-    
     if (!storedEmail || !storedResetToken) {
       router.push('/Email');
       return;
     }
-    
     setEmail(storedEmail);
     setIsAdmin(storedIsAdmin === 'true');
     setResetToken(storedResetToken);
@@ -150,9 +148,7 @@ function ForgotPasswordPage() {
           localStorage.removeItem('isAdmin');
           localStorage.removeItem('resetToken');
           // Redirect to login page after 3 seconds
-          setTimeout(() => {
-            router.push('/Login');
-          }, 3000);
+            router.push('/');
         },
         onError: (error: Error) => {
           console.error('Password reset error:', error);
