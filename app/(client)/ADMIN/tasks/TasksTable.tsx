@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import { tasks } from '@prisma/client'
 import { useEffect } from 'react'
 
+
 type TaskWithSupplier = tasks & {
   supplier?: {
     firstName: string;
@@ -10,6 +11,8 @@ type TaskWithSupplier = tasks & {
     phone: string;
   } | null;
 };
+
+
 import { getStatusColor, getStatusText } from '@/styles/taskstyles'
 import DeleteModal from '@/app/components/DeleteModal';
 import { useDeleteTask } from '@/hooks/useDeleteTask';
@@ -130,7 +133,7 @@ function TasksTable({ title='משימות היום', filters, showDeleteButton =
   const handleRowClick = (task: TaskWithSupplier) => {
     if (task.supplierid) {
       // Navigate to supplier task details page with task and supplier data
-      router.push(`/supplier-task-details?taskId=${task.id}&supplierId=${task.supplierid}`);
+      router.push(`/components/supplier-task-details?taskId=${task.id}&supplierId=${task.supplierid}`);
     }
   };
 

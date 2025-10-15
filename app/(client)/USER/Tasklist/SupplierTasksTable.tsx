@@ -30,7 +30,7 @@ function SupplierTasksTable({ title = 'המשימות שלי' }: SupplierTasksTa
    * Handle row click to navigate to task details
    */
   const handleRowClick = (task: TaskWithSupplier) => {
-    router.push(`/supplier-task-details?taskId=${task.id}&supplierId=${task.supplierid}`);
+    router.push(`/components/supplier-task-details?taskId=${task.id}&supplierId=${task.supplierid}`);
   };
 
   // Show loading state

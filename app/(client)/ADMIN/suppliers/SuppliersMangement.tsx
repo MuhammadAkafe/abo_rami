@@ -5,6 +5,8 @@ import SuppliersTable from './SuppliersTable';
 import LoadingComponent from '@/app/components/Loading/LoadingComponent';
 import { useSession } from 'next-auth/react';
 import { suppliers } from '@prisma/client';
+
+
 export default function SuppliersManagement() {
   const { data: session } = useSession();
   const User_id = session?.user && 'id' in session.user ? session.user.id : undefined;
