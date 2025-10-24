@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  clerkid   String   @unique @map("clerkId")
+  updatedAt DateTime @updatedAt
+  cities    cities[]
+  tasks     tasks[]
+}
+
+model tasks {
+  id          Int       @id @default(autoincrement())
+  address     String
+  description String
+  city        String
+  url         String?
+  status      Status    @default(PENDING)
+  date        DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  clerkId     String
+  user        users     @relation(fields: [clerkId], references: [clerkid], onDelete: Cascade)
+}
+
+model cities {
+  id      Int    @id @default(autoincrement())
+  city    String
+  clerkId String
+  user    users  @relation(fields: [clerkId], references: [clerkid], onDelete: Cascade)
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  PENDING
+  COMPLETED
+  REJECTED
+}

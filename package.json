@@ -1,0 +1,56 @@
+{
+  "name": "abo_rami",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "postinstall": "pnpm prisma generate",
+    "start": "next start",
+    "lint": "eslint",
+    "db:generate": "pnpm prisma generate",
+    "db:migrate": "pnpm prisma migrate dev",
+    "db:migrate:deploy": "pnpm prisma migrate deploy",
+    "db:migrate:reset": "pnpm prisma migrate reset",
+    "db:push": "pnpm prisma db push",
+    "db:studio": "pnpm prisma studio",
+    "db:seed": "pnpm prisma db seed",
+
+     
+    
+    "deploy:production": "pnpm run db:generate && pnpm run build",
+    "deploy:staging": "pnpm run db:generate && pnpm run build"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "^6.33.6",
+    "@prisma/client": "^6.17.1",
+    "@tanstack/react-query": "^5.87.4",
+    "axios": "^1.11.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "next": "15.5.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-toastify": "^11.0.5",
+    "redis": "^5.8.2",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20",
+    "@types/nodemailer": "^7.0.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.2",
+    "prisma": "^6.17.1",
+    "tailwindcss": "^4",
+    "tsx": "^4.20.5",
+    "typescript": "^5"
+  }
+}
