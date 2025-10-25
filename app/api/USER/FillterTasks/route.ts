@@ -19,9 +19,21 @@ export async function GET(request: Request) {
             );
         }
 
+        // First, find the supplier by clerkId
+        const supplier = await prisma.suppliers.findUnique({
+            where: { clerkId: clerkId },
+        });
+
+        if (!supplier) {
+            return NextResponse.json(
+                { error: 'Supplier not found' },
+                { status: 404 }
+            );
+        }
+
         // Build the where clause based on filters
         const whereClause: Prisma.tasksWhereInput = {
-            clerkId: clerkId, // Only get tasks for this specific user
+            supplierId: supplier.id, // Only get tasks for this specific supplier
         };
 
         // Filter by status if provided and not 'ALL'
@@ -61,7 +73,7 @@ export async function GET(request: Request) {
         const tasks = await prisma.tasks.findMany({
             where: whereClause,
             include: {
-                user: true,
+                supplier: true,
             },
             orderBy: {
                 date: 'desc',

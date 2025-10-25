@@ -18,6 +18,7 @@ export default function AddSuppliers() {
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [newSupplier, setNewSupplier] = useState<NewSupplier>({
+    clerkId: user?.id as string,
     firstName: '',
     lastName: '',
     email: '',
@@ -40,6 +41,7 @@ export default function AddSuppliers() {
 
   const resetForm = () => {
     setNewSupplier({
+      clerkId: user?.id as string,
       firstName: '',
       lastName: '',
       email: '',

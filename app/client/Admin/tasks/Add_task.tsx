@@ -1,10 +1,8 @@
 "use client"
-import { useUser } from '@clerk/nextjs';
-import React, { useEffect, useState } from 'react';
-import { getSuppliers } from '@/app/actions/supplierActions';
+import React, { useState } from 'react';
 import { Task } from '@/types/types';
-import { supplierList } from '@/types/types';
 import useAddTask from '@/hooks/Admin/useAddTask';
+import useGetSuppliers from '@/hooks/Admin/useGetSuppliers';
 
 
 
@@ -12,8 +10,7 @@ import useAddTask from '@/hooks/Admin/useAddTask';
 
 
 export default function Add_task() {
-  const { user } = useUser();
-  const [suppliersList, setSuppliersList] = useState<supplierList[]>([]);
+  const { suppliers: suppliersList, isLoading: suppliersLoading, error: suppliersError } = useGetSuppliers();
 
   const [newTask,setNewTask] = useState<Task>({
     address: "",
@@ -24,7 +21,6 @@ export default function Add_task() {
   });
 
   const [SelectedSupplier, setSelectedSupplier] = useState<string>("")
-  const AdminId = user?.id as string;
 
 
   const resetForm = () => {
@@ -41,17 +37,7 @@ export default function Add_task() {
 
 
 
-  useEffect(() => {
-    if (AdminId) {
-      const fetchSuppliers = async () => {
-       const suppliers = await getSuppliers(AdminId);
-       if (suppliers && suppliers.length > 0) {
-        setSuppliersList(suppliers);
-       }
-      };
-      fetchSuppliers();
-    }
-  }, [AdminId]);
+  // Suppliers are now fetched via useGetSuppliers hook
 
 
 
@@ -93,6 +79,25 @@ export default function Add_task() {
                   <h3 className="text-sm font-medium text-red-800">שגיאה בהוספת המשימה</h3>
                   <div className="mt-2 text-sm text-red-700">
                     {error.message}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Suppliers Error Display */}
+          {suppliersError && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">שגיאה בטעינת הספקים</h3>
+                  <div className="mt-2 text-sm text-red-700">
+                    {suppliersError.message}
                   </div>
                 </div>
               </div>
@@ -147,12 +152,14 @@ export default function Add_task() {
                 onChange={handleFormInputChange}
                 name="clerkId"
                 value={SelectedSupplier}
-                disabled={isPending}
+                disabled={isPending || suppliersLoading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 required
               >
-                <option value="">בחר שם ספק</option>
-                {suppliersList.map((supplier) => (
+                <option value="">
+                  {suppliersLoading ? "טוען ספקים..." : "בחר שם ספק"}
+                </option>
+                {suppliersList?.map((supplier) => (
                   <option key={supplier.clerkId} value={supplier.clerkId}>{supplier.firstName} {supplier.lastName}</option>
                 ))}
               </select>
@@ -176,12 +183,12 @@ export default function Add_task() {
                 onChange={handleFormInputChange}
                 name="city"
                 value={newTask.city}
-                disabled={isPending}
+                disabled={isPending || suppliersLoading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 required
               >
                 <option value="">בחר עיר</option>
-                {SelectedSupplier && suppliersList.find(supplier => supplier.clerkId === SelectedSupplier)?.cities?.map((city) => (
+                {SelectedSupplier && suppliersList?.find(supplier => supplier.clerkId === SelectedSupplier)?.cities?.map((city) => (
                   <option key={city.id} value={city.city}>{city.city}</option>
                 ))}
               </select>

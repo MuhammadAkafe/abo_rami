@@ -22,7 +22,7 @@ export async function GET(
         id: taskId,
       },
       include: {
-        user: true,
+        supplier: true,
       },
     });
 
@@ -86,7 +86,7 @@ export async function PUT(
       where: { id: taskId },
       data: updateData,
       include: {
-        user: true,
+        supplier: true,
       },
     });
 

@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "db:generate": "pnpm prisma generate",
+    "db:generate:safe": "taskkill /f /im node.exe 2>nul & timeout /t 2 /nobreak >nul & pnpm prisma generate",
     "db:migrate": "pnpm prisma migrate dev",
     "db:migrate:deploy": "pnpm prisma migrate deploy",
     "db:migrate:reset": "pnpm prisma migrate reset",
@@ -18,8 +19,8 @@
 
      
     
-    "deploy:production": "pnpm run db:generate && pnpm run build",
-    "deploy:staging": "pnpm run db:generate && pnpm run build"
+    "deploy:production": "pnpm run db:migrate:deploy && pnpm run build",
+    "deploy:staging": "pnpm run db:migrate:deploy && pnpm run build"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.6",

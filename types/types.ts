@@ -1,4 +1,4 @@
-import { users, tasks, cities } from "@prisma/client";
+import { suppliers, tasks, cities } from "@prisma/client";
 
 // Export the Status enum type for use throughout the application
 
@@ -37,7 +37,7 @@ export type Task= {
     address: string;
     description: string;
     city: string;
-    user?: users;
+    supplier?: suppliers;
     phone?: string;
     url?: string;
     date?: Date  | string;
@@ -45,6 +45,7 @@ export type Task= {
 
 
 export type supplierList = {
+  id: number | string;
   clerkId: string;
   firstName: string;
   lastName: string;
@@ -58,6 +59,7 @@ export type supplierList = {
 
 
 export interface NewSupplier {
+  clerkId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -76,7 +78,7 @@ export interface DeleteModalState {
 }
 
 export interface SuppliersTableProps {
-  filters?: users[];
+  filters?: suppliers[];
   refetch?: () => void;
 }
 

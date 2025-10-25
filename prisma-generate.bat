@@ -1,0 +1,9 @@
+@echo off
+echo Stopping all Node processes...
+taskkill /f /im node.exe 2>nul
+echo Waiting 2 seconds...
+timeout /t 2 /nobreak >nul
+echo Generating Prisma client...
+npx prisma generate
+echo Done!
+pause

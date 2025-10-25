@@ -16,11 +16,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     useEffect(() => {
         if (isLoaded) {
-            if (!user || (user.publicMetadata?.role !== 'USER' && user.publicMetadata?.role !== 'ADMIN')) {
-                router.replace(CLIENT_ROUTES.HOME);
-                return;
-            }
-            if(user && user.publicMetadata?.role !== 'ADMIN') {
+            if (!user || user.publicMetadata?.role !== 'ADMIN') {
                 router.replace(CLIENT_ROUTES.HOME);
                 return;
             }

@@ -40,14 +40,14 @@ export async function POST(request: Request) {
       if (!isValid) {
         return NextResponse.json({ success: false, message: error }, { status: 400 });
       }
-      const supplier = await prisma.users.findUnique({
-        where: { clerkid: clerkId },
+      const supplier = await prisma.suppliers.findUnique({
+        where: { clerkId: clerkId },
       });
       if (!supplier) {
         return NextResponse.json({ success: false, message: "Supplier not found" }, { status: 400 });
       }
       await prisma.tasks.create({
-        data: { address, description, clerkId: clerkId, date: validatedDate, city },
+        data: { address, description, supplierId: supplier.id, date: validatedDate, city },
       });
       return NextResponse.json({ success: true, message: "Task added successfully" }, { status: 200 });
     } 

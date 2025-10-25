@@ -54,7 +54,7 @@ export async function GET(request: Request) {
         const tasks = await prisma.tasks.findMany({
             where: whereClause,
             include: {
-                user: true,
+                supplier: true,
             },
             orderBy: {
                 date: 'desc',

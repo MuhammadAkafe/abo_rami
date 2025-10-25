@@ -1,13 +1,14 @@
 'use client';
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import DeleteModal from '@/components/DeleteModal';
 import { DeleteModalState, supplierList } from '@/types/types';
 import { useUser } from '@clerk/nextjs';
-import { DeleteSuppliers } from '@/app/actions/deleteSupplier';
 import { supplierList as supplier } from '@/types/types';
 import LoadingComponent from '@/components/LoadingComponent';
 import ErrorAlert from '@/components/ErrorAlert';
 import useGetSuppliers from '@/hooks/Admin/useGetSuppliers';
+
+import useDeleteSupplier from '@/hooks/Admin/useDeleteSupplier';
 function SuppliersTable() 
 {
     const [deleteModal, setDeleteModal] = useState<DeleteModalState>({
@@ -16,11 +17,19 @@ function SuppliersTable()
         isLoading: false
     });
 
+    const { isLoaded } = useUser();
+    const { suppliers, error, refetch, isLoading } = useGetSuppliers();
+    const { mutation } = useDeleteSupplier();
 
-    
-    const { user,isLoaded } = useUser();
-    const AdminId = user?.id as string;
-    const { suppliers, isLoading, error, refetch } = useGetSuppliers(AdminId);
+    // Refetch suppliers when component mounts
+    useEffect(() => {
+        if (isLoaded) {
+            refetch();
+        }
+    }, [isLoaded, refetch]);
+
+
+
 
 
     const handleDeleteClick = (Supplier: supplier) => {
@@ -36,15 +45,16 @@ function SuppliersTable()
     const handleDeleteConfirm = async () => {
         if (!deleteModal.Supplier) return;
         setDeleteModal({ isOpen: true, Supplier: deleteModal.Supplier, isLoading: true });
+        
         try {
-          await DeleteSuppliers(deleteModal.Supplier.clerkId);
-          // Success - close modal
-          refetch();
-          setDeleteModal({ isOpen: false, Supplier: null, isLoading: false });
-        } catch (error) {
-          console.error('Error deleting supplier:', error);
-          // Keep modal open to show error, but stop loading
-          setDeleteModal({ isOpen: true, Supplier: deleteModal.Supplier, isLoading: false });
+            await mutation.mutateAsync(deleteModal.Supplier.id as unknown as number);
+            // Close modal and refetch data on success
+            setDeleteModal({ isOpen: false, Supplier: null, isLoading: false });
+            refetch();
+        } catch (deleteError) {
+            // Keep modal open on error, but stop loading
+            console.error('Failed to delete supplier:', deleteError);
+            setDeleteModal({ isOpen: true, Supplier: deleteModal.Supplier, isLoading: false });
         }
     };
 
@@ -59,9 +69,11 @@ function SuppliersTable()
     return <LoadingComponent message="טוען משתמש..." />;
   }
 
-  // Handle data loading state
+  // Handle suppliers loading state
   if (isLoading) {
-    return <LoadingComponent message="טוען ספקים..." />;
+    return (<div className="flex justify-center items-center h-screen">
+           <p className="text-gray-500 text-lg">טוען ספקים... </p>
+        </div>);
   }
 
   // Handle error state
@@ -73,6 +85,8 @@ function SuppliersTable()
       />
     );
   }
+
+
 
 
 

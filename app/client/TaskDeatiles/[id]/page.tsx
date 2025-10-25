@@ -274,13 +274,13 @@ function TaskDetailsPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">שם ספק</label>
                 <p className="text-lg text-gray-900">
-                  {task.user ? `${task.user.firstName} ${task.user.lastName}` : 'לא זמין'}
+                  {task.supplier ? `${task.supplier.firstName} ${task.supplier.lastName}` : 'לא זמין'}
                 </p>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">טלפון</label>
-                <p className="text-lg text-gray-900">{task.user?.phone || 'לא זמין'}</p>
+                <p className="text-lg text-gray-900">{task.supplier?.phone || 'לא זמין'}</p>
               </div>
               
               <div>
