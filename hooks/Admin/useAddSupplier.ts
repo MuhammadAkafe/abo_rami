@@ -1,6 +1,6 @@
 "use client"
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { NewSupplier } from "@/types/types";;
 
 
@@ -55,11 +55,15 @@ const Add_Supplier = async (formData: NewSupplier) =>
 
   export const useAddSupplier = () => 
   {
+    const queryClient = useQueryClient();
+    
     const mutation = useMutation({
       mutationFn: Add_Supplier,
       onSuccess: () => 
         {
          console.log('Supplier added successfully');
+         // Invalidate and refetch suppliers query
+         queryClient.invalidateQueries({ queryKey: ['suppliers'] });
         },
       onError: (error) => {
        console.log("Error adding supplier: " + error.message);
