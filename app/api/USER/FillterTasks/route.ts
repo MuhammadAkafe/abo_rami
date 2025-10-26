@@ -1,39 +1,30 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+import { getSession } from "@/lib/session";
 
 type status = 'PENDING' | 'COMPLETED' | 'REJECTED';
 
 export async function GET(request: Request) {
     try {
+        // Get session to get supplier ID
+        const session = await getSession();
+        
+        if (!session) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
         const { searchParams } = new URL(request.url);
         const status = searchParams.get('status');
         const startDate = searchParams.get('startDate');
         const endDate = searchParams.get('endDate');
-        const clerkId = searchParams.get('clerkId');
-
-        if (!clerkId) {
-            return NextResponse.json(
-                { error: 'Clerk ID is required' },
-                { status: 400 }
-            );
-        }
-
-        // First, find the supplier by clerkId
-        const supplier = await prisma.suppliers.findUnique({
-            where: { clerkId: clerkId },
-        });
-
-        if (!supplier) {
-            return NextResponse.json(
-                { error: 'Supplier not found' },
-                { status: 404 }
-            );
-        }
 
         // Build the where clause based on filters
         const whereClause: Prisma.tasksWhereInput = {
-            supplierId: supplier.id, // Only get tasks for this specific supplier
+            supplierId: session.supplierId, // Only get tasks for this specific supplier
         };
 
         // Filter by status if provided and not 'ALL'

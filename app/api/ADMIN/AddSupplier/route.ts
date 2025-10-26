@@ -7,16 +7,18 @@ export async function POST(request: NextRequest) {
 
 
 
-    // Check if supplier already exists
-    const isSupplierExists = await prisma.suppliers.findUnique({
+    // Check if supplier already exists by email
+    const existingSupplierByEmail = await prisma.suppliers.findUnique({
       where: {
         email: email,
       },
     });
 
-    if (isSupplierExists) {
-      return NextResponse.json({ message: 'Supplier already exists' }, { status: 400 });
+    if (existingSupplierByEmail) {
+      return NextResponse.json({ message: 'Supplier with this email already exists' }, { status: 400 });
     }
+
+
 
     // Create supplier
     const supplier = await prisma.suppliers.create({
@@ -45,9 +47,11 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('Error creating supplier:', error);
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500 }
-    );
-  }
+    
+
+      return NextResponse.json(
+        { message: 'Internal server error' },
+        { status: 500 }
+      );
+    }
 }

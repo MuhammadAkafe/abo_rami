@@ -130,7 +130,7 @@ function SuppliersTable()
               </tr>
             ) : (
               suppliers?.map((Supplier: supplierList) => (
-                <tr key={Supplier.clerkId} className="hover:bg-gray-50 transition-colors">
+                <tr key={Supplier.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">

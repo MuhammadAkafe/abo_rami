@@ -32,7 +32,7 @@ export type ActiveView = 'dashboard' | 'suppliers' | 'tasks' | 'addSupplier' | '
 
 export type Task= {
     id?:  number;
-    clerkId: string;
+    supplierId: string;
     status?: Status;
     address: string;
     description: string;

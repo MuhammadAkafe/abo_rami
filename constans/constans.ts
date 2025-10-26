@@ -8,7 +8,7 @@ export const CLIENT_ROUTES = {
         TASKS: '/client/Admin/tasks',
     },
     SUPPLIER: {
-        SIGN_IN: '/client/User/sign-in',
+        SIGN_IN: '/client/Login',
         DASHBOARD: '/client/User/Dashboard',
         SUPPLIERS: '/client/User/suppliers',
         TASKS: '/client/User/tasks',
@@ -16,11 +16,5 @@ export const CLIENT_ROUTES = {
     Permission: '/client/Permission',
 }
 
-export const AUTH_STORAGE_KEYS = {
-    SUPPLIER_TOKEN: 'supplierToken',
-    SUPPLIER_DATA: 'supplierData',
-    ADMIN_TOKEN: 'adminToken',
-    ADMIN_DATA: 'adminData',
-}
 
 

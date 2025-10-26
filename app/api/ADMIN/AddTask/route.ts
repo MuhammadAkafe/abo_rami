@@ -35,19 +35,28 @@ function validateDate(dateString: string): { isValid: boolean; date?: Date; erro
 export async function POST(request: Request) {
     try {
       const taskData = await request.json();
-      const { address, description, clerkId, date, city } = taskData;
+      const { address, description, supplierId, date, city } = taskData;
       const { isValid, error, date: validatedDate } = validateDate(date);
       if (!isValid) {
         return NextResponse.json({ success: false, message: error }, { status: 400 });
       }
+      
+      // Convert supplierId to number
+      const supplierIdNumber = parseInt(supplierId);
+      if (isNaN(supplierIdNumber)) {
+        return NextResponse.json({ success: false, message: "Invalid supplier ID" }, { status: 400 });
+      }
+      
+      // Verify that the supplier exists
       const supplier = await prisma.suppliers.findUnique({
-        where: { clerkId: clerkId },
+        where: { id: supplierIdNumber },
       });
       if (!supplier) {
         return NextResponse.json({ success: false, message: "Supplier not found" }, { status: 400 });
       }
+      
       await prisma.tasks.create({
-        data: { address, description, supplierId: supplier.id, date: validatedDate, city },
+        data: { address, description, supplierId: supplierIdNumber, date: validatedDate, city },
       });
       return NextResponse.json({ success: true, message: "Task added successfully" }, { status: 200 });
     } 

@@ -18,7 +18,7 @@ model users {
 
 model suppliers {
   id        Int      @id @default(autoincrement())
-  clerkId   String   @unique 
+  clerkId   String   
   firstName String
   lastName  String
   email     String   @unique

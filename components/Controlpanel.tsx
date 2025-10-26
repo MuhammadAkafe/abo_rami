@@ -4,22 +4,22 @@ import React from 'react';
 
 import { ActiveView } from '@/types/types';
 import Navigation from './Navigation';
-import { clearSupplierAuth } from '@/lib/authUtils';
-import { CLIENT_ROUTES } from '@/constans/constans';
-import { useRouter } from 'next/navigation';
+import { logoutAction } from '@/app/actions/auth';
 
 interface ControlPanelProps {
   activeView?: ActiveView;
   setActiveView?: (view: ActiveView) => void;
   isAdmin: boolean;
+  session?: {
+    firstName: string;
+    lastName: string;
+  };
 }
 
-
-
-export default function ControlPanel({ activeView, setActiveView, isAdmin }: ControlPanelProps) {
+export default function ControlPanel({ activeView, setActiveView, isAdmin, session }: ControlPanelProps) {
   const { user } = useUser();
   const { signOut } = useClerk();
-  const router = useRouter();
+  
   const logoutUser = async () => {
     try {
       await signOut();
@@ -30,8 +30,7 @@ export default function ControlPanel({ activeView, setActiveView, isAdmin }: Con
   }
 
   const logoutSupplier = async () => {
-    clearSupplierAuth();
-    router.push(CLIENT_ROUTES.SUPPLIER.SIGN_IN);
+    await logoutAction();
   }
 
 
@@ -45,17 +44,23 @@ export default function ControlPanel({ activeView, setActiveView, isAdmin }: Con
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">לוח בקרה</h1>
               <p className="text-gray-600 text-xs sm:text-sm mt-1">
                 {
-                  !user ? (
-                    <span className="inline-flex items-center">
-                      <svg className="animate-spin h-3 w-3 sm:h-4 sm:w-4 text-gray-500 mr-2" xmlns="http://www.w3.org/w3.org/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      טוען...
-                    </span>
+                  isAdmin ? (
+                    !user ? (
+                      <span className="inline-flex items-center">
+                        <svg className="animate-spin h-3 w-3 sm:h-4 sm:w-4 text-gray-500 mr-2" xmlns="http://www.w3.org/w3.org/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        טוען...
+                      </span>
+                    ) : (
+                      <span className="block sm:inline">
+                        ברוך הבא, {user?.firstName || 'משתמש'} {user?.lastName || ''}
+                      </span>
+                    )
                   ) : (
                     <span className="block sm:inline">
-                      ברוך הבא, {user?.firstName || 'משתמש'} {user?.lastName || ''}
+                      ברוך הבא, {session?.firstName || 'משתמש'} {session?.lastName || ''}
                     </span>
                   )
                 }

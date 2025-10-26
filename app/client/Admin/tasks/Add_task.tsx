@@ -15,7 +15,7 @@ export default function Add_task() {
   const [newTask,setNewTask] = useState<Task>({
     address: "",
     description: "",
-    clerkId: "",
+    supplierId: "",
     date: "",
     city: "",
   });
@@ -27,7 +27,7 @@ export default function Add_task() {
     setNewTask({
       address: "",
       description: "",
-      clerkId: "",
+      supplierId: "",
       date: "",
       city: "",
     });
@@ -44,7 +44,7 @@ export default function Add_task() {
 
   const handleFormInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    if (name === "clerkId") {
+    if (name === "supplierId") {
       setSelectedSupplier(value);
     }
     setNewTask(prev => ({ ...prev, [name]: value }));
@@ -150,7 +150,7 @@ export default function Add_task() {
               <label className="block text-sm font-medium text-gray-700 mb-2">שם ספק *</label>
               <select
                 onChange={handleFormInputChange}
-                name="clerkId"
+                name="supplierId"
                 value={SelectedSupplier}
                 disabled={isPending || suppliersLoading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -160,7 +160,7 @@ export default function Add_task() {
                   {suppliersLoading ? "טוען ספקים..." : "בחר שם ספק"}
                 </option>
                 {suppliersList?.map((supplier) => (
-                  <option key={supplier.clerkId} value={supplier.clerkId}>{supplier.firstName} {supplier.lastName}</option>
+                  <option key={supplier.id} value={supplier.id}>{supplier.firstName} {supplier.lastName}</option>
                 ))}
               </select>
             </div>
@@ -188,7 +188,7 @@ export default function Add_task() {
                 required
               >
                 <option value="">בחר עיר</option>
-                {SelectedSupplier && suppliersList?.find(supplier => supplier.clerkId === SelectedSupplier)?.cities?.map((city) => (
+                {SelectedSupplier && suppliersList?.find(supplier => supplier.id.toString() === SelectedSupplier)?.cities?.map((city) => (
                   <option key={city.id} value={city.city}>{city.city}</option>
                 ))}
               </select>
