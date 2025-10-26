@@ -1,33 +1,33 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { loginAction } from '@/app/actions/auth'
+import { CLIENT_ROUTES } from '@/constans/constans'
 
 export default function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const router = useRouter()
 
   async function handleSubmit(formData: FormData) {
     setError(null) // Clear previous errors
     
     startTransition(async () => {
       try {
-        await loginAction(formData)
-      } catch (error) {
-        // Check if it's a Next.js redirect error (which is expected)
-        if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
-          throw error // Re-throw redirect errors to let Next.js handle them
-        }
+        const result = await loginAction(formData)
         
-        // Handle actual login errors
-        console.error('Login failed:', error)
-        
-        // Set user-friendly error message
-        if (error instanceof Error) {
-          setError(error.message)
+        if (result.success) {
+          // Login was successful, redirect to dashboard
+          router.push(CLIENT_ROUTES.SUPPLIER.DASHBOARD)
         } else {
-          setError('שגיאה בהתחברות. אנא נסה שוב.')
+          // Login failed, show error message
+          setError(result.message || 'שגיאה בהתחברות. אנא נסה שוב.')
         }
+      } catch (error) {
+        // Handle unexpected errors
+        console.error('Login failed:', error)
+        setError('שגיאה בהתחברות. אנא נסה שוב.')
       }
     })
   }

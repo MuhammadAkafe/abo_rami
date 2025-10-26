@@ -7,13 +7,13 @@ import { redirect } from 'next/navigation'
 import { CLIENT_ROUTES } from '@/constans/constans'
 import { clearSession } from '@/lib/session'
 
-export async function loginAction(formData: FormData): Promise<void> {
+export async function loginAction(formData: FormData): Promise<{ success: boolean; message?: string }> {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
   // Validate input
   if (!email || !password) {
-    throw new Error('כתובת אימייל וסיסמה נדרשים')
+    return { success: false, message: 'כתובת אימייל וסיסמה נדרשים' }
   }
 
   try {
@@ -28,28 +28,24 @@ export async function loginAction(formData: FormData): Promise<void> {
     })
 
     if (!supplier) {
-      throw new Error('ספק לא נמצא עם כתובת אימייל זו')
+      return { success: false, message: 'ספק לא נמצא עם כתובת אימייל זו' }
     }
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, supplier.password as string)
     if (!isPasswordValid) {
-      throw new Error('סיסמה שגויה')
+      return { success: false, message: 'סיסמה שגויה' }
     }
 
     // Create session
     await createSession(supplier)
-    // Redirect to dashboard on success
-    redirect(CLIENT_ROUTES.SUPPLIER.DASHBOARD)
+    
+    // Return success instead of redirecting
+    return { success: true }
   } 
   catch (error) {
-    // Check if it's a Next.js redirect error (which is expected)
-    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
-      throw error // Re-throw redirect errors
-    }
-    
     console.error('Login error:', error)
-    throw error // Re-throw other errors
+    return { success: false, message: 'שגיאה פנימית בשרת' }
   }
 }
 
