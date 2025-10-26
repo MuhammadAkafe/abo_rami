@@ -23,10 +23,10 @@ export const TaskRow = React.memo(({ task, onClick }: TaskRowProps) =>
       {task.city}
     </td>
     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-      {task.user?.firstName} {task.user?.lastName}
+      {task.supplier?.firstName} {task.supplier?.lastName}
     </td>
     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-      {task.user?.phone}
+      {task.supplier?.phone}
     </td>
     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
       {task.date ? (typeof task.date === 'string' && task.date.split('T')[0]) : ''}
