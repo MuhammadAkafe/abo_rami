@@ -1,7 +1,6 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import jwt from 'jsonwebtoken'
-import { supplierList } from '@/types/types'
 
 export interface SessionData {
   supplierId: number
@@ -17,7 +16,14 @@ export interface SessionData {
   }>
 }
 
-export async function createSession(supplierData: supplierList): Promise<void> {
+export async function createSession(supplierData: {
+  id: number;
+  clerkId?: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  cities?: Array<{ id: number; city: string; supplierId: number }>;
+}): Promise<void> {
   const secret = process.env.JWT_SECRET
   if (!secret) {
     throw new Error('JWT_SECRET is not configured')
@@ -26,11 +32,12 @@ export async function createSession(supplierData: supplierList): Promise<void> {
   const token = jwt.sign(
     {
       supplierId: supplierData.id,
+      clerkId: supplierData.clerkId || '',
       email: supplierData.email,
       role: 'SUPPLIER',
       firstName: supplierData.firstName,
       lastName: supplierData.lastName,
-      cities: supplierData.cities
+      cities: supplierData.cities || []
     },
     secret,
     { expiresIn: '24h' }

@@ -5,12 +5,17 @@ import Link from 'next/link'
 import LoginForm from '@/app/client/Login/LoginForm'
 
 export default async function LoginPage() {
-  // Check if user is already logged in
-  const cookieStore = await cookies()
-  const sessionCookie = cookieStore.get('session')
-  
-  if (sessionCookie) {
-    redirect(CLIENT_ROUTES.SUPPLIER.DASHBOARD)
+  try {
+    // Check if user is already logged in
+    const cookieStore = await cookies()
+    const sessionCookie = cookieStore.get('supplier-session')
+    
+    if (sessionCookie) {
+      redirect(CLIENT_ROUTES.SUPPLIER.DASHBOARD)
+    }
+  } catch (error) {
+    console.error('Error checking session:', error)
+    // Continue to show login form if there's an error
   }
 
   return (
