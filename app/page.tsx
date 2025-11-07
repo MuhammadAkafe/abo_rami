@@ -1,25 +1,11 @@
 "use client"
 
-import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { CLIENT_ROUTES } from "@/constans/constans";
 import Link from "next/link";
-import LoadingComponent from "@/components/LoadingComponent";
 
 export default function Home() {
-  const { user, isLoaded } = useUser();
   const router = useRouter();
-
-
-  // Show loading while checking authentication
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center" dir="rtl">
-        <LoadingComponent message="טוען..." />
-      </div>
-    );
-  }
 
 
 

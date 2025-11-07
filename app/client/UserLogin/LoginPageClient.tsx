@@ -7,50 +7,7 @@ import Link from 'next/link'
 import LoginForm from './LoginForm'
 
 export default function LoginPageClient() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const router = useRouter()
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const checkAuth = async () => {
-      try {
-        // Check for session cookie
-        const hasSession = document.cookie
-          .split(';')
-          .some(cookie => cookie.trim().startsWith('supplier-session='))
-        
-        if (hasSession) {
-          setIsAuthenticated(true)
-          router.push(CLIENT_ROUTES.SUPPLIER.DASHBOARD)
-        } else {
-          setIsLoading(false)
-        }
-      } catch (error) {
-        console.error('Error checking authentication:', error)
-        setIsLoading(false)
-      }
-    }
-
-    checkAuth()
-  }, [router])
-
-  // Show loading state while checking authentication
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100" dir="rtl">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">בודק הרשאות...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Don't render if user is authenticated (will redirect)
-  if (isAuthenticated) {
-    return null
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8" dir="rtl">
@@ -75,11 +32,9 @@ export default function LoginPageClient() {
             </svg>
           </div>
           <h2 className="text-3xl font-bold text-gray-900">
-            התחברות למערכת
+         כניסה ספקים
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            הכנס את פרטי ההתחברות שלך
-          </p>
+
         </div>
         
         <LoginForm />

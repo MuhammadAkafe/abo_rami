@@ -38,7 +38,14 @@ export async function loginAction(formData: FormData): Promise<{ success: boolea
     }
 
     // Create session
-    await createSession(supplier)
+    await createSession({
+      id: supplier.id,
+      email: supplier.email,
+      role: 'USER',
+      firstName: supplier.firstName,
+      lastName: supplier.lastName,
+      cities: supplier.cities
+    })
     
     // Return success instead of redirecting
     return { success: true }

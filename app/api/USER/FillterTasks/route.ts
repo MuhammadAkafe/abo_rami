@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
         // Build the where clause based on filters
         const whereClause: Prisma.tasksWhereInput = {
-            supplierId: session.supplierId, // Only get tasks for this specific supplier
+            supplierId: session.id, // Only get tasks for this specific supplier
         };
 
         // Filter by status if provided and not 'ALL'

@@ -5,20 +5,15 @@ import { validateRegisterForm } from '@/app/client/validtion';
 import { useAddSupplier } from '@/hooks/Admin/useAddSupplier';
 import { NewSupplier } from '@/types/types';
 import SupplierForm from '@/components/SupplierForm';
-import { useUser } from '@clerk/nextjs';
 
 
 
 export default function AddSuppliers() {
 
-  const { user } = useUser();
   const { mutation } = useAddSupplier();
-  const AdminId = user?.id as string;
-
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [newSupplier, setNewSupplier] = useState<NewSupplier>({
-    clerkId: user?.id as string,
     firstName: '',
     lastName: '',
     email: '',
@@ -41,7 +36,6 @@ export default function AddSuppliers() {
 
   const resetForm = () => {
     setNewSupplier({
-      clerkId: user?.id as string,
       firstName: '',
       lastName: '',
       email: '',
@@ -64,11 +58,6 @@ export default function AddSuppliers() {
       return;
     }
     
-    // Check if user is authenticated
-    if (!AdminId) {
-      console.error('User not authenticated');
-      return;
-    }
     // Submit data
     mutation.mutate(newSupplier);
   };

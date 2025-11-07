@@ -1,6 +1,6 @@
 
 export const CLIENT_ROUTES = {
-    SIGN_IN: '/client/sign-in',
+    SIGN_IN: '/client/AdminLogin',
     HOME: '/',
     ADMIN: {
         DASHBOARD: '/client/Admin/Dashboard',
@@ -8,7 +8,7 @@ export const CLIENT_ROUTES = {
         TASKS: '/client/Admin/tasks',
     },
     SUPPLIER: {
-        SIGN_IN: '/client/Login',
+        SIGN_IN: '/client/UserLogin',
         DASHBOARD: '/client/User/Dashboard',
         SUPPLIERS: '/client/User/suppliers',
         TASKS: '/client/User/tasks',

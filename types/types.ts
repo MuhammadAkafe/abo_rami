@@ -46,7 +46,6 @@ export type Task= {
 
 export type supplierList = {
   id: number | string;
-  clerkId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -59,7 +58,6 @@ export type supplierList = {
 
 
 export interface NewSupplier {
-  clerkId: string;
   firstName: string;
   lastName: string;
   email: string;

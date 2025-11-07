@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 export async function POST(request: NextRequest) {
   try {
-    const { clerkId, firstName, lastName, email, phone, password, cities } = await request.json();
+    const { firstName, lastName, email, phone, password, cities } = await request.json();
 
 
 
@@ -23,7 +23,6 @@ export async function POST(request: NextRequest) {
     // Create supplier
     const supplier = await prisma.suppliers.create({
       data: {
-        clerkId,
         firstName,
         lastName,
         email,

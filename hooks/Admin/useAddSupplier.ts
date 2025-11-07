@@ -23,10 +23,8 @@ const Add_Supplier = async (formData: NewSupplier) =>
       // Handle specific error messages
       let errorMessage = errorData.message || 'Add Supplier failed';
       
-      // Handle Clerk-specific errors
-      if (errorData.message && errorData.message.includes('Password has been found in an online data breach')) {
-        errorMessage = 'הסיסמה שנבחרה נמצאה בפריצת נתונים. אנא בחר סיסמה חזקה יותר.';
-      } else if (errorData.message && errorData.message.includes('User already exists')) {
+      // Handle specific errors
+      if (errorData.message && errorData.message.includes('User already exists')) {
         errorMessage = 'משתמש עם כתובת אימייל זו כבר קיים במערכת.';
       } else if (errorData.message && errorData.message.includes('Invalid email')) {
         errorMessage = 'כתובת האימייל אינה תקינה.';
@@ -36,8 +34,6 @@ const Add_Supplier = async (formData: NewSupplier) =>
         errorMessage = 'שגיאת חיבור למסד הנתונים. אנא נסה שוב מאוחר יותר.';
       } else if (errorData.message && errorData.message.includes('Network error')) {
         errorMessage = 'שגיאת רשת. אנא בדוק את החיבור שלך ונסה שוב.';
-      } else if (errorData.message && errorData.message.includes('Clerk error')) {
-        errorMessage = 'שגיאה במערכת האימות. אנא נסה שוב.';
       }
       
       throw new Error(errorMessage);

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react'
 import DeleteModal from '@/components/DeleteModal';
 import { DeleteModalState, supplierList } from '@/types/types';
-import { useUser } from '@clerk/nextjs';
 import { supplierList as supplier } from '@/types/types';
 import LoadingComponent from '@/components/LoadingComponent';
 import ErrorAlert from '@/components/ErrorAlert';
@@ -17,16 +16,13 @@ function SuppliersTable()
         isLoading: false
     });
 
-    const { isLoaded } = useUser();
     const { suppliers, error, refetch, isLoading } = useGetSuppliers();
     const { mutation } = useDeleteSupplier();
 
     // Refetch suppliers when component mounts
     useEffect(() => {
-        if (isLoaded) {
-            refetch();
-        }
-    }, [isLoaded, refetch]);
+        refetch();
+    }, [refetch]);
 
 
 
@@ -63,11 +59,6 @@ function SuppliersTable()
         setDeleteModal({ isOpen: false, Supplier: null, isLoading: false });
     };
 
-
-  // Handle user loading state
-  if (!isLoaded) {
-    return <LoadingComponent message="טוען משתמש..." />;
-  }
 
   // Handle suppliers loading state
   if (isLoading) {

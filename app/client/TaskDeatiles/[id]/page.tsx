@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import LoadingComponent from "@/components/LoadingComponent";
 import DeleteModal from "@/components/DeleteModal";
-import { useUser } from "@clerk/nextjs";
 
 
 function TaskDetailsPage() {
@@ -21,8 +20,8 @@ function TaskDetailsPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
-  const {user} = useUser();
-  const isAdmin = user?.publicMetadata.role ==="ADMIN";
+  // TODO: Replace with proper admin authentication check
+  const isAdmin = false;
 
 
 

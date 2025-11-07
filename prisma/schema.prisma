@@ -13,12 +13,11 @@ model users {
   lastName  String
   email     String   @unique
   phone     String?
-  clerkid   String    @unique 
+  role      Role     @default(ADMIN)
 }
 
 model suppliers {
   id        Int      @id @default(autoincrement())
-  clerkId   String   
   firstName String
   lastName  String
   email     String   @unique
