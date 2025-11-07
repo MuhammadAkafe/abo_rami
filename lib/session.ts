@@ -50,7 +50,7 @@ export async function requireAuth(): Promise<void>
 {
   const session = await getSession()
   if (!session || session.role!=="USER") {
-    redirect(CLIENT_ROUTES.SIGN_IN);
+    redirect(CLIENT_ROUTES.AdminSignIn);
   }
 
 }

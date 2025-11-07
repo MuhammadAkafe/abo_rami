@@ -42,7 +42,7 @@ export default function Home() {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-              <Link href={CLIENT_ROUTES.SIGN_IN}>
+              <Link href={CLIENT_ROUTES.AdminSignIn}>
                 <button className="group relative px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:bg-blue-700 hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 min-w-[200px]">
                   <span className="flex items-center justify-center gap-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +52,7 @@ export default function Home() {
                   </span>
                 </button>
               </Link>            
-                <Link href={CLIENT_ROUTES.SUPPLIER.SIGN_IN}>
+                <Link href={CLIENT_ROUTES.USER.SIGN_IN}>
                 <button className="group relative px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:bg-blue-700 hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 min-w-[200px]">
                   <span className="flex items-center justify-center gap-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

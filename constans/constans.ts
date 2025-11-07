@@ -1,13 +1,13 @@
 
 export const CLIENT_ROUTES = {
-    SIGN_IN: '/client/AdminLogin',
+    AdminSignIn: '/client/AdminLogin',
     HOME: '/',
     ADMIN: {
         DASHBOARD: '/client/Admin/Dashboard',
         SUPPLIERS: '/client/Admin/suppliers',
         TASKS: '/client/Admin/tasks',
     },
-    SUPPLIER: {
+    USER: {
         SIGN_IN: '/client/UserLogin',
         DASHBOARD: '/client/User/Dashboard',
         SUPPLIERS: '/client/User/suppliers',

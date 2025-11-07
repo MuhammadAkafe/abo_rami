@@ -21,9 +21,10 @@ export default async function UserLayout({
 }: {
   children: React.ReactNode
 }) {
+
   const session = await getSession();
   if (!session) {
-    redirect(CLIENT_ROUTES.SUPPLIER.SIGN_IN);
+    redirect(CLIENT_ROUTES.USER.SIGN_IN);
   }
 
   return (

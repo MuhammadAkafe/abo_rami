@@ -58,5 +58,5 @@ export async function loginAction(formData: FormData): Promise<{ success: boolea
 
 export async function logoutAction() {
   await clearSession()
-  redirect(CLIENT_ROUTES.SUPPLIER.SIGN_IN)
+  redirect(CLIENT_ROUTES.USER.SIGN_IN)
 }

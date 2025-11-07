@@ -19,7 +19,7 @@ export default function LoginForm() {
         
         if (result.success) {
           // Login was successful, redirect to dashboard
-          router.push(CLIENT_ROUTES.SUPPLIER.DASHBOARD)
+          router.push(CLIENT_ROUTES.USER.DASHBOARD)
         } else {
           // Login failed, show error message
           setError(result.message || 'שגיאה בהתחברות. אנא נסה שוב.')
