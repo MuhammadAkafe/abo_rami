@@ -1,8 +1,8 @@
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
-import { CLIENT_ROUTES } from '@/constans/constans'
+"use server"
 
-type cities = {id: number, city: string,supplierId: number}[]
+import { cookies } from 'next/headers'
+import crypto from 'crypto'
+
 
 export interface SessionData {
   id: number
@@ -10,14 +10,19 @@ export interface SessionData {
   role: string
   firstName: string
   lastName: string
-  cities: cities
 }
 
-export async function createSession(supplierData: SessionData): Promise<void> {
+const genetateSessionId = () => 
+  {
+  return crypto.randomBytes(32).toString('hex') + Date.now().toString();
+}
 
+export async function createSession(Data: SessionData ): Promise<void>
+ {
 
-  const cookieStore = await cookies()
-  cookieStore.set('supplier-session', JSON.stringify(supplierData), {
+  const sessionId = genetateSessionId();
+  const cookieStore = await cookies();
+  cookieStore.set('session', sessionId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -26,12 +31,15 @@ export async function createSession(supplierData: SessionData): Promise<void> {
   })
 }
 
-export async function getSession(): Promise<SessionData | null> {
+export async function getSession(): Promise<string | null> {
   try {
     const cookieStore = await cookies()
-    const data = cookieStore.get('supplier-session')?.value
-
-    return data ? JSON.parse(data) as SessionData : null
+    const sessionId = cookieStore.get('session')?.value
+    if (!sessionId) {
+      console.log("No session found");
+      return null;
+    }
+    return sessionId  
   } 
   catch (error) 
   {
@@ -42,15 +50,14 @@ export async function getSession(): Promise<SessionData | null> {
 
 export async function clearSession(): Promise<void> 
 {
-  const cookieStore = await cookies()
-  cookieStore.delete('supplier-session')
-}
-
-export async function requireAuth(): Promise<void> 
-{
-  const session = await getSession()
-  if (!session || session.role!=="USER") {
-    redirect(CLIENT_ROUTES.AdminSignIn);
+  const sessionId = await getSession();
+  if (!sessionId) {
+    console.log(" failed to clear session No session found");
+    return;
   }
-
+  const cookieStore = await cookies();
+  cookieStore.delete('session');
+  return;
 }
+
+

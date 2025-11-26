@@ -1,7 +1,8 @@
 "use client"
 
-import { CLIENT_ROUTES } from "@/constans/constans"
+import { CLIENT_ROUTES } from "@/app/constans/constans"
 import Link from "next/link"
+import { Adminlogin } from "@/app/actions/AdminLogin"
 
 export default function SignInPage() {
 
@@ -31,7 +32,7 @@ export default function SignInPage() {
                         <div className="text-center mb-6">
                             <h1 className="text-2xl font-bold text-gray-900">כניסה מנהלים</h1>
                         </div>
-                        <form className="space-y-6" dir="rtl">
+                        <form className="space-y-6" dir="rtl" action={Adminlogin}>
                             <div className="space-y-4">
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">

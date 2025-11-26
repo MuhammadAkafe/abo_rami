@@ -1,42 +1,16 @@
 'use client'
-
-import { useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
-import { loginAction } from '@/app/actions/auth'
-import { CLIENT_ROUTES } from '@/constans/constans'
-
+import { useActionState } from "react"
+import {Supplierlogin} from "@/app/actions/SupplierLogin"
 export default function LoginForm() {
-  const [error, setError] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
-  const router = useRouter()
 
-  async function handleSubmit(formData: FormData) {
-    setError(null) // Clear previous errors
-    
-    startTransition(async () => {
-      try {
-        const result = await loginAction(formData)
-        
-        if (result.success) {
-          // Login was successful, redirect to dashboard
-          router.push(CLIENT_ROUTES.USER.DASHBOARD)
-        } else {
-          // Login failed, show error message
-          setError(result.message || 'שגיאה בהתחברות. אנא נסה שוב.')
-        }
-      } catch (error) {
-        // Handle unexpected errors
-        console.error('Login failed:', error)
-        setError('שגיאה בהתחברות. אנא נסה שוב.')
-      }
-    })
-  }
+  const [state,formAction,isPending]=useActionState(Supplierlogin,null)
+
 
   return (
     <div className="bg-white py-8 px-6 shadow-xl rounded-lg border border-gray-200">
-      <form action={handleSubmit} className="space-y-6" dir="rtl">
+      <form action={formAction} className="space-y-6" dir="rtl">
         {/* Error Display */}
-        {error && (
+        {state?.error && (
           <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
             <div className="flex">
               <div className="flex-shrink-0">
@@ -47,7 +21,7 @@ export default function LoginForm() {
               <div className="mr-3">
                 <h3 className="text-sm font-medium text-red-800">שגיאה בהתחברות</h3>
                 <div className="mt-2 text-sm text-red-700">
-                  {error}
+                  {state.error}
                 </div>
               </div>
             </div>

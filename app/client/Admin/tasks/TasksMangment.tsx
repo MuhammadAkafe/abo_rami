@@ -18,6 +18,7 @@ export default function TaskManagement() {
   });
 
   const [tasks, setTasks] = useState<Task[] | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
 
   const clearFilters = useCallback(() => {
@@ -41,6 +42,7 @@ export default function TaskManagement() {
 
   useEffect(() => {
     const fetchTasks = async () => {
+      setIsLoading(true);
       try {
         // Build query parameters
         const params = new URLSearchParams();
@@ -63,6 +65,8 @@ export default function TaskManagement() {
         }
       } catch (error) {
         console.error('Error fetching tasks:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchTasks();
@@ -77,7 +81,7 @@ export default function TaskManagement() {
     <Filter onFiltersChange={handleFiltersChange} 
     clearFilters={clearFilters}
      filters={filters} setFilters={setFilters} />
-    <TasksTable title="ניהול משימות" filters={filters} tasks={tasks as Task[]} />
+    <TasksTable title="ניהול משימות" filters={filters} tasks={tasks as Task[]} isLoading={isLoading} />
     </>
   );
 }

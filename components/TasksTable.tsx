@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 
 
-function TasksTable({ title,tasks }: TasksTableProps) 
+function TasksTable({ title,tasks, isLoading }: TasksTableProps & { isLoading?: boolean }) 
 {
   const router=useRouter()
   const handleRowClick = (task: Task) => {
@@ -45,7 +45,6 @@ function TasksTable({ title,tasks }: TasksTableProps)
     </div>
 
     <div className="overflow-x-auto">
-      {tasks && tasks.length === 0 ? <EmptyTasksUi /> : (
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -73,13 +72,27 @@ function TasksTable({ title,tasks }: TasksTableProps)
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {/* Task Row */}
-            {tasks && tasks.map((task: Task) => (
-              <TaskRow key={task.id} task={task} onClick={() => handleRowClick(task)} />
-            ))}
+            {isLoading ? (
+              <tr>
+                <td colSpan={7} className="px-6 py-12 text-center">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="relative">
+                      <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200"></div>
+                      <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent absolute top-0 left-0"></div>
+                    </div>
+                    <p className="text-gray-500 text-sm mt-4">טוען משימות...</p>
+                  </div>
+                </td>
+              </tr>
+            ) : tasks && tasks.length === 0 ? (
+              <EmptyTasksUi />
+            ) : (
+              tasks && tasks.map((task: Task) => (
+                <TaskRow key={task.id} task={task} onClick={() => handleRowClick(task)} />
+              ))
+            )}
           </tbody>
         </table>
-      )}
     </div>
   </div>
   </>

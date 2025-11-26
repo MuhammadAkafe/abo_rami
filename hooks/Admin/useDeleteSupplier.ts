@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { DeleteSupplier } from "@/app/actions/Prisma/DeleteSupplier";
+import { DeleteSupplier } from "@/app/actions/DeleteSupplier";
 import { useMutation } from "@tanstack/react-query";
 
 export const useDeleteSupplier = () => {

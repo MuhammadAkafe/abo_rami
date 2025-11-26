@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query"
-import { GetSuppliers } from "@/app/actions/Prisma/GetSuppliers";
+import { GetSuppliers } from "@/app/actions/GetSuppliers";
 
 
 

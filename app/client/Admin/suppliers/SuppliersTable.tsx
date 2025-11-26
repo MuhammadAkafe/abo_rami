@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react'
 import DeleteModal from '@/components/DeleteModal';
 import { DeleteModalState, supplierList } from '@/types/types';
 import { supplierList as supplier } from '@/types/types';
-import LoadingComponent from '@/components/LoadingComponent';
 import ErrorAlert from '@/components/ErrorAlert';
 import useGetSuppliers from '@/hooks/Admin/useGetSuppliers';
 
@@ -60,13 +59,6 @@ function SuppliersTable()
     };
 
 
-  // Handle suppliers loading state
-  if (isLoading) {
-    return (<div className="flex justify-center items-center h-screen">
-           <p className="text-gray-500 text-lg">טוען ספקים... </p>
-        </div>);
-  }
-
   // Handle error state
   if (error) {
     return (
@@ -107,7 +99,19 @@ function SuppliersTable()
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {(!suppliers || suppliers.length === 0) ? (
+            {isLoading ? (
+              <tr>
+                <td colSpan={6} className="px-6 py-12 text-center">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="relative">
+                      <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200"></div>
+                      <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent absolute top-0 left-0"></div>
+                    </div>
+                    <p className="text-gray-500 text-sm mt-4">טוען ספקים...</p>
+                  </div>
+                </td>
+              </tr>
+            ) : (!suppliers || suppliers.length === 0) ? (
               <tr>
                 <td colSpan={6} className="px-6 py-12 text-center">
                   <div className="flex flex-col items-center">

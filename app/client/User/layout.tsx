@@ -2,7 +2,7 @@
 import { Suspense } from 'react'
 import { getSession } from '@/lib/session'
 import { SessionProvider } from './SesstionProvider'
-import { CLIENT_ROUTES } from '@/constans/constans'
+import { CLIENT_ROUTES } from '@/app/constans/constans'
 import { redirect } from 'next/navigation'
 // Loading component for authentication check
 function AuthLoading() {

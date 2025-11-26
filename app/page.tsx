@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation";
-import { CLIENT_ROUTES } from "@/constans/constans";
+import { CLIENT_ROUTES } from "@/app/constans/constans";
 import Link from "next/link";
 
 export default function Home() {

@@ -3,7 +3,8 @@ import React from 'react';
 
 import { ActiveView } from '@/types/types';
 import Navigation from './Navigation';
-import { logoutAction } from '@/app/actions/auth';
+import { clearSession } from '@/lib/session';
+
 
 interface ControlPanelProps {
   activeView?: ActiveView;
@@ -19,7 +20,7 @@ export default  function ControlPanel({ activeView, setActiveView, isAdmin, sess
 
 
   const logoutSupplier = async () => {
-    await logoutAction();
+    await clearSession();
   }
 
   return (
