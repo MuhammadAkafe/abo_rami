@@ -6,14 +6,13 @@ import { createSession } from '@/lib/session'
 import { redirect } from 'next/navigation'
 import { CLIENT_ROUTES } from '@/app/constans/constans'
 
-export async function Adminlogin(formData: FormData): Promise<void  > {
+export async function Adminlogin(prevState: { error?: string } | null, formData: FormData): Promise<{ error?: string }> {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
   
     // Validate input
     if (!email || !password) {
-      console.log("email or password are required");
-      return 
+      return { error: "נדרש אימייל וסיסמה" };
     }
   
     try {
@@ -25,19 +24,17 @@ export async function Adminlogin(formData: FormData): Promise<void  > {
       })
   
       if (!user) {
-        console.log("user not found");
-        return;
+        return { error: "משתמש לא נמצא" };
       }
-  
   
       // Verify password
       const isPasswordValid = await bcrypt.compare(password, user.password as string);
   
       if (!isPasswordValid) {
-        console.log("invaild creadintals");
-        return;
+        return { error: "פרטי התחברות לא תקינים" };
       }
-  
+
+
       // Create session
       await createSession({
         id: user.id,
@@ -57,6 +54,7 @@ export async function Adminlogin(formData: FormData): Promise<void  > {
         }
       }
       console.error('Login error:', error)
+      return { error: "שגיאת שרת. נסה שוב מאוחר יותר." }
     }
   }
   

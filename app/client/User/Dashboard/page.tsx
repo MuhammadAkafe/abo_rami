@@ -1,6 +1,6 @@
+"use client"
 import UserDashboardClient from './UserDashboardClient';
-
-export default async function UserDashboard() {
+export default  function UserDashboard() {
 
 
   return <UserDashboardClient />

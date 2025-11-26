@@ -4,23 +4,21 @@ import React from 'react';
 import { ActiveView } from '@/types/types';
 import Navigation from './Navigation';
 import { clearSession } from '@/lib/session';
-
+import { useRouter } from 'next/navigation';
+import { CLIENT_ROUTES } from '@/app/constans/constans';
 
 interface ControlPanelProps {
   activeView?: ActiveView;
   setActiveView?: (view: ActiveView) => void;
   isAdmin: boolean;
-  session?: {
-    firstName: string;
-    lastName: string;
-  };
+
 }
 
-export default  function ControlPanel({ activeView, setActiveView, isAdmin, session }: ControlPanelProps) {
-
-
+export default  function ControlPanel({ activeView, setActiveView, isAdmin }: ControlPanelProps) {
+  const router = useRouter();
   const logoutSupplier = async () => {
     await clearSession();
+    router.push(CLIENT_ROUTES.HOME);
   }
 
   return (
@@ -39,7 +37,7 @@ export default  function ControlPanel({ activeView, setActiveView, isAdmin, sess
                     </span>
                   ) : (
                     <span className="block sm:inline">
-                      ברוך הבא, {session?.firstName || 'משתמש'} {session?.lastName || ''}
+                      ברוך הבא, משתמש
                     </span>
                   )
                 }

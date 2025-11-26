@@ -6,12 +6,10 @@ import { TaskFilters } from '@/types/types';
 import ControlPanel from '@/components/Controlpanel';
 import { Task } from '@/types/types';
 import Filter from '../../Admin/tasks/Fillter';
-import { useSession } from '../SesstionProvider';
-import { SessionData } from '@/lib/session';
+import { useSession } from '../../SesstionProvider';
 
 
 export default  function UserDashboardClient() {
-  const session = useSession() as SessionData;
   const [tasks, setTasks] = useState<Task[]>([]);
 
   const today = new Date().toISOString().split('T')[0];
@@ -65,7 +63,7 @@ export default  function UserDashboardClient() {
           {/* Header section with ControlPanel and SignOutButton side by side */}
           <div className="flex justify-between items-center gap-4">
             <div className="flex-1">
-              <ControlPanel isAdmin={false} session={session} />
+              <ControlPanel isAdmin={false} />
             </div>
           </div>
         </div>
