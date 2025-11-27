@@ -1,33 +1,35 @@
 "use client"
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import Filter from './Fillter';
 import TasksTable from '../../../../components/TasksTable';
 import { TaskFilters } from '@/types/types';
-import {useEffect} from 'react';
 import { Task } from '@/types/types';
-
-
+import { useQuery } from '@tanstack/react-query';
+import { fetchTasks } from '@/app/actions/fetchtasks';
 export default function TaskManagement() {
-  // Set default filter to today
-  const today = new Date().toISOString().split('T')[0];
+  // Memoize today's date to avoid recalculation on every render
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
   
-  const [filters, setFilters] = useState<TaskFilters>({
+  const [filters, setFilters] = useState<TaskFilters>(() => ({
     status: 'ALL',
-    startDate: today,
+    startDate: new Date().toISOString().split('T')[0],
     endDate: '',
+  }));
+  const { data: tasks = [], isLoading, error } = useQuery<Task[]>({
+    queryKey: ['tasks', filters],
+    queryFn: () => fetchTasks(filters),
   });
 
-  const [tasks, setTasks] = useState<Task[] | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
+  if (error) {
+    console.error('Error fetching tasks:', error);
+  }
 
   const clearFilters = useCallback(() => {
-    const clearedFilters: TaskFilters = {
+    setFilters({
       status: 'ALL',
       startDate: today,
       endDate: ''
-    };
-    setFilters(clearedFilters);
+    });
   }, [today]);
 
 
@@ -40,48 +42,21 @@ export default function TaskManagement() {
 
 
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      setIsLoading(true);
-      try {
-        // Build query parameters
-        const params = new URLSearchParams();
-        if (filters.status && filters.status !== 'ALL') {
-          params.append('status', filters.status);
-        }
-        if (filters.startDate) {
-          params.append('startDate', filters.startDate.toString());
-        }
-        if (filters.endDate) {
-          params.append('endDate', filters.endDate.toString());
-        }
-
-        const response = await fetch(`/api/tasks/FillterTasks?${params.toString()}`);
-        if (response.ok) {
-          const data = await response.json();
-          setTasks(data);
-        } else {
-          console.error('Failed to fetch tasks');
-        }
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchTasks();
-  }, [filters]);
-
-
-
-
 
   return (
     <>
-    <Filter onFiltersChange={handleFiltersChange} 
-    clearFilters={clearFilters}
-     filters={filters} setFilters={setFilters} />
-    <TasksTable title="ניהול משימות" filters={filters} tasks={tasks as Task[]} isLoading={isLoading} />
+      <Filter 
+        onFiltersChange={handleFiltersChange} 
+        clearFilters={clearFilters}
+        filters={filters} 
+        setFilters={setFilters} 
+      />
+      <TasksTable 
+        title="ניהול משימות" 
+        filters={filters} 
+        tasks={tasks as Task[]} 
+        isLoading={isLoading} 
+      />
     </>
   );
 }

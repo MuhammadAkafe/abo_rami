@@ -23,24 +23,25 @@ export async function GET(request: Request) {
 
 
         // Filter by date range if provided
-        if (startDate || endDate) {
+        const hasStartDate = startDate && startDate.trim() !== '';
+        const hasEndDate = endDate && endDate.trim() !== '';
+        
+        if (hasStartDate || hasEndDate) {
             whereClause.date = {};
             
-            if (startDate) {
+            if (hasStartDate) {
                 const start = new Date(startDate);
                 start.setHours(0, 0, 0, 0);
                 whereClause.date.gte = start;
             }
             
-            if (endDate) {
+            if (hasEndDate) {
                 const end = new Date(endDate);
                 end.setHours(23, 59, 59, 999);
                 whereClause.date.lte = end;
             }
-        }
-
-        // If no date filters are provided, default to today
-        if (!startDate && !endDate) {
+        } else {
+            // If no date filters are provided, default to today
             const today = new Date();
             const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
             const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);

@@ -11,7 +11,8 @@ import { useRouter } from 'next/navigation';
 function TasksTable({ title,tasks, isLoading }: TasksTableProps & { isLoading?: boolean }) 
 {
   const router=useRouter()
-  const handleRowClick = (task: Task) => {
+  const handleRowClick = (task: Task) => 
+    {
     router.push(`/client/TaskDeatiles/${task.id}`);
   }
 
