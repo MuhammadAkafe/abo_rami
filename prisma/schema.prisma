@@ -15,6 +15,7 @@ model users {
   password  String
   solt      Int?
   role      Role     @default(ADMIN)
+  suppliers suppliers[]
 }
 
 model suppliers {
@@ -28,6 +29,8 @@ model suppliers {
   tasks     tasks[]
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
+  userId    Int
+  users     users?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 

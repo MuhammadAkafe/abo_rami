@@ -63,7 +63,7 @@ export default  function UserDashboardClient() {
           {/* Header section with ControlPanel and SignOutButton side by side */}
           <div className="flex justify-between items-center gap-4">
             <div className="flex-1">
-              <ControlPanel isAdmin={false} />
+              <ControlPanel  />
             </div>
           </div>
         </div>

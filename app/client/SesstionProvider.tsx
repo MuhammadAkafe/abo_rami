@@ -1,8 +1,9 @@
 "use client";
 
 import { createContext, useContext } from "react";
+import { SessionData } from "@/lib/session";
 
-const SessionContext = createContext<string | null>(null);
+const SessionContext = createContext<SessionData | null>(null);
 
 
 export const useSession = () => 
@@ -10,7 +11,8 @@ export const useSession = () =>
     return useContext(SessionContext);
 }
 
-export const SessionProvider = ({ children, session }: { children: React.ReactNode; session: string | null }) => {
+export const SessionProvider = ({ children, session }: { children: React.ReactNode; session: SessionData | null }) => {
+
     return (
         <SessionContext.Provider value={session}>
             {children}

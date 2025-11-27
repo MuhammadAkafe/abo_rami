@@ -16,7 +16,6 @@ import { ActiveView } from '@/types/types';
 
 function Dashbaord() {
   const [activeView, setActiveView] = useState<ActiveView>('dashboard');
-  const isAdmin=true;
 
 
   const renderActiveView = () => {
@@ -41,7 +40,7 @@ function Dashbaord() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" dir="rtl">
       {/* Header and Navigation */}
-      <ControlPanel activeView={activeView} setActiveView={setActiveView} isAdmin={isAdmin} />
+      <ControlPanel activeView={activeView} setActiveView={setActiveView}  />
       
       {/* Main Content Container */}
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">

@@ -6,19 +6,28 @@ import Navigation from './Navigation';
 import { clearSession } from '@/lib/session';
 import { useRouter } from 'next/navigation';
 import { CLIENT_ROUTES } from '@/app/constans/constans';
+import { useSession } from '@/app/client/SesstionProvider';
 
 interface ControlPanelProps {
   activeView?: ActiveView;
   setActiveView?: (view: ActiveView) => void;
-  isAdmin: boolean;
-
 }
 
-export default  function ControlPanel({ activeView, setActiveView, isAdmin }: ControlPanelProps) {
+export default  function ControlPanel({ activeView, setActiveView }: ControlPanelProps) {
   const router = useRouter();
-  const logoutSupplier = async () => {
-    await clearSession();
-    router.push(CLIENT_ROUTES.HOME);
+  const session=useSession();
+  const role=session?.role;
+  console.log(role);
+
+  const logout = async () => {
+    try {
+      await clearSession();
+      router.push(CLIENT_ROUTES.HOME);
+    } 
+    catch (error) 
+    {
+      console.log(error);
+    }
   }
 
   return (
@@ -31,19 +40,19 @@ export default  function ControlPanel({ activeView, setActiveView, isAdmin }: Co
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">לוח בקרה</h1>
               <p className="text-gray-600 text-xs sm:text-sm mt-1">
                 {
-                  isAdmin ? (
+                  role=="ADMIN" ? (
                     <span className="block sm:inline">
-                      ברוך הבא, מנהל
+                      ברוך הבא, {session?.firstName} {session?.lastName} מנהל
                     </span>
                   ) : (
                     <span className="block sm:inline">
-                      ברוך הבא, משתמש
+                      ברוך הבא {session?.firstName} {session?.lastName}
                     </span>
                   )
                 }
               </p>
             </div>
-            <button onClick={logoutSupplier} className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+            <button onClick={logout} className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
               <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
@@ -52,7 +61,7 @@ export default  function ControlPanel({ activeView, setActiveView, isAdmin }: Co
           </div>
           {/* Navigation Component */}
           {
-            isAdmin && (
+            role==="ADMIN" && (
               <Navigation activeView={activeView!} setActiveView={setActiveView!} />
             )
           }

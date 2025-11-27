@@ -4,14 +4,15 @@ import bcrypt from "bcryptjs";
 
 const addAdmin = async () => {
   try {
+    const password = await bcrypt.hash("adminadmin", 10);
     const admin = await prisma.users.create({
       data: {
         email: "admin@example.com",
-        firstName: "Admin",
-        lastName: "Admin",
+        firstName: "אבו עקפי",
+        lastName: "",
         phone: "1234567890",
         role: "ADMIN",
-        password: await bcrypt.hash("admin123", 10),
+        password: password,
       },
     });
     console.log("✅ Admin user created successfully:", admin.email);
@@ -41,6 +42,7 @@ const main = async () => {
   try {
     await delete_users();
     await addAdmin();
+    console.log("✅ Seed completed successfully!");
   } 
   catch (error) {
     console.error("❌ Seed failed:", error);

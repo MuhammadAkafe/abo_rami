@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers'
 import crypto from 'crypto'
 import { redisClient } from './redis'
+import { redirect } from 'next/dist/server/api-utils'
 
 
 const SESSION_EXPIRES = 24 * 60 * 60
@@ -68,13 +69,13 @@ export async function getSession(): Promise<SessionData | null> {
 
 
 export async function clearSession(): Promise<void> {
-  try {
+
     const cookieStore = await cookies()
     const sessionId = cookieStore.get('session_id')?.value
     
     if (!sessionId) {
-      console.log("Failed to clear session: No session found")
-      return
+      console.log("Failed to clear session: No session found");
+      throw new Error(`Failed to clear session: No session found`)
     }
     
     // Delete from Redis first
@@ -82,11 +83,7 @@ export async function clearSession(): Promise<void> {
     
     // Delete cookie
     cookieStore.delete('session_id')
-  } catch (error) 
-  {
-    console.error('Failed to clear session:', error)
 
-  }
 }
 
 

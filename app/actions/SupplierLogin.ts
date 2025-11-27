@@ -5,7 +5,6 @@ import bcrypt from 'bcryptjs'
 import { createSession } from '@/lib/session'
 import { redirect } from 'next/navigation'
 import { CLIENT_ROUTES } from '@/app/constans/constans'
-import { clearSession } from '@/lib/session'
 
 
 
@@ -61,11 +60,6 @@ export async function Supplierlogin(prevState: { error?: string } | null, formDa
     console.error('server error:', error)
     return { error: "שגיאת שרת. נסה שוב מאוחר יותר." }
   }
-}
-
-export async function logout() {
-  await clearSession()
-  redirect(CLIENT_ROUTES.HOME)
 }
 
 
