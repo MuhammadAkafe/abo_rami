@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation';
 import DeleteModal from '@/components/DeleteModal';
 import { DeleteModalState, supplierList } from '@/types/types';
 import { supplierList as supplier } from '@/types/types';
@@ -9,6 +10,7 @@ import useGetSuppliers from '@/hooks/Admin/useGetSuppliers';
 import useDeleteSupplier from '@/hooks/Admin/useDeleteSupplier';
 function SuppliersTable() 
 {
+    const router = useRouter();
     const [deleteModal, setDeleteModal] = useState<DeleteModalState>({
         isOpen: false,
         Supplier: null,
@@ -27,13 +29,18 @@ function SuppliersTable()
 
 
 
-    const handleDeleteClick = (Supplier: supplier) => {
+    const handleDeleteClick = (e: React.MouseEvent, Supplier: supplier) => {
+        e.stopPropagation(); // Prevent row click when clicking delete button
         console.log("Supplier clicked:", Supplier);
         setDeleteModal({
             isOpen: true,
             Supplier: Supplier,
             isLoading: false
         });
+    };
+
+    const handleRowClick = (supplierId: number | string) => {
+        router.push(`/client/SupplierDeatiles/${supplierId}`);
     };
 
 
@@ -125,7 +132,11 @@ function SuppliersTable()
               </tr>
             ) : (
               suppliers?.map((Supplier: supplierList) => (
-                <tr key={Supplier.id} className="hover:bg-gray-50 transition-colors">
+                <tr 
+                  key={Supplier.id} 
+                  className="hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => handleRowClick(Supplier.id)}
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
@@ -159,7 +170,7 @@ function SuppliersTable()
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-center gap-1">
                         <button
-                          onClick={() => handleDeleteClick(Supplier)}
+                          onClick={(e) => handleDeleteClick(e, Supplier)}
                           className="text-red-600 cursor-pointer hover:text-red-900 p-1 rounded-md hover:bg-red-50 transition-colors"
                           title="מחק"
                         >

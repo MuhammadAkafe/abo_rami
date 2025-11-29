@@ -86,16 +86,6 @@ export default function Add_task() {
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-shadow duration-300">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">הוספת משימה</h2>
-        <button
-          onClick={handleRefreshSuppliers}
-          disabled={suppliersLoading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          <svg className={`w-4 h-4 ${suppliersLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          רענן ספקים
-        </button>
       </div>
       <form onSubmit={handleFormSubmit}>
         <div className="bg-gray-50 rounded-lg p-6 mb-6">
