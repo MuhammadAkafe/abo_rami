@@ -20,7 +20,7 @@ const useAddTask = (resetForm: () => void) => {
         mutationFn: AddTask,
         onSuccess: () => {
           console.log("Task added successfully");
-         resetForm();
+         //resetForm();
         },
         onError: (error) => {
          console.log("Error adding task: " + error.message);

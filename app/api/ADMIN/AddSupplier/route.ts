@@ -37,12 +37,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Supplier with this email already exists' }, { status: 400 });
     }
 
+    // Verify the user exists in the database
+    const user = await prisma.users.findUnique({
+      where: { id: session.id },
+    });
+
+    if (!user) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+
     // Create supplier
     const supplier = await prisma.suppliers.create({
       data: {
-        users: {
-          connect: { id: session.id },
-        },
+        userId: session.id,
         firstName,
         lastName,
         email,

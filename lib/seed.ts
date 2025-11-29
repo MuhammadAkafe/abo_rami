@@ -28,19 +28,29 @@ const addAdmin = async () => {
   }
 };
 
-const delete_users = async () => {
+const delete_admin = async () => {
   try {
-    await prisma.users.deleteMany();
-    console.log("✅ Users deleted successfully");
+    // Delete admin user by email
+    const deletedAdmin = await prisma.users.deleteMany({
+      where: {
+        email: "admin@example.com",
+      },
+    });
+    
+    if (deletedAdmin.count > 0) {
+      console.log(`✅ Admin user deleted successfully (${deletedAdmin.count} user(s))`);
+    } else {
+      console.log("ℹ️  Admin user not found");
+    }
   } catch (error) {
-    console.error("❌ Error deleting users:", error);
+    console.error("❌ Error deleting admin user:", error);
     throw error;
   }
 };
 
 const main = async () => {
   try {
-    await delete_users();
+    await delete_admin();
     await addAdmin();
     console.log("✅ Seed completed successfully!");
   } 
