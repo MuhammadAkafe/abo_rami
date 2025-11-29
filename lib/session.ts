@@ -14,13 +14,13 @@ export interface SessionData {
   role: string
   firstName: string
   lastName: string
-  sessionId:string
+  session_id:string
 }
 
-export type CreateSessionInput = Omit<SessionData, 'sessionId'>
+export type CreateSessionInput = Omit<SessionData, 'session_id'>
 
 const generateSessionId = (): string => {
-  return crypto.randomBytes(32).toString('hex') + Date.now().toString()
+  return crypto.randomBytes(512).toString('hex') + Date.now().toString()
 }
 
 export async function createSession(data: CreateSessionInput): Promise<void> {
@@ -39,7 +39,7 @@ export async function createSession(data: CreateSessionInput): Promise<void> {
     // Store session data in Redis with the sessionId as the key
     await redisClient.set(`session:${sessionId}`, {
       ...data,
-      sessionId
+      session_id: sessionId
     }, {
       ex: SESSION_EXPIRES
     })

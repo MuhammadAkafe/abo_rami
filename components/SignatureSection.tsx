@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Task } from '@/types/types';
 
 interface SignatureSectionProps {
-  task: Task;
+  task: Task | null;
   onSignatureUpdate?: (signatureData: string) => void;
   allowEdit?: boolean;
 }
@@ -46,10 +46,10 @@ export const SignatureSection: React.FC<SignatureSectionProps> = ({
         }`}
         onClick={handleSignatureClick}
       >
-        {task.url ? (
+        {task?.url ? (
           <div>
             <Image 
-              src={task.url} 
+              src={task?.url} 
               alt="חתימת ספק" 
               width={400}
               height={300}

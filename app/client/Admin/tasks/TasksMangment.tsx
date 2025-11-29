@@ -15,14 +15,11 @@ export default function TaskManagement() {
     startDate: new Date().toISOString().split('T')[0],
     endDate: '',
   }));
-  const { data: tasks = [], isLoading, error } = useQuery<Task[]>({
+  const { data: tasks = [], isLoading,refetch } = useQuery<Task[]>({
     queryKey: ['tasks', filters],
     queryFn: () => fetchTasks(filters),
   });
 
-  if (error) {
-    console.error('Error fetching tasks:', error);
-  }
 
   const clearFilters = useCallback(() => {
     setFilters({
@@ -54,6 +51,7 @@ export default function TaskManagement() {
       <TasksTable 
         title="ניהול משימות" 
         filters={filters} 
+        refetch={() => refetch()}
         tasks={tasks as Task[]} 
         isLoading={isLoading} 
       />

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { validateRegisterForm } from '@/app/client/validtion';
+import { AddSupplierFormValidation } from '@/app/client/validtion';
 import { useAddSupplier } from '@/hooks/Admin/useAddSupplier';
 import { NewSupplier } from '@/types/types';
 import SupplierForm from '@/components/SupplierForm';
@@ -52,7 +52,7 @@ export default function AddSuppliers() {
     e.preventDefault();
     
  
-    const validation = validateRegisterForm(newSupplier);
+    const validation = AddSupplierFormValidation(newSupplier);
     if (!validation.success) {
       setFieldErrors(validation.errors);
       return;

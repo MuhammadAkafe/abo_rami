@@ -58,7 +58,7 @@ export async function GET(request: Request) {
                 supplier: true,
             },
             orderBy: {
-                date: 'desc',
+                date: 'asc',
             },
         });
         return NextResponse.json(tasks);

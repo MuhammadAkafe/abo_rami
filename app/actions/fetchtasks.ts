@@ -25,3 +25,15 @@ export async function fetchTasks(filters: TaskFilters) {
       return [];
     }
   }
+
+
+  export async function fetchTask(id: string) {
+    const response = await fetch(`/api/tasks/${id}`);
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      console.error('Failed to fetch task');
+      return null;
+    }
+  }

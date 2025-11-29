@@ -1,5 +1,5 @@
 "use client"
-import React from 'react'
+import React, { useEffect } from 'react'
 import { TasksTableProps } from '@/types/types';
 import { TaskRow } from '@/components/TaskRow';
 import { EmptyTasksUi } from '@/components/EmptyTasksUi';
@@ -8,13 +8,19 @@ import { useRouter } from 'next/navigation';
 
 
 
-function TasksTable({ title,tasks, isLoading }: TasksTableProps & { isLoading?: boolean }) 
+function TasksTable({ title,tasks, isLoading, refetch }: TasksTableProps & { isLoading?: boolean }) 
 {
   const router=useRouter()
   const handleRowClick = (task: Task) => 
     {
     router.push(`/client/TaskDeatiles/${task.id}`);
   }
+
+  useEffect(() => {
+    refetch?.();
+  }, [refetch]);
+
+
 
   return (<>
     <div className="bg-white rounded-lg shadow-sm">
@@ -26,6 +32,7 @@ function TasksTable({ title,tasks, isLoading }: TasksTableProps & { isLoading?: 
             className="flex items-center p-2 text-gray-600 hover:text-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mr-4"
             title="רענן רשימת משימות"
             aria-label="רענן רשימת משימות"
+            onClick={() => refetch?.()}
           >
             <svg 
               className="w-5 h-5 cursor-pointer" 

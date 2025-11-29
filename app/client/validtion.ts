@@ -51,7 +51,7 @@ export type RegisterFormData = z.infer<typeof registerSchema>;
 
 
 // Simple validation function
-export const validateRegisterForm = (data: RegisterFormData) => {
+export const AddSupplierFormValidation = (data: RegisterFormData) => {
   try {
     registerSchema.parse(data);
     return { success: true, errors: {} };
