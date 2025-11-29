@@ -23,3 +23,4 @@ export default function SupplierDetailsClient({ children }: { children: React.Re
   );
 }
 
+

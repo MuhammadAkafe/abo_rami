@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import DeleteModal from '@/components/DeleteModal';
+import LoadingComponent from '@/components/LoadingComponent';
 import { DeleteModalState, supplierList } from '@/types/types';
 import { supplierList as supplier } from '@/types/types';
 import ErrorAlert from '@/components/ErrorAlert';
@@ -16,6 +17,7 @@ function SuppliersTable()
         Supplier: null,
         isLoading: false
     });
+    const [isNavigating, setIsNavigating] = useState(false);
 
     const { suppliers, error, refetch, isLoading } = useGetSuppliers();
     const { mutation } = useDeleteSupplier();
@@ -40,6 +42,7 @@ function SuppliersTable()
     };
 
     const handleRowClick = (supplierId: number | string) => {
+        setIsNavigating(true);
         router.push(`/client/SupplierDeatiles/${supplierId}`);
     };
 
@@ -77,7 +80,11 @@ function SuppliersTable()
   }
 
 
-
+if (isNavigating) {
+  return (
+    <LoadingComponent message="טוען פרטי ספק..." />
+  );
+}
 
 
 
@@ -118,7 +125,7 @@ function SuppliersTable()
                   </div>
                 </td>
               </tr>
-            ) : (!suppliers || suppliers.length === 0) ? (
+            ) : (!suppliers || (Array.isArray(suppliers) && suppliers.length === 0)) ? (
               <tr>
                 <td colSpan={6} className="px-6 py-12 text-center">
                   <div className="flex flex-col items-center">
@@ -131,7 +138,7 @@ function SuppliersTable()
                 </td>
               </tr>
             ) : (
-              suppliers?.map((Supplier: supplierList) => (
+              Array.isArray(suppliers) && suppliers.map((Supplier: supplierList) => (
                 <tr 
                   key={Supplier.id} 
                   className="hover:bg-gray-50 transition-colors cursor-pointer"

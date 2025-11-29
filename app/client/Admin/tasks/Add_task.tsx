@@ -26,15 +26,9 @@ export default function Add_task() {
 
   // Re-render when suppliers are fetched
   useEffect(() => {
-    if (suppliersList && suppliersList.length > 0) {
-      console.log('Suppliers loaded, Add_task component re-rendering');
-    }
-  }, [suppliersList]);
-
-  // Manual refresh function
-  const handleRefreshSuppliers = () => {
     refetch();
-  };
+  }, [refetch]);
+
 
   const resetForm = () => {
     setNewTask({
@@ -184,7 +178,7 @@ export default function Add_task() {
                 <option value="">
                   {suppliersLoading ? "טוען ספקים..." : "בחר שם ספק"}
                 </option>
-                {suppliersList?.map((supplier) => (
+                {Array.isArray(suppliersList) && suppliersList.map((supplier) => (
                   <option key={supplier.id} value={supplier.id}>{supplier.firstName} {supplier.lastName}</option>
                 ))}
               </select>
@@ -213,7 +207,7 @@ export default function Add_task() {
                 required
               >
                 <option value="">בחר עיר</option>
-                {SelectedSupplier && suppliersList?.find(supplier => supplier.id.toString() === SelectedSupplier)?.cities?.map((city) => (
+                {SelectedSupplier && Array.isArray(suppliersList) && suppliersList.find(supplier => supplier.id.toString() === SelectedSupplier)?.cities?.map((city) => (
                   <option key={city.id} value={city.city}>{city.city}</option>
                 ))}
               </select>
