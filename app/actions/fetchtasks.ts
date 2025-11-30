@@ -46,7 +46,11 @@ export async function fetchTasks(filters: TaskFilters) {
           // If response is not JSON, use status text
           errorMessage = response.statusText || errorMessage;
         }
-        console.error('Failed to fetch task:', errorMessage, `Status: ${response.status}`);
+        
+        // Only log non-404 errors (404 is expected when task is deleted)
+        if (response.status !== 404) {
+          console.error('Failed to fetch task:', errorMessage, `Status: ${response.status}`);
+        }
         return null;
       }
 

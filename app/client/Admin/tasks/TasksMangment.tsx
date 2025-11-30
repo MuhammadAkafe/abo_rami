@@ -16,8 +16,11 @@ export default function TaskManagement() {
     endDate: '',
   }));
   const { data: tasks = [], isLoading,refetch } = useQuery<Task[]>({
-    queryKey: ['tasks', filters],
+    queryKey: ['tasks', 'admin', filters],
     queryFn: () => fetchTasks(filters),
+    staleTime: 30 * 1000, // Consider data fresh for 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
+    refetchOnWindowFocus: false, // Don't refetch on window focus for better UX
   });
 
 

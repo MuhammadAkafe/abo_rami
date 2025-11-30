@@ -21,16 +21,31 @@ function TaskDetailsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isUpdatingSignature, setIsUpdatingSignature] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const session = useSession();
   const isAdmin = session?.role === 'ADMIN';
   const taskId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const { task, isLoading, error: taskError, refetch } = useFetchTask(taskId);
+  const { task, isLoading, error: taskError, refetch } = useFetchTask(taskId, !isRedirecting);
   const queryClient = useQueryClient();
 
   const handleStatusUpdate = async (newStatus: TaskStatus) => {
     if (!task || task.status === newStatus) return;
+
+    // Optimistic update - update UI immediately
+    const previousTask = task;
+    queryClient.setQueryData<Task>(['task', taskId], (old) => {
+      if (!old) return old;
+      return { ...old, status: newStatus };
+    });
+
+    // Also update in tasks list cache
+    queryClient.setQueriesData<Task[]>(
+      { queryKey: ['tasks'] },
+      (oldData) => {
+        if (!oldData) return oldData;
+        return oldData.map(t => t.id === task.id ? { ...t, status: newStatus } : t);
+      }
+    );
 
     setIsUpdatingStatus(true);
     try {
@@ -43,12 +58,22 @@ function TaskDetailsPage() {
       });
 
       if (response.ok) {
+        // Refetch to ensure we have the latest data
         await refetch();
         toast.success('הסטטוס עודכן בהצלחה', {
           position: 'top-left',
           rtl: true,
         });
       } else {
+        // Rollback on error
+        queryClient.setQueryData(['task', taskId], previousTask);
+        queryClient.setQueriesData<Task[]>(
+          { queryKey: ['tasks'] },
+          (oldData) => {
+            if (!oldData) return oldData;
+            return oldData.map(t => t.id === task.id ? previousTask : t);
+          }
+        );
         const errorData = await response.json().catch(() => ({}));
         toast.error(errorData.error || 'שגיאה בעדכון הסטטוס', {
           position: 'top-left',
@@ -56,6 +81,15 @@ function TaskDetailsPage() {
         });
       }
     } catch (error) {
+      // Rollback on error
+      queryClient.setQueryData(['task', taskId], previousTask);
+      queryClient.setQueriesData<Task[]>(
+        { queryKey: ['tasks'] },
+        (oldData) => {
+          if (!oldData) return oldData;
+          return oldData.map(t => t.id === task.id ? previousTask : t);
+        }
+      );
       console.error('Error updating status:', error);
       toast.error('שגיאה בעדכון הסטטוס', {
         position: 'top-left',
@@ -69,7 +103,22 @@ function TaskDetailsPage() {
   const handleSignatureUpdate = async (signatureUrl: string) => {
     if (!task) return;
 
-    setIsUpdatingSignature(true);
+    // Optimistic update - update UI immediately
+    const previousTask = task;
+    queryClient.setQueryData<Task>(['task', taskId], (old) => {
+      if (!old) return old;
+      return { ...old, url: signatureUrl };
+    });
+
+    // Also update in tasks list cache
+    queryClient.setQueriesData<Task[]>(
+      { queryKey: ['tasks'] },
+      (oldData) => {
+        if (!oldData) return oldData;
+        return oldData.map(t => t.id === task.id ? { ...t, url: signatureUrl } : t);
+      }
+    );
+
     try {
       const response = await fetch(API_ROUTES.USER.updateTask + `/${params.id}`, {
         method: 'PUT',
@@ -80,12 +129,22 @@ function TaskDetailsPage() {
       });
 
       if (response.ok) {
+        // Refetch to ensure we have the latest data
         await refetch();
         toast.success('החתימה עודכנה בהצלחה', {
           position: 'top-left',
           rtl: true,
         });
       } else {
+        // Rollback on error
+        queryClient.setQueryData(['task', taskId], previousTask);
+        queryClient.setQueriesData<Task[]>(
+          { queryKey: ['tasks'] },
+          (oldData) => {
+            if (!oldData) return oldData;
+            return oldData.map(t => t.id === task.id ? previousTask : t);
+          }
+        );
         const errorData = await response.json().catch(() => ({}));
         toast.error(errorData.error || 'שגיאה בעדכון החתימה', {
           position: 'top-left',
@@ -93,18 +152,27 @@ function TaskDetailsPage() {
         });
       }
     } catch (error) {
+      // Rollback on error
+      queryClient.setQueryData(['task', taskId], previousTask);
+      queryClient.setQueriesData<Task[]>(
+        { queryKey: ['tasks'] },
+        (oldData) => {
+          if (!oldData) return oldData;
+          return oldData.map(t => t.id === task.id ? previousTask : t);
+        }
+      );
       console.error('Error updating signature:', error);
       toast.error('שגיאה בעדכון החתימה', {
         position: 'top-left',
         rtl: true,
       });
-    } finally {
-      setIsUpdatingSignature(false);
     }
   };
 
   const handleDeleteTask = async () => {
     setIsDeleting(true);
+    setIsRedirecting(true); // Set redirecting immediately to prevent refetches
+    
     try {
       const response = await fetch(API_ROUTES.ADMIN.DELETE_TASK + `/${params.id}`, {
         method: 'DELETE',
@@ -115,6 +183,12 @@ function TaskDetailsPage() {
 
       if (response.ok) {
         const taskId = parseInt(params.id as string);
+        
+        // Cancel any ongoing queries for this task
+        queryClient.cancelQueries({ queryKey: ['task', taskId] });
+        
+        // Remove the task query from cache immediately
+        queryClient.removeQueries({ queryKey: ['task', taskId] });
         
         // Optimistically update all task queries to remove the deleted task
         queryClient.setQueriesData<Task[]>(
@@ -131,15 +205,12 @@ function TaskDetailsPage() {
           refetchType: 'all'
         });
         
-        // Also remove any cached data for this specific task
-        queryClient.removeQueries({ queryKey: ['task', params.id] });
-        
         setShowDeleteModal(false);
-        setIsRedirecting(true); // Prevent error state from showing
         
         // Use router.replace to avoid back button issues and redirect immediately
         router.replace(CLIENT_ROUTES.ADMIN.DASHBOARD);
       } else {
+        setIsRedirecting(false); // Reset if deletion failed
         const errorData = await response.json().catch(() => ({}));
         toast.error(errorData.error || 'שגיאה במחיקת המשימה', {
           position: 'top-left',
@@ -148,6 +219,7 @@ function TaskDetailsPage() {
         setShowDeleteModal(false);
       }
     } catch (error) {
+      setIsRedirecting(false); // Reset if deletion failed
       console.error('Error deleting task:', error);
       toast.error('שגיאה במחיקת המשימה', {
         position: 'top-left',

@@ -1,23 +1,31 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import TasksTable from '@/components/TasksTable';
 import { TaskFilters } from '@/types/types';
 import ControlPanel from '@/components/Controlpanel';
 import { Task } from '@/types/types';
 import Filter from '../../Admin/tasks/Fillter';
-import { API_ROUTES } from '@/app/constans/constans';
+import { useQuery } from '@tanstack/react-query';
+import { fetchTasks } from '@/app/actions/fetchtasks';
 
 
 
 export default  function UserDashboardClient() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-
-  const today = new Date().toISOString().split('T')[0];
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
   const [filters, setFilters] = useState<TaskFilters>({
     status: 'ALL',
     startDate: today,
     endDate: '',
+  });
+
+  // Use React Query for better performance, caching, and request deduplication
+  const { data: tasks = [], isLoading, refetch } = useQuery<Task[]>({
+    queryKey: ['tasks', 'user', filters],
+    queryFn: () => fetchTasks(filters),
+    staleTime: 30 * 1000, // Consider data fresh for 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
+    refetchOnWindowFocus: false, // Don't refetch on window focus for better UX
   });
 
   const clearFilters = useCallback(() => {
@@ -32,38 +40,6 @@ export default  function UserDashboardClient() {
   const handleFiltersChange = useCallback((newFilters: TaskFilters) => {
     setFilters(newFilters);
   }, []);
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const params = new URLSearchParams();
-        
-        if (filters.status && filters.status !== 'ALL') {
-          params.append('status', filters.status);
-        }
-        
-        if (filters.startDate && filters.startDate.toString().trim() !== '') {
-          params.append('startDate', filters.startDate.toString());
-        }
-        
-        if (filters.endDate && filters.endDate.toString().trim() !== '') {
-          params.append('endDate', filters.endDate.toString());
-        }
-
-        const response = await fetch(API_ROUTES.Packages.FILTER_TASKS + `?${params.toString()}`);
-        if (response.ok) {
-          const data = await response.json();
-          setTasks(data);
-        } else {
-          console.error('Failed to fetch tasks');
-        }
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
-      }
-    };
-    
-    fetchTasks();
-  }, [filters]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" dir="rtl">
@@ -88,7 +64,12 @@ export default  function UserDashboardClient() {
       {/* Tasks section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-          <TasksTable title="המשימות שלי" tasks={tasks} />
+          <TasksTable 
+            title="המשימות שלי" 
+            tasks={tasks} 
+            isLoading={isLoading}
+            refetch={() => refetch()}
+          />
         </div>
       </div>
     </div>

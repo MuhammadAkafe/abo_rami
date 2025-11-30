@@ -5,7 +5,7 @@ import { fetchTask } from "@/app/actions/fetchtasks";
 
 
 
-export const useFetchTask = (id: string | string[] | undefined) => {
+export const useFetchTask = (id: string | string[] | undefined, enabled: boolean = true) => {
     // Ensure id is a string
     const taskId = Array.isArray(id) ? id[0] : id;
 
@@ -18,7 +18,11 @@ export const useFetchTask = (id: string | string[] | undefined) => {
             }
             return await fetchTask(taskId);
         },
-        enabled: !!taskId, // Only run query if taskId exists
+        enabled: !!taskId && enabled, // Only run query if taskId exists and enabled is true
+        staleTime: 60 * 1000, // Consider data fresh for 1 minute
+        gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+        refetchOnWindowFocus: false, // Don't refetch on window focus
+        retry: 1, // Retry once for network errors (fetchTask handles 404s gracefully)
       });
 
     return { task, isLoading, error,refetch };
