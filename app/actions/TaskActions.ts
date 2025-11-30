@@ -7,6 +7,36 @@ import { TaskFilters } from "@/types/types";
 
 type status = 'PENDING' | 'COMPLETED' | 'REJECTED';
 
+
+        // Date validation
+        function validateDate(dateString: string): { isValid: boolean; date?: Date; error?: string } {
+            if (!dateString) {
+                return { isValid: false, error: "Date is required" };
+            }
+
+            const date = new Date(dateString);
+            
+            if (isNaN(date.getTime())) {
+                return { isValid: false, error: "Invalid date format" };
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (date < today) {
+                return { isValid: false, error: "Date cannot be in the past" };
+            }
+
+            const maxDate = new Date();
+            maxDate.setFullYear(maxDate.getFullYear() + 1);
+            
+            if (date > maxDate) {
+                return { isValid: false, error: "Date cannot be more than 1 year in the future" };
+            }
+
+            return { isValid: true, date };
+        }
+
 // Filter tasks with permission checks
 export async function filterTasks(filters: TaskFilters) {
     try {
@@ -17,9 +47,13 @@ export async function filterTasks(filters: TaskFilters) {
 
         const whereClause: Prisma.tasksWhereInput = {};
 
-        // Admin sees all tasks from all suppliers
+        // Admin sees only tasks from suppliers they created (filtered by supplier.userId)
         // Regular users (suppliers) only see their own tasks
-        if (session.role !== 'ADMIN') {
+        if (session.role === 'ADMIN') {
+            whereClause.supplier = {
+                userId: session.id
+            };
+        } else {
             whereClause.supplierId = session.id;
         }
 
@@ -131,34 +165,7 @@ export async function addTask(taskData: { address: string; description: string; 
             return { error: 'Forbidden: Admin access required', success: false };
         }
 
-        // Date validation
-        function validateDate(dateString: string): { isValid: boolean; date?: Date; error?: string } {
-            if (!dateString) {
-                return { isValid: false, error: "Date is required" };
-            }
 
-            const date = new Date(dateString);
-            
-            if (isNaN(date.getTime())) {
-                return { isValid: false, error: "Invalid date format" };
-            }
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            if (date < today) {
-                return { isValid: false, error: "Date cannot be in the past" };
-            }
-
-            const maxDate = new Date();
-            maxDate.setFullYear(maxDate.getFullYear() + 1);
-            
-            if (date > maxDate) {
-                return { isValid: false, error: "Date cannot be more than 1 year in the future" };
-            }
-
-            return { isValid: true, date };
-        }
 
         const { isValid, error, date: validatedDate } = validateDate(taskData.date);
         if (!isValid) {

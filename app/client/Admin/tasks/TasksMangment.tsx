@@ -6,7 +6,12 @@ import { TaskFilters } from '@/types/types';
 import { Task } from '@/types/types';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTasks } from '@/app/actions/fetchtasks';
+import { useSession } from '@/app/client/SesstionProvider';
+
 export default function TaskManagement() {
+  const session = useSession();
+  const userId = session?.id ?? null;
+  
   // Memoize today's date to avoid recalculation on every render
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
   
@@ -16,7 +21,7 @@ export default function TaskManagement() {
     endDate: '',
   }));
   const { data: tasks = [], isLoading,refetch } = useQuery<Task[]>({
-    queryKey: ['tasks', 'admin', filters],
+    queryKey: ['tasks', 'admin', userId, filters],
     queryFn: () => fetchTasks(filters),
     staleTime: 30 * 1000, // Consider data fresh for 30 seconds
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
@@ -54,7 +59,7 @@ export default function TaskManagement() {
       <TasksTable 
         title="ניהול משימות" 
         filters={filters} 
-        refetch={() => refetch()}
+        refetch={refetch}
         tasks={tasks as Task[]} 
         isLoading={isLoading} 
       />

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
 import DeleteModal from '@/components/DeleteModal';
 import LoadingComponent from '@/components/LoadingComponent';
@@ -21,11 +21,6 @@ function SuppliersTable()
 
     const { suppliers, error, refetch, isLoading } = useGetSuppliers();
     const { mutation } = useDeleteSupplier();
-
-    // Refetch suppliers when component mounts
-    useEffect(() => {
-        refetch();
-    }, [refetch]);
 
 
 

@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect } from 'react'
+import React from 'react'
 import { TasksTableProps } from '@/types/types';
 import { TaskRow } from '@/components/TaskRow';
 import { EmptyTasksUi } from '@/components/EmptyTasksUi';
@@ -15,10 +15,6 @@ function TasksTable({ title,tasks, isLoading, refetch }: TasksTableProps & { isL
     {
     router.push(`/client/TaskDeatiles/${task.id}`);
   }
-
-  useEffect(() => {
-    refetch?.();
-  }, [refetch]);
 
 
 

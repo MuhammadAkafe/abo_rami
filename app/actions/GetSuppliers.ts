@@ -7,16 +7,23 @@ export const GetSuppliers = async () => {
     try {
         const session = await getSession();
         if (!session) {
-            return []
+            return [];
         }
+        
         if (session.role !== 'ADMIN') {
-            return { message: 'Forbi[dden: Admin access required', suppliers:null };
+            return [];
         }
+        
+        // Admin sees only suppliers they created (filtered by userId)
         const suppliers = await prisma.suppliers.findMany({
+            where: {
+                userId: session.id
+            },
             include: {
                 cities: true
             }
         });
+        
         return suppliers;
     } catch (error) {
         console.error('Error getting suppliers:', error);

@@ -8,10 +8,14 @@ import { Task } from '@/types/types';
 import Filter from '../../Admin/tasks/Fillter';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTasks } from '@/app/actions/fetchtasks';
+import { useSession } from '@/app/client/SesstionProvider';
 
 
 
 export default  function UserDashboardClient() {
+  const session = useSession();
+  const userId = session?.id ?? null;
+  
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
   const [filters, setFilters] = useState<TaskFilters>({
     status: 'ALL',
@@ -21,7 +25,7 @@ export default  function UserDashboardClient() {
 
   // Use React Query for better performance, caching, and request deduplication
   const { data: tasks = [], isLoading, refetch } = useQuery<Task[]>({
-    queryKey: ['tasks', 'user', filters],
+    queryKey: ['tasks', 'user', userId, filters],
     queryFn: () => fetchTasks(filters),
     staleTime: 30 * 1000, // Consider data fresh for 30 seconds
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
@@ -68,7 +72,7 @@ export default  function UserDashboardClient() {
             title="המשימות שלי" 
             tasks={tasks} 
             isLoading={isLoading}
-            refetch={() => refetch()}
+            refetch={refetch}
           />
         </div>
       </div>
