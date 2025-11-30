@@ -7,11 +7,12 @@ import LoadingComponent from "@/components/LoadingComponent";
 import DeleteModal from "@/components/DeleteModal";
 import { useSession } from "@/app/client/SesstionProvider";
 import { useFetchTask } from "@/hooks/useFetchTask";
-import { API_ROUTES, CLIENT_ROUTES } from "@/app/constans/constans";
+import { CLIENT_ROUTES } from "@/app/constans/constans";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types/types";
+import { updateTask, deleteTask } from "@/app/actions/TaskActions";
 
 type TaskStatus = 'PENDING' | 'COMPLETED' | 'REJECTED';
 
@@ -25,14 +26,17 @@ function TaskDetailsPage() {
   const session = useSession();
   const isAdmin = session?.role === 'ADMIN';
   const taskId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const { task, isLoading, error: taskError, refetch } = useFetchTask(taskId, !isRedirecting);
+  const { task, isLoading, error: taskError } = useFetchTask(taskId, !isRedirecting);
   const queryClient = useQueryClient();
+  
+  // Type assertion for task
+  const typedTask = task as Task | null;
 
   const handleStatusUpdate = async (newStatus: TaskStatus) => {
-    if (!task || task.status === newStatus) return;
+    if (!typedTask || typedTask.status === newStatus) return;
 
     // Optimistic update - update UI immediately
-    const previousTask = task;
+    const previousTask = typedTask;
     queryClient.setQueryData<Task>(['task', taskId], (old) => {
       if (!old) return old;
       return { ...old, status: newStatus };
@@ -43,39 +47,41 @@ function TaskDetailsPage() {
       { queryKey: ['tasks'] },
       (oldData) => {
         if (!oldData) return oldData;
-        return oldData.map(t => t.id === task.id ? { ...t, status: newStatus } : t);
+        return oldData.map(t => t.id === typedTask.id ? { ...t, status: newStatus } : t);
       }
     );
 
     setIsUpdatingStatus(true);
     try {
-      const response = await fetch(API_ROUTES.USER.updateTask + `/${params.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
+      const result = await updateTask(taskId!, { status: newStatus });
 
-      if (response.ok) {
-        // Refetch to ensure we have the latest data
-        await refetch();
-        toast.success('הסטטוס עודכן בהצלחה', {
-          position: 'top-left',
-          rtl: true,
-        });
-      } else {
+      if (result.error) {
         // Rollback on error
         queryClient.setQueryData(['task', taskId], previousTask);
         queryClient.setQueriesData<Task[]>(
           { queryKey: ['tasks'] },
           (oldData) => {
             if (!oldData) return oldData;
-            return oldData.map(t => t.id === task.id ? previousTask : t);
+              return oldData.map(t => t.id === typedTask.id ? previousTask : t);
           }
         );
-        const errorData = await response.json().catch(() => ({}));
-        toast.error(errorData.error || 'שגיאה בעדכון הסטטוס', {
+        toast.error(result.error || 'שגיאה בעדכון הסטטוס', {
+          position: 'top-left',
+          rtl: true,
+        });
+      } else {
+        // Update cache with new task data
+        if (result.task) {
+          queryClient.setQueryData(['task', taskId], result.task);
+          queryClient.setQueriesData<Task[]>(
+            { queryKey: ['tasks'] },
+            (oldData) => {
+              if (!oldData) return oldData;
+              return oldData.map(t => t.id === typedTask.id ? (result.task as unknown as Task) : t);
+            }
+          );
+        }
+        toast.success('הסטטוס עודכן בהצלחה', {
           position: 'top-left',
           rtl: true,
         });
@@ -87,7 +93,7 @@ function TaskDetailsPage() {
         { queryKey: ['tasks'] },
         (oldData) => {
           if (!oldData) return oldData;
-          return oldData.map(t => t.id === task.id ? previousTask : t);
+              return oldData.map(t => t.id === typedTask.id ? previousTask : t);
         }
       );
       console.error('Error updating status:', error);
@@ -101,10 +107,10 @@ function TaskDetailsPage() {
   };
 
   const handleSignatureUpdate = async (signatureUrl: string) => {
-    if (!task) return;
+    if (!typedTask) return;
 
     // Optimistic update - update UI immediately
-    const previousTask = task;
+    const previousTask = typedTask;
     queryClient.setQueryData<Task>(['task', taskId], (old) => {
       if (!old) return old;
       return { ...old, url: signatureUrl };
@@ -115,38 +121,40 @@ function TaskDetailsPage() {
       { queryKey: ['tasks'] },
       (oldData) => {
         if (!oldData) return oldData;
-        return oldData.map(t => t.id === task.id ? { ...t, url: signatureUrl } : t);
+        return oldData.map(t => t.id === typedTask.id ? { ...t, url: signatureUrl } : t);
       }
     );
 
     try {
-      const response = await fetch(API_ROUTES.USER.updateTask + `/${params.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url: signatureUrl }),
-      });
+      const result = await updateTask(taskId!, { url: signatureUrl });
 
-      if (response.ok) {
-        // Refetch to ensure we have the latest data
-        await refetch();
-        toast.success('החתימה עודכנה בהצלחה', {
-          position: 'top-left',
-          rtl: true,
-        });
-      } else {
+      if (result.error) {
         // Rollback on error
         queryClient.setQueryData(['task', taskId], previousTask);
         queryClient.setQueriesData<Task[]>(
           { queryKey: ['tasks'] },
           (oldData) => {
             if (!oldData) return oldData;
-            return oldData.map(t => t.id === task.id ? previousTask : t);
+              return oldData.map(t => t.id === typedTask.id ? previousTask : t);
           }
         );
-        const errorData = await response.json().catch(() => ({}));
-        toast.error(errorData.error || 'שגיאה בעדכון החתימה', {
+        toast.error(result.error || 'שגיאה בעדכון החתימה', {
+          position: 'top-left',
+          rtl: true,
+        });
+      } else {
+        // Update cache with new task data
+        if (result.task) {
+          queryClient.setQueryData(['task', taskId], result.task);
+          queryClient.setQueriesData<Task[]>(
+            { queryKey: ['tasks'] },
+            (oldData) => {
+              if (!oldData) return oldData;
+              return oldData.map(t => t.id === typedTask.id ? (result.task as unknown as Task) : t);
+            }
+          );
+        }
+        toast.success('החתימה עודכנה בהצלחה', {
           position: 'top-left',
           rtl: true,
         });
@@ -158,7 +166,7 @@ function TaskDetailsPage() {
         { queryKey: ['tasks'] },
         (oldData) => {
           if (!oldData) return oldData;
-          return oldData.map(t => t.id === task.id ? previousTask : t);
+              return oldData.map(t => t.id === typedTask.id ? previousTask : t);
         }
       );
       console.error('Error updating signature:', error);
@@ -174,28 +182,30 @@ function TaskDetailsPage() {
     setIsRedirecting(true); // Set redirecting immediately to prevent refetches
     
     try {
-      const response = await fetch(API_ROUTES.ADMIN.DELETE_TASK + `/${params.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const result = await deleteTask(taskId!);
 
-      if (response.ok) {
-        const taskId = parseInt(params.id as string);
+      if (result.error) {
+        setIsRedirecting(false); // Reset if deletion failed
+        toast.error(result.error || 'שגיאה במחיקת המשימה', {
+          position: 'top-left',
+          rtl: true,
+        });
+        setShowDeleteModal(false);
+      } else {
+        const deletedTaskId = parseInt(params.id as string);
         
         // Cancel any ongoing queries for this task
-        queryClient.cancelQueries({ queryKey: ['task', taskId] });
+        queryClient.cancelQueries({ queryKey: ['task', deletedTaskId] });
         
         // Remove the task query from cache immediately
-        queryClient.removeQueries({ queryKey: ['task', taskId] });
+        queryClient.removeQueries({ queryKey: ['task', deletedTaskId] });
         
         // Optimistically update all task queries to remove the deleted task
         queryClient.setQueriesData<Task[]>(
           { queryKey: ['tasks'] },
           (oldData) => {
             if (!oldData) return oldData;
-            return oldData.filter(task => task.id !== taskId);
+            return oldData.filter(task => task.id !== deletedTaskId);
           }
         );
         
@@ -209,14 +219,6 @@ function TaskDetailsPage() {
         
         // Use router.replace to avoid back button issues and redirect immediately
         router.replace(CLIENT_ROUTES.ADMIN.DASHBOARD);
-      } else {
-        setIsRedirecting(false); // Reset if deletion failed
-        const errorData = await response.json().catch(() => ({}));
-        toast.error(errorData.error || 'שגיאה במחיקת המשימה', {
-          position: 'top-left',
-          rtl: true,
-        });
-        setShowDeleteModal(false);
       }
     } catch (error) {
       setIsRedirecting(false); // Reset if deletion failed
@@ -244,7 +246,7 @@ function TaskDetailsPage() {
   }
 
   // Show error state if there's an error or task doesn't exist (and not redirecting)
-  if (taskError || !task) {
+  if (taskError || !typedTask) {
     return (
       <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center" dir="rtl">
         <div className="text-center">
@@ -298,23 +300,23 @@ function TaskDetailsPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">כתובת</label>
-                <p className="text-lg text-gray-900">{task.address}</p>
+                <p className="text-lg text-gray-900">{typedTask.address}</p>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">תיאור</label>
-                <p className="text-lg text-gray-900">{task.description}</p>
+                <p className="text-lg text-gray-900">{typedTask.description}</p>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">עיר</label>
-                <p className="text-lg text-gray-900">{task.city}</p>
+                <p className="text-lg text-gray-900">{typedTask.city}</p>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">עד תאריך</label>
                 <p className="text-lg text-gray-900">
-                  {task.date ? new Date(task.date).toLocaleDateString('he-IL') : 'לא צוין'}
+                  {typedTask.date ? new Date(typedTask.date).toLocaleDateString('he-IL') : 'לא צוין'}
                 </p>
               </div>
             </div>
@@ -324,13 +326,13 @@ function TaskDetailsPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">שם ספק</label>
                 <p className="text-lg text-gray-900">
-                  {task.supplier ? `${task.supplier.firstName} ${task.supplier.lastName}` : 'לא זמין'}
+                  {typedTask.supplier ? `${typedTask.supplier.firstName} ${typedTask.supplier.lastName}` : 'לא זמין'}
                 </p>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">טלפון</label>
-                <p className="text-lg text-gray-900">{task.supplier?.phone || 'לא זמין'}</p>
+                <p className="text-lg text-gray-900">{typedTask.supplier?.phone || 'לא זמין'}</p>
               </div>
               
               <div>
@@ -338,21 +340,21 @@ function TaskDetailsPage() {
                   <>
                     <label className="block text-sm font-medium text-gray-700 mb-1">סטטוס</label>
                     <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                      task.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                      task.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                      task.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                      typedTask.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                      typedTask.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                      typedTask.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>
-                      {task.status === 'COMPLETED' ? 'הושלם' :
-                       task.status === 'PENDING' ? 'ממתין' :
-                       task.status === 'REJECTED' ? 'נדחה' : 'לא ידוע'}
+                      {typedTask.status === 'COMPLETED' ? 'הושלם' :
+                       typedTask.status === 'PENDING' ? 'ממתין' :
+                       typedTask.status === 'REJECTED' ? 'נדחה' : 'לא ידוע'}
                     </span>
                   </>
                 ) : (
                   <>
                     <label className="block text-sm font-medium text-gray-700 mb-1">עדכן סטטוס</label>
                     <select
-                      value={task.status}
+                      value={typedTask.status}
                       onChange={(e) => handleStatusUpdate(e.target.value as TaskStatus)}
                       disabled={isUpdatingStatus}
                       className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -373,7 +375,7 @@ function TaskDetailsPage() {
 
         {/* Signature Section */}
         <SignatureSection 
-          task={task} 
+          task={typedTask} 
           allowEdit={!isAdmin} 
           onSignatureUpdate={handleSignatureUpdate}
         />
@@ -386,7 +388,7 @@ function TaskDetailsPage() {
         onConfirm={handleDeleteTask}
         title="מחיקת משימה"
         message="האם אתה בטוח שברצונך למחוק את המשימה?"
-        itemName={`${task.address} - ${task.description}`}
+        itemName={`${typedTask.address} - ${typedTask.description}`}
         isLoading={isDeleting}
       />
 
