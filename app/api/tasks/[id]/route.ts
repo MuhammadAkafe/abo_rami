@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { Prisma } from '@prisma/client';
-import { getSession } from '@/lib/session';
 
 export async function GET(
   request: Request,
@@ -10,14 +9,6 @@ export async function GET(
   try {
     const resolvedParams = await params;
     const taskId = parseInt(resolvedParams.id);
-    
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
 
     if (isNaN(taskId)) {
       return NextResponse.json(

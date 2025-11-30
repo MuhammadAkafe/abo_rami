@@ -1,19 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { getSession } from '@/lib/session';
+import { cookies } from 'next/headers';
+import { redisClient } from '@/lib/redis';
+import { SessionData } from '@/lib/session';
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
-    const session = await getSession();
-    if (!session) {
+    // Get session from cookies (middleware already handles authentication and role check)
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get('session_id')?.value;
+    
+    if (!sessionId) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-
-    // Check if user is ADMIN
-    if (session.role !== 'ADMIN') {
-      return NextResponse.json({ message: 'Forbidden: Admin access required' }, { status: 403 });
+    
+    const redisData = await redisClient.get(`session:${sessionId}`);
+    const session = redisData as unknown as SessionData;
+    
+    if (!session) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
     const { firstName, lastName, email, phone, password, cities } = await request.json();

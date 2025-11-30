@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/session";
 import { NextResponse } from "next/server";
 // Date validation helper function
 function validateDate(dateString: string): { isValid: boolean; date?: Date; error?: string } {
@@ -35,17 +34,6 @@ function validateDate(dateString: string): { isValid: boolean; date?: Date; erro
 
 export async function POST(request: Request) {
     try {
-
-      const session = await getSession();
-      if (!session) {
-        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-      }
-  
-      // Check if user is ADMIN
-      if (session.role !== 'ADMIN') {
-        return NextResponse.json({ message: 'Forbidden: Admin access required' }, { status: 403 });
-      }
-
       const taskData = await request.json();
       const { address, description, supplierId, date, city } = taskData;
       const { isValid, error, date: validatedDate } = validateDate(date);
