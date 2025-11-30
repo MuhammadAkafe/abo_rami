@@ -1,18 +1,22 @@
 "use server";
 
 import { filterTasks, getTask } from "./TaskActions";
-import { TaskFilters } from "@/types/types";
+import { TaskFilters, Task } from "@/types/types";
 
-export async function fetchTasks(filters: TaskFilters) {
+export async function fetchTasks(filters: TaskFilters): Promise<Task[]> {
     const result = await filterTasks(filters);
     if (result.error) {
         console.error('Failed to fetch tasks:', result.error);
         return [];
     }
-    return result.tasks;
+    // Transform Prisma tasks to match Task type (convert supplierId from number to string)
+    return result.tasks.map(task => ({
+        ...task,
+        supplierId: task.supplierId.toString(),
+    })) as Task[];
 }
 
-export async function fetchTask(id: string) {
+export async function fetchTask(id: string): Promise<Task | null> {
     if (!id) {
         console.error('Task ID is required');
         return null;
@@ -26,5 +30,12 @@ export async function fetchTask(id: string) {
         }
         return null;
     }
-    return result.task;
+    if (!result.task) {
+        return null;
+    }
+    // Transform Prisma task to match Task type (convert supplierId from number to string)
+    return {
+        ...result.task,
+        supplierId: result.task.supplierId.toString(),
+    } as Task;
 }

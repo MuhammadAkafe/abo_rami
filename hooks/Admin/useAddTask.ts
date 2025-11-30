@@ -3,6 +3,10 @@ import { useMutation } from "@tanstack/react-query";
 import { addTask } from "@/app/actions/TaskActions";
 
 const AddTask = async (newTask: Task) => {
+    if (!newTask.date) {
+        throw new Error('תאריך הוא שדה חובה');
+    }
+    
     const result = await addTask({
         address: newTask.address,
         description: newTask.description,
