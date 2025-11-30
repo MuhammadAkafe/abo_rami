@@ -6,7 +6,8 @@ import { TaskFilters } from '@/types/types';
 import ControlPanel from '@/components/Controlpanel';
 import { Task } from '@/types/types';
 import Filter from '../../Admin/tasks/Fillter';
-import { useSession } from '../../SesstionProvider';
+import { API_ROUTES } from '@/app/constans/constans';
+
 
 
 export default  function UserDashboardClient() {
@@ -35,13 +36,21 @@ export default  function UserDashboardClient() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const params = new URLSearchParams({
-          status: filters.status,
-          startDate: filters.startDate.toString(),
-          endDate: filters.endDate.toString(),
-        });
+        const params = new URLSearchParams();
+        
+        if (filters.status && filters.status !== 'ALL') {
+          params.append('status', filters.status);
+        }
+        
+        if (filters.startDate && filters.startDate.toString().trim() !== '') {
+          params.append('startDate', filters.startDate.toString());
+        }
+        
+        if (filters.endDate && filters.endDate.toString().trim() !== '') {
+          params.append('endDate', filters.endDate.toString());
+        }
 
-        const response = await fetch(`/api/USER/FillterTasks?${params}`);
+        const response = await fetch(API_ROUTES.Packages.FILTER_TASKS + `?${params.toString()}`);
         if (response.ok) {
           const data = await response.json();
           setTasks(data);

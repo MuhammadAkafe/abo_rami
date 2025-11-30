@@ -1,7 +1,8 @@
 import { Task } from "@/types/types";
 import { useMutation } from "@tanstack/react-query";
+import { API_ROUTES } from "@/app/constans/constans";
 const AddTask = async (newTask: Task) => {
-    const response = await fetch("/api/ADMIN/AddTask", {
+    const response = await fetch(API_ROUTES.ADMIN.ADD_TASK, {
       method: "POST",
       body: JSON.stringify(newTask),
     });

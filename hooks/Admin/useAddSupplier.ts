@@ -2,13 +2,13 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { NewSupplier } from "@/types/types";;
-
+import { API_ROUTES } from "@/app/constans/constans";
 
 
 const Add_Supplier = async (formData: NewSupplier) => 
   {
     try {
-      const response = await fetch('/api/ADMIN/AddSupplier', {
+      const response = await fetch(API_ROUTES.ADMIN.ADD_SUPPLIER, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -11,6 +11,23 @@ interface FilterProps {
 export default function Filter({ onFiltersChange, clearFilters, filters, setFilters }: FilterProps) 
 {
 
+  const handlefillterchange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    let newFilters = { ...filters };
+
+    if (name === "status") {
+      newFilters = { ...filters, status: value as Status };
+    } else if (name === "startDate") {
+      newFilters = { ...filters, startDate: value };
+    } else if (name === "endDate") {
+      newFilters = { ...filters, endDate: value };
+    }
+
+    setFilters(newFilters);
+    onFiltersChange?.(newFilters);
+  }
+
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -20,12 +37,9 @@ export default function Filter({ onFiltersChange, clearFilters, filters, setFilt
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">סטטוס</label>
         <select 
+          name="status"
           value={filters.status}
-          onChange={(e) => {
-            const newFilters = { ...filters, status: e.target.value as Status };
-            setFilters(newFilters);
-            onFiltersChange?.(newFilters);
-          }}
+          onChange={handlefillterchange}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="ALL">כל הסטטוסים</option>
@@ -41,12 +55,9 @@ export default function Filter({ onFiltersChange, clearFilters, filters, setFilt
         <label className="block text-sm font-medium text-gray-700 mb-2">תאריך התחלה</label>
         <input
           type="date"
+          name="startDate"
           value={filters.startDate as string}
-          onChange={(e) => {
-            const newFilters = { ...filters, startDate: e.target.value as string };
-            setFilters(newFilters);
-            onFiltersChange?.(newFilters);
-          }}
+          onChange={handlefillterchange}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
@@ -56,13 +67,10 @@ export default function Filter({ onFiltersChange, clearFilters, filters, setFilt
         <label className="block text-sm font-medium text-gray-700 mb-2">תאריך סיום</label>
         <input
           type="date"
-          value={filters.endDate as string}
-          min={filters.startDate as string}
-          onChange={(e) => {
-            const newFilters = { ...filters, endDate: e.target.value as string };
-            setFilters(newFilters);
-            onFiltersChange?.(newFilters);
-          }}
+          name="endDate"
+          value={filters.endDate as string || ''}
+          min={filters.startDate && filters.startDate.toString().trim() !== '' ? filters.startDate as string : undefined}
+          onChange={handlefillterchange}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>

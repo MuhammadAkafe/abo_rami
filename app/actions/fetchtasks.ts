@@ -28,12 +28,50 @@ export async function fetchTasks(filters: TaskFilters) {
 
 
   export async function fetchTask(id: string) {
-    const response = await fetch(`/api/tasks/${id}`);
-    if (response.ok) {
-      const data = await response.json();
-      return data;
-    } else {
-      console.error('Failed to fetch task');
+    try {
+      if (!id) {
+        console.error('Task ID is required');
+        return null;
+      }
+
+      const response = await fetch(`/api/tasks/${id}`);
+      
+      if (!response.ok) {
+        // Try to get error message from response
+        let errorMessage = 'Failed to fetch task';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // If response is not JSON, use status text
+          errorMessage = response.statusText || errorMessage;
+        }
+        console.error('Failed to fetch task:', errorMessage, `Status: ${response.status}`);
+        return null;
+      }
+
+      // Check if response has content
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Invalid response content type:', contentType);
+        return null;
+      }
+
+      const text = await response.text();
+      if (!text) {
+        console.error('Empty response from server');
+        return null;
+      }
+
+      try {
+        const data = JSON.parse(text);
+        return data;
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', parseError, 'Response:', text);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching task:', error);
       return null;
     }
   }

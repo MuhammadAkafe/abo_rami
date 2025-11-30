@@ -7,7 +7,7 @@ import LoadingComponent from "@/components/LoadingComponent";
 import DeleteModal from "@/components/DeleteModal";
 import { useSession } from "@/app/client/SesstionProvider";
 import { useFetchTask } from "@/hooks/useFetchTask";
-import { CLIENT_ROUTES } from "@/app/constans/constans";
+import { API_ROUTES, CLIENT_ROUTES } from "@/app/constans/constans";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useQueryClient } from "@tanstack/react-query";
@@ -25,7 +25,8 @@ function TaskDetailsPage() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const session = useSession();
   const isAdmin = session?.role === 'ADMIN';
-  const { task, isLoading, error: taskError, refetch } = useFetchTask(params.id as string);
+  const taskId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { task, isLoading, error: taskError, refetch } = useFetchTask(taskId);
   const queryClient = useQueryClient();
 
   const handleStatusUpdate = async (newStatus: TaskStatus) => {
@@ -33,7 +34,7 @@ function TaskDetailsPage() {
 
     setIsUpdatingStatus(true);
     try {
-      const response = await fetch(`/api/tasks/${params.id}`, {
+      const response = await fetch(API_ROUTES.USER.updateTask + `/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +71,7 @@ function TaskDetailsPage() {
 
     setIsUpdatingSignature(true);
     try {
-      const response = await fetch(`/api/tasks/${params.id}`, {
+      const response = await fetch(API_ROUTES.USER.updateTask + `/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +106,7 @@ function TaskDetailsPage() {
   const handleDeleteTask = async () => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/tasks/${params.id}`, {
+      const response = await fetch(API_ROUTES.ADMIN.DELETE_TASK + `/${params.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
