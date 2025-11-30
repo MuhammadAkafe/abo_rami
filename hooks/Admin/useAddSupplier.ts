@@ -17,24 +17,78 @@ const Add_Supplier = async (formData: NewSupplier) =>
     });
     
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('API Error Response:', errorData);
+      // Try to get error message from response
+      let errorData: { message?: string } = {};
+      let errorMessage = 'Add Supplier failed';
+      
+      try {
+        // Check if response has content
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const text = await response.text();
+          if (text) {
+            errorData = JSON.parse(text);
+          }
+        }
+      } catch (parseError) {
+        // If parsing fails, use status text
+        console.warn('Failed to parse error response:', parseError);
+      }
+      
+      // Get error message from response or use status text
+      if (errorData && errorData.message) {
+        errorMessage = errorData.message;
+      } else if (response.statusText) {
+        errorMessage = response.statusText;
+      } else {
+        // Default messages based on status code
+        switch (response.status) {
+          case 400:
+            errorMessage = 'שגיאה בנתונים שנשלחו';
+            break;
+          case 401:
+            errorMessage = 'אין הרשאה - נא להתחבר מחדש';
+            break;
+          case 403:
+            errorMessage = 'אין הרשאה לבצע פעולה זו';
+            break;
+          case 404:
+            errorMessage = 'המשאב המבוקש לא נמצא';
+            break;
+          case 500:
+            errorMessage = 'שגיאת שרת - אנא נסה שוב מאוחר יותר';
+            break;
+          default:
+            errorMessage = `שגיאה ${response.status}: נכשל בהוספת הספק`;
+        }
+      }
       
       // Handle specific error messages
-      let errorMessage = errorData.message || 'Add Supplier failed';
-      
-      // Handle specific errors
-      if (errorData.message && errorData.message.includes('User already exists')) {
+      if (errorMessage.includes('Supplier with this email already exists') || 
+          errorMessage.includes('User already exists') ||
+          errorMessage.includes('already exists')) {
         errorMessage = 'משתמש עם כתובת אימייל זו כבר קיים במערכת.';
-      } else if (errorData.message && errorData.message.includes('Invalid email')) {
+      } else if (errorMessage.includes('Invalid email') || 
+                 errorMessage.includes('email')) {
         errorMessage = 'כתובת האימייל אינה תקינה.';
-      } else if (errorData.message && errorData.message.includes('Password')) {
+      } else if (errorMessage.includes('Password') || 
+                 errorMessage.includes('password')) {
         errorMessage = 'הסיסמה אינה עומדת בדרישות הבטיחות.';
-      } else if (errorData.message && errorData.message.includes('Database connection failed')) {
+      } else if (errorMessage.includes('Database connection failed') ||
+                 errorMessage.includes('Database')) {
         errorMessage = 'שגיאת חיבור למסד הנתונים. אנא נסה שוב מאוחר יותר.';
-      } else if (errorData.message && errorData.message.includes('Network error')) {
+      } else if (errorMessage.includes('Network error') ||
+                 errorMessage.includes('Network')) {
         errorMessage = 'שגיאת רשת. אנא בדוק את החיבור שלך ונסה שוב.';
+      } else if (errorMessage.includes('Missing required fields')) {
+        errorMessage = 'חסרים שדות חובה: שם פרטי, שם משפחה, אימייל וסיסמה.';
       }
+      
+      console.error('API Error Response:', { 
+        status: response.status, 
+        statusText: response.statusText,
+        errorData 
+      });
       
       throw new Error(errorMessage);
     }
