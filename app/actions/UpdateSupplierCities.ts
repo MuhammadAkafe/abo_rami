@@ -28,8 +28,8 @@ export async function UpdateSupplierCities(
       .filter((city): city is string => typeof city === 'string' && city.trim().length > 0)
       .map(city => city.trim());
 
-    if (validCities.length > 100) {
-      return { success: false, error: "Too many cities (max 100)" };
+    if (validCities.length > 20) {
+      return { success: false, error: "Too many cities (max 20)" };
     }
 
     const id = parseInt(supplierId);
