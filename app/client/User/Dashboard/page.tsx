@@ -1,5 +1,5 @@
 "use client"
-import UserDashboardClient from './UserDashboardClient';
+import UserDashboardClient from '@/components/user/UserDashboardClient';
 export default  function UserDashboard() {
 
 

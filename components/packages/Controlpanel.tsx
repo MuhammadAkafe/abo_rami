@@ -10,8 +10,8 @@ import { useSession } from '@/app/client/SesstionProvider';
 import { Loader2 } from 'lucide-react';
 
 interface ControlPanelProps {
-  activeView?: ActiveView;
-  setActiveView?: (view: ActiveView) => void;
+  activeView: ActiveView;
+  setActiveView: (view: ActiveView) => void;
 }
 
 export default  function ControlPanel({ activeView, setActiveView }: ControlPanelProps) {
@@ -19,7 +19,6 @@ export default  function ControlPanel({ activeView, setActiveView }: ControlPane
   const session=useSession();
   const [isLoading, setIsLoading] = useState(false);
   const role=session?.role;
-  console.log(role);
 
   const logout = async () => {
     try {
@@ -66,7 +65,7 @@ export default  function ControlPanel({ activeView, setActiveView }: ControlPane
           {/* Navigation Component */}
           {
             role==="ADMIN" && (
-              <Navigation activeView={activeView!} setActiveView={setActiveView!} />
+              <Navigation activeView={activeView} setActiveView={setActiveView} />
             )
           }
         </div>

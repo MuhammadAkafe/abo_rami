@@ -6,13 +6,9 @@ import { SessionProvider } from "../SesstionProvider";
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
     const session = await getSession();
     
-    // Check if user is authenticated
-    if (!session) {
-        redirect(CLIENT_ROUTES.AdminSignIn);
-    }
-    
+
     // Check if user has ADMIN role
-    if (session.role !== "ADMIN") {
+    if (session && session.role !== "ADMIN") {
         redirect(CLIENT_ROUTES.AdminSignIn);
     }
 

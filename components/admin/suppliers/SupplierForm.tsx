@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { NewSupplier } from '@/types/types';
-import FormField from './FormField';
-import CitySelector from './CitySelector';
+import FormField from '../FormField';
+import CitySelector from '../CitySelector';
 
 
 interface SupplierFormProps {

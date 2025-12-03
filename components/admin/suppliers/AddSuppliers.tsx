@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { AddSupplierFormValidation } from '@/app/client/validtion';
 import { useAddSupplier } from '@/hooks/Admin/useAddSupplier';
 import { NewSupplier } from '@/types/types';
-import SupplierForm from '@/components/SupplierForm';
+import SupplierForm from '@/components/admin/suppliers/SupplierForm';
 
 
 

@@ -1,8 +1,8 @@
 "use client"
 import React from 'react'
 import { TasksTableProps } from '@/types/types';
-import { TaskRow } from '@/components/TaskRow';
-import { EmptyTasksUi } from '@/components/EmptyTasksUi';
+import { TaskRow } from '@/components/packages/TaskRow';
+import { EmptyTasksUi } from '@/components/packages/EmptyTasksUi';
 import { Task } from '@/types/types';
 import { useRouter } from 'next/navigation';
 

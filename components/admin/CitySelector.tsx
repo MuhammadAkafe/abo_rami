@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from 'react';
-import { israel_cities as cities } from '@/components/israel_cities_names_and__geometric_data';
+import { israel_cities as cities } from '@/components/packages/israel_cities_names_and__geometric_data';
 
 interface CitySelectorProps {
   selectedCities: string[];

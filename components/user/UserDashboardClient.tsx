@@ -1,20 +1,22 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react';
-import TasksTable from '@/components/TasksTable';
-import { TaskFilters } from '@/types/types';
-import ControlPanel from '@/components/Controlpanel';
+import TasksTable from '@/components/packages/TasksTable';
+import { ActiveView, TaskFilters } from '@/types/types';
+import ControlPanel from '@/components/packages/Controlpanel';
 import { Task } from '@/types/types';
-import Filter from '../../Admin/tasks/Fillter';
+import Filter from '@/components/admin/tasks/Fillter';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTasks } from '@/app/actions/fetchtasks';
 import { useSession } from '@/app/client/SesstionProvider';
+import { useActiveView } from '@/hooks/useActiveView';
 
 
 
 export default  function UserDashboardClient() {
   const session = useSession();
   const userId = session?.id ?? null;
+  const [activeView, setActiveView] = useActiveView('suppliers');
   
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
   const [filters, setFilters] = useState<TaskFilters>({
@@ -52,7 +54,7 @@ export default  function UserDashboardClient() {
           {/* Header section with ControlPanel and SignOutButton side by side */}
           <div className="flex justify-between items-center gap-4">
             <div className="flex-1">
-              <ControlPanel  />
+              <ControlPanel activeView={activeView} setActiveView={setActiveView} />
             </div>
           </div>
         </div>

@@ -1,11 +1,11 @@
 'use client';
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
-import DeleteModal from '@/components/DeleteModal';
-import LoadingComponent from '@/components/LoadingComponent';
+import DeleteModal from '@/components/packages/DeleteModal';
+import LoadingComponent from '@/components/user/LoadingComponent';
 import { DeleteModalState, supplierList } from '@/types/types';
 import { supplierList as supplier } from '@/types/types';
-import ErrorAlert from '@/components/ErrorAlert';
+import ErrorAlert from '@/components/packages/ErrorAlert';
 import useGetSuppliers from '@/hooks/Admin/useGetSuppliers';
 
 import useDeleteSupplier from '@/hooks/Admin/useDeleteSupplier';

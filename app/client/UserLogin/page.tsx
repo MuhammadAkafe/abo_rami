@@ -1,4 +1,4 @@
-import LoginPageClient from '@/app/client/UserLogin/LoginPageClient'
+import LoginPageClient from '@/components/user/LoginPageClient'
 export default async function LoginPage() {
   return <LoginPageClient />
 }

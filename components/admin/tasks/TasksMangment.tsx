@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useCallback, useMemo } from 'react';
 import Filter from './Fillter';
-import TasksTable from '../../../../components/TasksTable';
+import TasksTable from '../../packages/TasksTable';
 import { TaskFilters } from '@/types/types';
 import { Task } from '@/types/types';
 import { useQuery } from '@tanstack/react-query';

@@ -27,6 +27,7 @@ model suppliers {
   password  String?
   cities    cities[]
   tasks     tasks[]
+  tokens    tokens[]
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
   userId    String
@@ -63,4 +64,12 @@ enum Status {
   PENDING
   COMPLETED
   REJECTED
+}
+
+model tokens {
+  id        String   @id @default(uuid())
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  supplierId String
+  supplier   suppliers @relation(fields: [supplierId], references: [id], onDelete: Cascade)
 }

@@ -26,7 +26,7 @@ export interface DeleteModalProps {
 export type City = cities;
 
 
-export type ActiveView = 'dashboard' | 'suppliers' | 'tasks' | 'addSupplier' | 'addTask';
+export type ActiveView = 'dashboard' | 'suppliers' | 'tasks' | 'addSupplier' | 'addTask' | 'tokens';
 
 
 

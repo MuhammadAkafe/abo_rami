@@ -1,10 +1,10 @@
 "use client"
 
-import { SignatureSection } from "@/components/SignatureSection";
+import { SignatureSection } from "@/components/packages/SignatureSection";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import LoadingComponent from "@/components/LoadingComponent";
-import DeleteModal from "@/components/DeleteModal";
+import LoadingComponent from "@/components/user/LoadingComponent";
+import DeleteModal from "@/components/packages/DeleteModal";
 import { useSession } from "@/app/client/SesstionProvider";
 import { useFetchTask } from "@/hooks/useFetchTask";
 import { CLIENT_ROUTES } from "@/app/constans/constans";

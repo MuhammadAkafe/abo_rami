@@ -2,9 +2,10 @@
 import { GetSupplier } from '@/app/actions/GetSupplier';
 import { getSession } from '@/lib/session';
 import { redirect } from 'next/navigation';
-import ChangePasswordForm from '@/components/ChangePasswordForm';
-import EditCitiesClient from '@/components/EditCitiesClient';
-import SupplierDetailsClient from '@/components/SupplierDetailsClient';
+import ChangePasswordForm from '@/components/admin/ChangePasswordForm';
+import EditCitiesClient from '@/components/admin/EditCitiesClient';
+import SupplierDetailsClient from '@/components/admin/suppliers/SupplierDetailsClient';
+import { CLIENT_ROUTES } from '@/app/constans/constans';
 import Link from 'next/link';
 import { suppliers, tasks, cities } from '@prisma/client';
 
@@ -27,8 +28,8 @@ export default async function SupplierDeatiles({ params }: PageProps) {
   const { id } = await params;
   const session = await getSession();
   
-  if (!session) {
-    redirect('/client/AdminLogin');
+  if (session && session.role !== "ADMIN") {
+    redirect(CLIENT_ROUTES.AdminSignIn);
   }
 
   const { supplier, error } = await GetSupplier(id);
@@ -50,7 +51,7 @@ export default async function SupplierDeatiles({ params }: PageProps) {
   }
 
   const supplierWithRelations = supplier as SupplierWithRelations;
-  const isAdmin = session.role === 'ADMIN';
+  const isAdmin = session && session.role === 'ADMIN';
   
   // Calculate statistics
   const totalTasks = supplierWithRelations.tasks?.length || 0;
