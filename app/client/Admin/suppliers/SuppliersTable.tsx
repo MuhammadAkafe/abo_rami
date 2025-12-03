@@ -36,7 +36,7 @@ function SuppliersTable()
         });
     };
 
-    const handleRowClick = (supplierId: number | string) => {
+    const handleRowClick = (supplierId: string) => {
         setIsNavigating(true);
         router.push(`/client/SupplierDeatiles/${supplierId}`);
     };
@@ -47,7 +47,7 @@ function SuppliersTable()
         setDeleteModal({ isOpen: true, Supplier: deleteModal.Supplier, isLoading: true });
         
         try {
-            await mutation.mutateAsync(deleteModal.Supplier.id as unknown as number);
+            await mutation.mutateAsync(deleteModal.Supplier.id);
             // Close modal and refetch data on success
             setDeleteModal({ isOpen: false, Supplier: null, isLoading: false });
             refetch();

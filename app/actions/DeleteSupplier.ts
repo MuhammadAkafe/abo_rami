@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 
-export const DeleteSupplier = async (id: number) => {
+export const DeleteSupplier = async (id: string) => {
     try {
         const session = await getSession();
         if (!session) {
@@ -11,6 +11,9 @@ export const DeleteSupplier = async (id: number) => {
         }
         if (session.role !== 'ADMIN') {
             return { message: 'Forbidden: Admin access required' };
+        }
+        if (!id || typeof id !== 'string') {
+            return { message: 'Invalid supplier ID' };
         }
         await prisma.suppliers.delete({
             where:

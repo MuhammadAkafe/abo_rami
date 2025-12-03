@@ -6,6 +6,18 @@ import ChangePasswordForm from '@/components/ChangePasswordForm';
 import EditCitiesClient from '@/components/EditCitiesClient';
 import SupplierDetailsClient from '@/components/SupplierDetailsClient';
 import Link from 'next/link';
+import { suppliers, tasks, cities } from '@prisma/client';
+
+type SupplierWithRelations = suppliers & {
+  tasks: tasks[];
+  cities: cities[];
+  users?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  } | null;
+};
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -37,13 +49,14 @@ export default async function SupplierDeatiles({ params }: PageProps) {
     );
   }
 
+  const supplierWithRelations = supplier as SupplierWithRelations;
   const isAdmin = session.role === 'ADMIN';
   
   // Calculate statistics
-  const totalTasks = supplier.tasks.length;
-  const completedTasks = supplier.tasks.filter(t => t.status === 'COMPLETED').length;
-  const pendingTasks = supplier.tasks.filter(t => t.status === 'PENDING').length;
-  const rejectedTasks = supplier.tasks.filter(t => t.status === 'REJECTED').length;
+  const totalTasks = supplierWithRelations.tasks?.length || 0;
+  const completedTasks = supplierWithRelations.tasks?.filter((t: tasks) => t.status === 'COMPLETED').length || 0;
+  const pendingTasks = supplierWithRelations.tasks?.filter((t: tasks) => t.status === 'PENDING').length || 0;
+  const rejectedTasks = supplierWithRelations.tasks?.filter((t: tasks) => t.status === 'REJECTED').length || 0;
 
   return (
     <SupplierDetailsClient>
@@ -73,9 +86,10 @@ export default async function SupplierDeatiles({ params }: PageProps) {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
-                  {supplier.firstName} {supplier.lastName}
+                  {supplierWithRelations.firstName} {supplierWithRelations.lastName}
                 </h1>
-                <p className="text-gray-500 mt-1">פרטי ספק</p>
+                <p className="text-sm text-gray-500 mt-1">מספר מזהה</p>
+                <p className="text-sm text-blue-400 mt-1">{supplierWithRelations.id}</p>
               </div>
             </div>
           </div>
@@ -109,8 +123,8 @@ export default async function SupplierDeatiles({ params }: PageProps) {
                   <svg className="w-5 h-5 text-gray-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <a href={`mailto:${supplier.email}`} className="text-lg text-blue-600 hover:text-blue-800">
-                    {supplier.email}
+                  <a href={`mailto:${supplierWithRelations.email}`} className="text-lg text-blue-600 hover:text-blue-800">
+                    {supplierWithRelations.email}
                   </a>
                 </div>
               </div>
@@ -121,8 +135,8 @@ export default async function SupplierDeatiles({ params }: PageProps) {
                   <svg className="w-5 h-5 text-gray-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <a href={`tel:${supplier.phone}`} className="text-lg text-gray-900">
-                    {supplier.phone || 'לא זמין'}
+                  <a href={`tel:${supplierWithRelations.phone || ''}`} className="text-lg text-gray-900">
+                    {supplierWithRelations.phone || 'לא זמין'}
                   </a>
                 </div>
               </div>
@@ -130,14 +144,12 @@ export default async function SupplierDeatiles({ params }: PageProps) {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">נוצר ב</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">תאריך יצירה</label>
                 <p className="text-lg text-gray-900">
-                  {new Date(supplier.createdAt).toLocaleDateString('he-IL', {
+                  {new Date(supplierWithRelations.createdAt).toLocaleDateString('he-IL', {
                     year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    month: '2-digit',
+                    day: '2-digit'
                   })}
                 </p>
               </div>
@@ -145,12 +157,10 @@ export default async function SupplierDeatiles({ params }: PageProps) {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">עודכן לאחרונה</label>
                 <p className="text-lg text-gray-900">
-                  {new Date(supplier.updatedAt).toLocaleDateString('he-IL', {
+                  {new Date(supplierWithRelations.updatedAt).toLocaleDateString('he-IL', {
                     year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    month: '2-digit',
+                    day: '2-digit'
                   })}
                 </p>
               </div>
@@ -175,12 +185,15 @@ export default async function SupplierDeatiles({ params }: PageProps) {
           {isAdmin ? (
             <EditCitiesClient 
               supplierId={id} 
-              currentCities={supplier.cities || []}
+              currentCities={(supplierWithRelations.cities || []).map((city: cities) => ({
+                id: String(city.id),
+                city: city.city
+              }))}
             />
           ) : (
-            supplier.cities && supplier.cities.length > 0 ? (
+            supplierWithRelations.cities && supplierWithRelations.cities.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {supplier.cities.map((city) => (
+                {supplierWithRelations.cities.map((city: cities) => (
                   <span
                     key={city.id}
                     className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800"

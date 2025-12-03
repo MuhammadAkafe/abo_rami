@@ -10,14 +10,13 @@ export async function GetSupplier(id: string) {
       return { error: "Unauthorized", supplier: null };
     }
 
-    const supplierId = parseInt(id);
-    if (isNaN(supplierId)) {
+    if (!id || typeof id !== 'string') {
       return { error: "Invalid supplier ID", supplier: null };
     }
 
     const supplier = await prisma.suppliers.findUnique({
       where: {
-        id: supplierId,
+        id: id,
       },
       include: {
         cities: true,

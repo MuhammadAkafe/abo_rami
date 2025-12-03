@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 
 export const useDeleteSupplier = () => {
     const mutation = useMutation({
-        mutationFn: async (id: number) => await DeleteSupplier(id),
+        mutationFn: async (id: string) => await DeleteSupplier(id),
         onSuccess: () => {
             console.log('Supplier deleted successfully');
         },

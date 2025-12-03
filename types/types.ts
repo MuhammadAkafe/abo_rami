@@ -31,7 +31,7 @@ export type ActiveView = 'dashboard' | 'suppliers' | 'tasks' | 'addSupplier' | '
 
 
 export type Task= {
-    id?:  number;
+    id?:  string;
     supplierId: string;
     status?: Status;
     address: string;
@@ -45,7 +45,7 @@ export type Task= {
 
 
 export type supplierList = {
-  id: number | string;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -89,6 +89,7 @@ export interface TasksTableProps {
   title?: string;
   refetch?: () => void;
   filters?: TaskFilters;
+  onExport?: () => void;
 }
 
 

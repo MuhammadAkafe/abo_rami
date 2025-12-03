@@ -28,14 +28,13 @@ export async function UpdateSupplierPassword(
       return { success: false, error: "Password is too long (max 100 characters)" };
     }
 
-    const id = parseInt(supplierId);
-    if (isNaN(id)) {
+    if (!supplierId || typeof supplierId !== 'string') {
       return { success: false, error: "Invalid supplier ID" };
     }
 
     // Check if supplier exists
     const supplier = await prisma.suppliers.findUnique({
-      where: { id },
+      where: { id: supplierId },
     });
 
     if (!supplier) {
@@ -47,7 +46,7 @@ export async function UpdateSupplierPassword(
 
     // Update the password
     await prisma.suppliers.update({
-      where: { id },
+      where: { id: supplierId },
       data: { password: hashedPassword },
     });
 

@@ -8,7 +8,7 @@ import CitySelector from './CitySelector';
 
 interface EditCitiesFormProps {
   supplierId: string;
-  currentCities: Array<{ id: number; city: string }>;
+  currentCities: Array<{ id: string; city: string }>;
   onSuccess?: () => void;
 }
 

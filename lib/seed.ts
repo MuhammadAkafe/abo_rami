@@ -7,7 +7,7 @@ const addAdmin = async () => {
     const password = await bcrypt.hash("adminadmin", 10);
     const admin = await prisma.users.create({
       data: {
-        email: "admin1@example.com",
+        email: "admin@example.com",
         firstName: "אבו עקפי",
         lastName: "",
         phone: "1234567890",

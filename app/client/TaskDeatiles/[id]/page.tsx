@@ -192,7 +192,7 @@ function TaskDetailsPage() {
         });
         setShowDeleteModal(false);
       } else {
-        const deletedTaskId = parseInt(params.id as string);
+        const deletedTaskId = params.id as string;
         
         // Cancel any ongoing queries for this task
         queryClient.cancelQueries({ queryKey: ['task', deletedTaskId] });

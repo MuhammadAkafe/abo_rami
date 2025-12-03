@@ -32,14 +32,13 @@ export async function UpdateSupplierCities(
       return { success: false, error: "Too many cities (max 20)" };
     }
 
-    const id = parseInt(supplierId);
-    if (isNaN(id)) {
+    if (!supplierId || typeof supplierId !== 'string') {
       return { success: false, error: "Invalid supplier ID" };
     }
 
     // Check if supplier exists
     const supplier = await prisma.suppliers.findUnique({
-      where: { id },
+      where: { id: supplierId },
     });
 
     if (!supplier) {
@@ -48,7 +47,7 @@ export async function UpdateSupplierCities(
 
     // Delete all existing cities for this supplier
     await prisma.cities.deleteMany({
-      where: { supplierId: id },
+      where: { supplierId: supplierId },
     });
 
     // Create new cities if any
@@ -56,7 +55,7 @@ export async function UpdateSupplierCities(
       await prisma.cities.createMany({
         data: validCities.map((city) => ({
           city: city,
-          supplierId: id,
+          supplierId: supplierId,
         })),
       });
     }

@@ -7,7 +7,7 @@ datasource db {
 }
 
 model users {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   firstName String
   lastName  String
   email     String   @unique
@@ -19,7 +19,7 @@ model users {
 }
 
 model suppliers {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   firstName String
   lastName  String
   email     String   @unique
@@ -29,13 +29,13 @@ model suppliers {
   tasks     tasks[]
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
-  userId    Int
+  userId    String
   users     users?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 
 model tasks {
-  id          Int       @id @default(autoincrement()) 
+  id          String    @id @default(uuid()) 
   address     String
   description String
   city        String
@@ -43,14 +43,14 @@ model tasks {
   status      Status    @default(PENDING)
   date        DateTime?
   createdAt   DateTime  @default(now())
-  supplierId  Int
+  supplierId  String
   supplier    suppliers @relation(fields: [supplierId], references: [id], onDelete: Cascade)
 }
 
 model cities {
-  id        Int    @id @default(autoincrement())
+  id        String   @id @default(uuid())
   city      String
-  supplierId Int
+  supplierId String
   supplier  suppliers @relation(fields: [supplierId], references: [id], onDelete: Cascade)
 }
 

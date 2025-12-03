@@ -8,6 +8,21 @@ interface TaskRowProps {
   onClick: () => void;
 }
 
+// Helper function to format date whether it's a Date object or string
+const formatDate = (date: Date | string | undefined): string => {
+  if (!date) return '';
+  
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(dateObj.getTime())) return '';
+    
+    // Format as YYYY-MM-DD
+    return dateObj.toISOString().split('T')[0];
+  } catch {
+    return '';
+  }
+};
+
 export const TaskRow = React.memo(({ task, onClick }: TaskRowProps) => 
   <tr 
     className="hover:bg-gray-50 cursor-pointer transition-colors"
@@ -29,7 +44,7 @@ export const TaskRow = React.memo(({ task, onClick }: TaskRowProps) =>
       {task.supplier?.phone}
     </td>
     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-      {task.date ? (typeof task.date === 'string' && task.date.split('T')[0]) : ''}
+      {formatDate(task.date)}
     </td>
     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
       <div className="flex items-center gap-2">

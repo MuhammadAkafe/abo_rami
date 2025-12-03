@@ -127,13 +127,12 @@ export async function getTask(id: string) {
             return { error: 'Unauthorized', task: null };
         }
 
-        const taskId = parseInt(id);
-        if (isNaN(taskId)) {
+        if (!id || typeof id !== 'string') {
             return { error: 'Invalid task ID', task: null };
         }
 
         const task = await prisma.tasks.findUnique({
-            where: { id: taskId },
+            where: { id: id },
             include: { supplier: true },
         });
 
@@ -154,7 +153,7 @@ export async function getTask(id: string) {
 }
 
 // Add task (Admin only)
-export async function addTask(taskData: { address: string; description: string; supplierId: number | string; date: string; city: string }) {
+export async function addTask(taskData: { address: string; description: string; supplierId: string; date: string; city: string }) {
     try {
         const session = await getSession();
         if (!session) {
@@ -172,18 +171,13 @@ export async function addTask(taskData: { address: string; description: string; 
             return { error: error || 'Invalid date', success: false };
         }
         
-        // Convert supplierId to number if it's a string
-        const supplierIdNumber = typeof taskData.supplierId === 'string' 
-            ? parseInt(taskData.supplierId, 10) 
-            : taskData.supplierId;
-        
-        if (isNaN(supplierIdNumber)) {
+        if (!taskData.supplierId || typeof taskData.supplierId !== 'string') {
             return { error: 'Invalid supplier ID', success: false };
         }
         
         // Verify that the supplier exists
         const supplier = await prisma.suppliers.findUnique({
-            where: { id: supplierIdNumber },
+            where: { id: taskData.supplierId },
         });
         
         if (!supplier) {
@@ -194,7 +188,7 @@ export async function addTask(taskData: { address: string; description: string; 
             data: {
                 address: taskData.address,
                 description: taskData.description,
-                supplierId: supplierIdNumber,
+                supplierId: taskData.supplierId,
                 date: validatedDate!,
                 city: taskData.city,
             },
@@ -219,14 +213,13 @@ export async function deleteTask(id: string) {
             return { error: 'Forbidden: Admin access required', success: false };
         }
 
-        const taskId = parseInt(id);
-        if (isNaN(taskId)) {
+        if (!id || typeof id !== 'string') {
             return { error: 'Invalid task ID', success: false };
         }
 
         // Check if task exists
         const existingTask = await prisma.tasks.findUnique({
-            where: { id: taskId },
+            where: { id: id },
         });
 
         if (!existingTask) {
@@ -235,7 +228,7 @@ export async function deleteTask(id: string) {
 
         // Delete the task
         await prisma.tasks.delete({
-            where: { id: taskId },
+            where: { id: id },
         });
 
         return { error: null, success: true, message: 'Task deleted successfully' };
@@ -257,14 +250,13 @@ export async function updateTask(id: string, updateData: { status?: 'PENDING' | 
             return { error: 'Forbidden: User access required', task: null };
         }
 
-        const taskId = parseInt(id);
-        if (isNaN(taskId)) {
+        if (!id || typeof id !== 'string') {
             return { error: 'Invalid task ID', task: null };
         }
 
         // Check if task exists and belongs to the user
         const existingTask = await prisma.tasks.findUnique({
-            where: { id: taskId },
+            where: { id: id },
         });
 
         if (!existingTask) {
@@ -282,7 +274,7 @@ export async function updateTask(id: string, updateData: { status?: 'PENDING' | 
         if (updateData.url) updateFields.url = updateData.url;
 
         const updatedTask = await prisma.tasks.update({
-            where: { id: taskId },
+            where: { id: id },
             data: updateFields,
             include: {
                 supplier: true,

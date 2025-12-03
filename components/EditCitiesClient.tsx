@@ -6,7 +6,7 @@ import EditCitiesForm from './EditCitiesForm';
 
 interface EditCitiesClientProps {
   supplierId: string;
-  currentCities: Array<{ id: number; city: string }>;
+  currentCities: Array<{ id: string; city: string }>;
 }
 
 export default function EditCitiesClient({ supplierId, currentCities }: EditCitiesClientProps) {

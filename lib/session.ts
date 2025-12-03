@@ -9,7 +9,7 @@ import { redirect } from 'next/dist/server/api-utils'
 const SESSION_EXPIRES = 24 * 60 * 60
 
 export interface SessionData {
-  id: number
+  id: string
   email: string
   role: string
   firstName: string
