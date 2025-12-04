@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import LoadingComponent from "@/components/user/LoadingComponent";
 import DeleteModal from "@/components/packages/DeleteModal";
@@ -26,19 +26,18 @@ function TaskDetailsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [link, setLink] = useState<string>('');
   const session = useSession();
   const isAdmin = session?.role === 'ADMIN';
   const taskId = Array.isArray(params.id) ? params.id[0] : params.id;
   const { task, isLoading, error: taskError, isError } = useFetchTask(taskId, !!taskId && !isRedirecting);
   const queryClient = useQueryClient();
 
-  // Generate the signature link using window.location.origin (works in client components)
-  const link = useMemo(() => {
-    if (typeof window !== 'undefined') {
-      return `${window.location.origin}/client/Signaturelink/${taskId}`;
+  // Generate the signature link only on client side to avoid SSR issues
+  useEffect(() => {
+    if (typeof window !== 'undefined' && taskId) {
+      setLink(`${window.location.origin}/client/Signaturelink/${taskId}`);
     }
-    // Fallback (shouldn't happen in client component, but TypeScript safety)
-    return `/client/Signaturelink/${taskId}`;
   }, [taskId]);
   
   // Type assertion for task
@@ -370,8 +369,8 @@ function TaskDetailsPage() {
 
         {/* Signature Section - Show Link if no signature, show SignatureSection if signature exists */}
         {!typedTask.url ? (
-          // No signature - show Link component
-          <Link link={link} isAdmin={isAdmin} isCopied={isCopied} handleCopyLink={handleCopyLink} />
+          // No signature - show Link component (only if link is available)
+          link && <Link link={link} isAdmin={isAdmin} isCopied={isCopied} handleCopyLink={handleCopyLink} />
         ) : (
           // Signature exists - show SignatureSection
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
