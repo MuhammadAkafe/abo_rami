@@ -46,7 +46,7 @@ const delete_admin = async () => {
 
 const main = async () => {
   try {
-    await delete_admin();
+    // await delete_admin();
     await addAdmin();
     console.log("✅ Seed completed successfully!");
   } 
