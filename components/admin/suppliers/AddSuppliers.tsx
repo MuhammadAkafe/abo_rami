@@ -12,7 +12,6 @@ export default function AddSuppliers() {
 
   const { mutation } = useAddSupplier();
 
-  const [showAddForm, setShowAddForm] = useState(false);
   const [newSupplier, setNewSupplier] = useState<NewSupplier>({
     firstName: '',
     lastName: '',
@@ -63,7 +62,6 @@ export default function AddSuppliers() {
   };
 
   const handleFormCancel = () => {
-    setShowAddForm(false);
     resetForm();
   };
 
@@ -86,16 +84,7 @@ export default function AddSuppliers() {
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-shadow duration-300">
       
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">הוספת ספקים</h2>
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors cursor-pointer"
-        >
-          {showAddForm ? 'ביטול' : 'הוסף ספק חדש'}
-        </button>
-      </div>
+
 
       {/* Success Message */}
       {mutation.isSuccess && (
@@ -112,7 +101,6 @@ export default function AddSuppliers() {
       )}
 
       {/* Add Supplier Form */}
-      {showAddForm && (
         <SupplierForm
           supplier={newSupplier}
           fieldErrors={fieldErrors}
@@ -123,7 +111,7 @@ export default function AddSuppliers() {
           onSubmit={handleFormSubmit}
           onCancel={handleFormCancel}
         />
-      )}
+      
     </div>
   );
 }

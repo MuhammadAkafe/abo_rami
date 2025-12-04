@@ -8,9 +8,9 @@ const addAdmin = async () => {
     const admin = await prisma.users.create({
       data: {
         email: "admin@example.com",
-        firstName: "אבו עקפי",
+        firstName: "אבו ראמי",
         lastName: "",
-        phone: "1234567890",
+        phone: "0585774408",
         role: "ADMIN",
         password: password,
       },
@@ -50,6 +50,7 @@ const delete_admin = async () => {
 
 const main = async () => {
   try {
+    await delete_admin();
     await addAdmin();
     console.log("✅ Seed completed successfully!");
   } 

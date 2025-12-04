@@ -34,10 +34,11 @@ function TaskDetailsPage() {
 
   // Generate the signature link
   const getSignatureLink = () => {
-    if (typeof window !== 'undefined') {
-      return `${window.location.origin}/client/Signaturelink/${taskId}`;
+
+      if (!process.env.NEXT_PUBLIC_APP_URL) {
+        throw new Error('NEXT_PUBLIC_APP_URL is not set');
     }
-    return `https://localhost:3000/client/Signaturelink/${taskId}`;
+    return `${process.env.NEXT_PUBLIC_APP_URL}/client/Signaturelink/${taskId}`;
   };
 
   const link = getSignatureLink();
