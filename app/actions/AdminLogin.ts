@@ -7,33 +7,32 @@ import { redirect } from 'next/navigation'
 import { CLIENT_ROUTES } from '@/app/constans/constans'
 
 export async function Adminlogin(prevState: { error?: string } | null, formData: FormData): Promise<{ error?: string }> {
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-  
-    // Validate input
-    if (!email || !password) {
-      return { error: "נדרש אימייל וסיסמה" };
-    }
-  
     try {
+      const email = formData.get('email') as string
+      const password = formData.get('password') as string
+    
+      // Validate input
+      if (!email || !password) {
+        return { error: "נדרש אימייל וסיסמה" };
+      }
+    
       // Find user by email
       const user = await prisma.users.findUnique({
         where: {
           email: email,
         },
       })
-  
+    
       if (!user) {
         return { error: "משתמש לא נמצא" };
       }
-  
+    
       // Verify password
       const isPasswordValid = await bcrypt.compare(password, user.password as string);
-  
+    
       if (!isPasswordValid) {
         return { error: "פרטי התחברות לא תקינים" };
       }
-
 
       // Create session
       await createSession({
@@ -43,6 +42,8 @@ export async function Adminlogin(prevState: { error?: string } | null, formData:
         firstName: user.firstName,
         lastName: user.lastName,
       })
+      
+      // Redirect after successful login
       redirect(CLIENT_ROUTES.ADMIN.DASHBOARD as string)
     } 
     catch (error) {
@@ -53,7 +54,15 @@ export async function Adminlogin(prevState: { error?: string } | null, formData:
           throw error
         }
       }
-      console.error('Login error:', error)
+      
+      // Log error for debugging (visible in Vercel logs)
+      console.error('Login error:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        error: error,
+        timestamp: new Date().toISOString()
+      })
+      
+      // Always return a proper error object
       return { error: "שגיאת שרת. נסה שוב מאוחר יותר." }
     }
   }

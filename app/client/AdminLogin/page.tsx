@@ -3,10 +3,18 @@
 import { CLIENT_ROUTES } from "@/app/constans/constans"
 import Link from "next/link"
 import { Adminlogin } from "@/app/actions/AdminLogin"
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
 
 export default function SignInPage() {
     const [state, formAction, isPending] = useActionState(Adminlogin, null)
+
+    // Debug: Log state changes (visible in browser console and Vercel logs)
+    useEffect(() => {
+        console.log('Login state updated:', state)
+        if (state?.error) {
+            console.error('Login error:', state.error)
+        }
+    }, [state])
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" dir="rtl">
@@ -34,25 +42,27 @@ export default function SignInPage() {
                         <div className="text-center mb-6">
                             <h1 className="text-2xl font-bold text-gray-900">כניסה מנהלים</h1>
                         </div>
-                        <form className="space-y-6" dir="rtl" action={formAction}>
-                            {/* Error Display */}
-                            {state?.error && (
-                                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-                                    <div className="flex">
-                                        <div className="flex-shrink-0">
-                                            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <div className="mr-3">
-                                            <h3 className="text-sm font-medium text-red-800">שגיאה בהתחברות</h3>
-                                            <div className="mt-2 text-sm text-red-700">
-                                                {state.error}
-                                            </div>
+                        
+                        {/* Error Display - Show at top before form */}
+                        {state && typeof state === 'object' && 'error' in state && state.error && (
+                            <div className="mb-6 p-4 bg-red-50 border-2 border-red-300 rounded-md animate-in fade-in slide-in-from-top-2" role="alert">
+                                <div className="flex">
+                                    <div className="flex-shrink-0">
+                                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div className="mr-3 flex-1">
+                                        <h3 className="text-sm font-semibold text-red-800 mb-1">שגיאה בהתחברות</h3>
+                                        <div className="text-sm text-red-700 font-medium">
+                                            {String(state.error)}
                                         </div>
                                     </div>
                                 </div>
-                            )}
+                            </div>
+                        )}
+                        
+                        <form className="space-y-6" dir="rtl" action={formAction}>
                             <div className="space-y-4">
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
