@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import LoadingComponent from "@/components/user/LoadingComponent";
 import DeleteModal from "@/components/packages/DeleteModal";
@@ -32,16 +32,14 @@ function TaskDetailsPage() {
   const { task, isLoading, error: taskError, isError } = useFetchTask(taskId, !!taskId && !isRedirecting);
   const queryClient = useQueryClient();
 
-  // Generate the signature link
-  const getSignatureLink = () => {
-
-      if (!process.env.NEXT_PUBLIC_APP_URL) {
-        throw new Error('NEXT_PUBLIC_APP_URL is not set');
+  // Generate the signature link using window.location.origin (works in client components)
+  const link = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}/client/Signaturelink/${taskId}`;
     }
-    return `${process.env.NEXT_PUBLIC_APP_URL}/client/Signaturelink/${taskId}`;
-  };
-
-  const link = getSignatureLink();
+    // Fallback (shouldn't happen in client component, but TypeScript safety)
+    return `/client/Signaturelink/${taskId}`;
+  }, [taskId]);
   
   // Type assertion for task
   const typedTask = task as Task | null;
