@@ -31,11 +31,7 @@ const addAdmin = async () => {
 const delete_admin = async () => {
   try {
     // Delete admin user by email
-    const deletedAdmin = await prisma.users.deleteMany({
-      where: {
-        email: "admin@example.com",
-      },
-    });
+    const deletedAdmin = await prisma.users.deleteMany();
     
     if (deletedAdmin.count > 0) {
       console.log(`✅ Admin user deleted successfully (${deletedAdmin.count} user(s))`);
