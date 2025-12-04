@@ -63,7 +63,7 @@ export async function Adminlogin(prevState: { error?: string } | null, formData:
       })
       
       // Always return a proper error object
-      return { error: "שגיאת שרת. נסה שוב מאוחר יותר." }
+      return { error: "שגיאת שרת. נסה שוב מאוחר יותר. שגיאה: " + error }
     }
   }
   
