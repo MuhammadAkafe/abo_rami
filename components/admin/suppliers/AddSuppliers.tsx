@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { AddSupplierFormValidation } from '@/app/client/validtion';
+import { AddSupplierFormValidation } from '@/components/packages/validtion';
 import { useAddSupplier } from '@/hooks/Admin/useAddSupplier';
 import { NewSupplier } from '@/types/types';
 import SupplierForm from '@/components/admin/suppliers/SupplierForm';

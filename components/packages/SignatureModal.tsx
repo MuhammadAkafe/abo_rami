@@ -4,6 +4,7 @@ interface SignatureModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (signatureData: string) => void;
+  isLoading?: boolean;
 }
 
 /**
@@ -13,7 +14,8 @@ interface SignatureModalProps {
 export const SignatureModal: React.FC<SignatureModalProps> = ({
   isOpen,
   onClose,
-  onSave
+  onSave,
+  isLoading = false
 }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -174,9 +176,10 @@ export const SignatureModal: React.FC<SignatureModalProps> = ({
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 order-1 sm:order-2"
+            disabled={isLoading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
           >
-            שמור חתימה
+            {isLoading ? 'שומר...' : 'שמור חתימה'}
           </button>
         </div>
       </div>

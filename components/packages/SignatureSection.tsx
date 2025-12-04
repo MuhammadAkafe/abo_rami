@@ -2,33 +2,62 @@ import React, { useState } from 'react';
 import { SignatureModal } from './SignatureModal';
 import Image from 'next/image';
 import { Task } from '@/types/types';
+import { updateSignatureViaLink } from '@/app/actions/links/updateSignatureViaLink';
+import { toast } from 'react-toastify';
 
 interface SignatureSectionProps {
   task: Task | null;
-  onSignatureUpdate?: (signatureData: string) => void;
-  allowEdit?: boolean;
+  onSignatureSaved?: () => void;
 }
 
-/**
- * Signature Section Component
- * Displays the digital signature if available and allows editing
- */
 export const SignatureSection: React.FC<SignatureSectionProps> = ({ 
-  task, 
-  onSignatureUpdate,
-  allowEdit
+  task,
+  onSignatureSaved,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSignatureClick = () => {
-    if (allowEdit) {
-      setIsModalOpen(true);
-    }
+    setIsModalOpen(!isModalOpen);
   };
 
-  const handleSignatureSave = (signatureData: string) => {
-    if (onSignatureUpdate) {
-      onSignatureUpdate(signatureData);
+  const handleSignatureSave = async (signatureData: string) => {
+    if (!task?.id) {
+      toast.error('שגיאה: מזהה משימה לא נמצא', {
+        position: 'top-left',
+        rtl: true,
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const result = await updateSignatureViaLink(task.id, signatureData);
+      
+      if (result.error) {
+        toast.error(result.error || 'שגיאה בשמירת החתימה', {
+          position: 'top-left',
+          rtl: true,
+        });
+      } else {
+        toast.success('החתימה נשמרה בהצלחה', {
+          position: 'top-left',
+          rtl: true,
+        });
+        setIsModalOpen(false);
+        // Call callback to refresh task data
+        if (onSignatureSaved) {
+          onSignatureSaved();
+        }
+      }
+    } catch (error) {
+      console.error('Error saving signature:', error);
+      toast.error('שגיאה בשמירת החתימה', {
+        position: 'top-left',
+        rtl: true,
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
   return (
@@ -42,7 +71,7 @@ export const SignatureSection: React.FC<SignatureSectionProps> = ({
       
       <div 
         className={`bg-gray-50 rounded-lg p-4 md:p-8 text-center transition-colors ${
-          allowEdit ? 'cursor-pointer hover:bg-gray-100 active:bg-gray-200' : 'cursor-default'
+          'cursor-pointer hover:bg-gray-100 active:bg-gray-200'
         }`}
         onClick={handleSignatureClick}
       >
@@ -56,10 +85,8 @@ export const SignatureSection: React.FC<SignatureSectionProps> = ({
               className="max-w-full h-auto mx-auto border border-gray-300 rounded-lg shadow-sm"
               style={{ maxHeight: '300px' }}
             />
-            <p className="text-xs md:text-sm text-gray-600 mt-2 md:mt-4">חתימה דיגיטלית של המשימה</p>
-            {allowEdit && (
-              <p className="text-xs text-blue-600 mt-1 md:mt-2">לחץ לעריכה</p>
-            )}
+            <p className="text-xs md:text-sm text-gray-600 mt-2 md:mt-4">חתימה דיגיטלית של המשימה</p>            
+            <p className="text-xs text-blue-600 mt-1 md:mt-2">לחץ לעריכה</p>
           </div>
         ) : (
           <div className="text-gray-500">
@@ -67,19 +94,18 @@ export const SignatureSection: React.FC<SignatureSectionProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>
             <p className="text-base md:text-lg">אין חתימה זמינה</p>
-            {allowEdit && (
-              <p className="text-xs md:text-sm text-gray-400">לחץ להוספת חתימה דיגיטלית</p>
-            )}
+            <p className="text-xs md:text-sm text-gray-400">לחץ להוספת חתימה דיגיטלית</p>
           </div>
         )}
       </div>
 
-      {/* Signature Modal - Only show if editing is allowed */}
-      {allowEdit && (
+      {/* Signature Modal */}
+      {isModalOpen && (
         <SignatureModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSave={handleSignatureSave}
+          isLoading={isSaving}
         />
       )}
     </div>

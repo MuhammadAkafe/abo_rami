@@ -5,7 +5,8 @@ import { SessionProvider } from "../SesstionProvider";
 
 export default async function TaskDetailsLayout({ children }: { children: React.ReactNode }) {
     const session = await getSession();
-    if (session && session.role !== "USER") {
+    // Allow both ADMIN and USER roles to access task details
+    if (session && session.role !== "USER" && session.role !== "ADMIN") {
         redirect(CLIENT_ROUTES.HOME);
     }
     return (

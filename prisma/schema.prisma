@@ -7,14 +7,14 @@ datasource db {
 }
 
 model users {
-  id        String   @id @default(uuid())
+  id        String      @id @default(uuid())
   firstName String
   lastName  String
-  email     String   @unique
+  email     String      @unique
   phone     String?
   password  String
   solt      Int?
-  role      Role     @default(ADMIN)
+  role      Role        @default(ADMIN)
   suppliers suppliers[]
 }
 
@@ -27,16 +27,14 @@ model suppliers {
   password  String?
   cities    cities[]
   tasks     tasks[]
-  tokens    tokens[]
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
   userId    String
   users     users?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
 model tasks {
-  id          String    @id @default(uuid()) 
+  id          String    @id @default(uuid())
   address     String
   description String
   city        String
@@ -46,13 +44,23 @@ model tasks {
   createdAt   DateTime  @default(now())
   supplierId  String
   supplier    suppliers @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  link        link?
 }
 
 model cities {
-  id        String   @id @default(uuid())
-  city      String
+  id         String    @id @default(uuid())
+  city       String
   supplierId String
-  supplier  suppliers @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  supplier   suppliers @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+}
+
+model link {
+  id        String   @id @default(uuid())
+  isUsed    Boolean  @default(false)
+  taskId    String   @unique
+  task      tasks    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
@@ -66,10 +74,3 @@ enum Status {
   REJECTED
 }
 
-model tokens {
-  id        String   @id @default(uuid())
-  isUsed    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  supplierId String
-  supplier   suppliers @relation(fields: [supplierId], references: [id], onDelete: Cascade)
-}

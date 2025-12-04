@@ -1,6 +1,6 @@
 import { Task } from "@/types/types";
 import { useMutation } from "@tanstack/react-query";
-import { addTask } from "@/app/actions/TaskActions";
+import { addTask } from "@/app/actions/tasks/addTask";
 
 const AddTask = async (newTask: Task) => {
     if (!newTask.date) {

@@ -7,7 +7,7 @@ import ControlPanel from '@/components/packages/Controlpanel';
 import { Task } from '@/types/types';
 import Filter from '@/components/admin/tasks/Fillter';
 import { useQuery } from '@tanstack/react-query';
-import { fetchTasks } from '@/app/actions/fetchtasks';
+import { fetchTasks } from '@/app/actions/tasks/fetchtasks';
 import { useSession } from '@/app/client/SesstionProvider';
 import { useActiveView } from '@/hooks/useActiveView';
 
@@ -28,7 +28,10 @@ export default  function UserDashboardClient() {
   // Use React Query for better performance, caching, and request deduplication
   const { data: tasks = [], isLoading, refetch } = useQuery<Task[]>({
     queryKey: ['tasks', 'user', userId, filters],
-    queryFn: () => fetchTasks(filters),
+    queryFn: async () => {
+      const result = await fetchTasks(filters);
+      return result || [];
+    },
     staleTime: 30 * 1000, // Consider data fresh for 30 seconds
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
     refetchOnWindowFocus: false, // Don't refetch on window focus for better UX

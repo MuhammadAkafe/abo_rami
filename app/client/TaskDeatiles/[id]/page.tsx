@@ -1,6 +1,5 @@
 "use client"
 
-import { SignatureSection } from "@/components/packages/SignatureSection";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import LoadingComponent from "@/components/user/LoadingComponent";
@@ -12,7 +11,10 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useQueryClient } from "@tanstack/react-query";
 import { Task } from "@/types/types";
-import { updateTask, deleteTask } from "@/app/actions/TaskActions";
+import { updateTask } from "@/app/actions/tasks/updateTask";
+import { deleteTask } from "@/app/actions/tasks/deleteTask";
+import Link from "@/components/admin/Link";
+import { SignatureSection } from "@/components/packages/SignatureSection";
 
 type TaskStatus = 'PENDING' | 'COMPLETED' | 'REJECTED';
 
@@ -23,14 +25,43 @@ function TaskDetailsPage() {
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const session = useSession();
   const isAdmin = session?.role === 'ADMIN';
   const taskId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const { task, isLoading, error: taskError } = useFetchTask(taskId, !isRedirecting);
+  const { task, isLoading, error: taskError, isError } = useFetchTask(taskId, !!taskId && !isRedirecting);
   const queryClient = useQueryClient();
+
+  // Generate the signature link
+  const getSignatureLink = () => {
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}/client/Signaturelink/${taskId}`;
+    }
+    return `https://localhost:3000/client/Signaturelink/${taskId}`;
+  };
+
+  const link = getSignatureLink();
   
   // Type assertion for task
   const typedTask = task as Task | null;
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(link);
+      setIsCopied(true);
+      toast.success('הקישור הועתק ללוח', {
+        position: 'top-left',
+        rtl: true,
+      });
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+      toast.error('שגיאה בהעתקת הקישור', {
+        position: 'top-left',
+        rtl: true,
+      });
+    }
+  };
 
   const handleStatusUpdate = async (newStatus: TaskStatus) => {
     if (!typedTask || typedTask.status === newStatus) return;
@@ -106,76 +137,7 @@ function TaskDetailsPage() {
     }
   };
 
-  const handleSignatureUpdate = async (signatureUrl: string) => {
-    if (!typedTask) return;
 
-    // Optimistic update - update UI immediately
-    const previousTask = typedTask;
-    queryClient.setQueryData<Task>(['task', taskId], (old) => {
-      if (!old) return old;
-      return { ...old, url: signatureUrl };
-    });
-
-    // Also update in tasks list cache
-    queryClient.setQueriesData<Task[]>(
-      { queryKey: ['tasks'] },
-      (oldData) => {
-        if (!oldData) return oldData;
-        return oldData.map(t => t.id === typedTask.id ? { ...t, url: signatureUrl } : t);
-      }
-    );
-
-    try {
-      const result = await updateTask(taskId!, { url: signatureUrl });
-
-      if (result.error) {
-        // Rollback on error
-        queryClient.setQueryData(['task', taskId], previousTask);
-        queryClient.setQueriesData<Task[]>(
-          { queryKey: ['tasks'] },
-          (oldData) => {
-            if (!oldData) return oldData;
-              return oldData.map(t => t.id === typedTask.id ? previousTask : t);
-          }
-        );
-        toast.error(result.error || 'שגיאה בעדכון החתימה', {
-          position: 'top-left',
-          rtl: true,
-        });
-      } else {
-        // Update cache with new task data
-        if (result.task) {
-          queryClient.setQueryData(['task', taskId], result.task);
-          queryClient.setQueriesData<Task[]>(
-            { queryKey: ['tasks'] },
-            (oldData) => {
-              if (!oldData) return oldData;
-              return oldData.map(t => t.id === typedTask.id ? (result.task as unknown as Task) : t);
-            }
-          );
-        }
-        toast.success('החתימה עודכנה בהצלחה', {
-          position: 'top-left',
-          rtl: true,
-        });
-      }
-    } catch (error) {
-      // Rollback on error
-      queryClient.setQueryData(['task', taskId], previousTask);
-      queryClient.setQueriesData<Task[]>(
-        { queryKey: ['tasks'] },
-        (oldData) => {
-          if (!oldData) return oldData;
-              return oldData.map(t => t.id === typedTask.id ? previousTask : t);
-        }
-      );
-      console.error('Error updating signature:', error);
-      toast.error('שגיאה בעדכון החתימה', {
-        position: 'top-left',
-        rtl: true,
-      });
-    }
-  };
 
   const handleDeleteTask = async () => {
     setIsDeleting(true);
@@ -241,12 +203,17 @@ function TaskDetailsPage() {
 
 
   // Show loading state during initial load or redirect
-  if (isLoading || isRedirecting) {
-    return <LoadingComponent message={isRedirecting ? "מעביר לדף הבית..." : "טוען פרטי משימה..."} />;
+  if (isRedirecting) {
+    return <LoadingComponent message="מעביר לדף הבית..." />;
   }
 
-  // Show error state if there's an error or task doesn't exist (and not redirecting)
-  if (taskError || !typedTask) {
+  // Show loading only if we have a taskId and query is loading
+  if (taskId && isLoading) {
+    return <LoadingComponent message="טוען פרטי משימה..." />;
+  }
+
+  // Show error state if there's an error or task doesn't exist
+  if (isError || taskError || (!isLoading && !typedTask)) {
     return (
       <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center" dir="rtl">
         <div className="text-center">
@@ -260,6 +227,28 @@ function TaskDetailsPage() {
         </div>
       </div>
     );
+  }
+
+  // If no taskId, show error
+  if (!taskId) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center" dir="rtl">
+        <div className="text-center">
+          <p className="text-red-600 text-lg">מזהה משימה לא נמצא</p>
+          <button
+            onClick={() => router.back()}
+            className="mt-4 text-blue-600 hover:text-blue-800"
+          >
+            חזור
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // At this point, typedTask should exist, but TypeScript needs assurance
+  if (!typedTask) {
+    return null; // This should never happen due to checks above, but satisfies TypeScript
   }
 
   return (
@@ -301,6 +290,11 @@ function TaskDetailsPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">כתובת</label>
                 <p className="text-lg text-gray-900">{typedTask.address}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">מזהה משימה</label>
+                <p className="text-lg text-gray-900">{typedTask.id || 'לא זמין'}</p>
               </div>
               
               <div>
@@ -373,13 +367,20 @@ function TaskDetailsPage() {
           </div>
         </div>
 
-        {/* Signature Section */}
-        <SignatureSection 
-          task={typedTask} 
-          allowEdit={!isAdmin} 
-          onSignatureUpdate={handleSignatureUpdate}
-        />
+
+
+        {/* Signature Section - Show Link if no signature, show SignatureSection if signature exists */}
+        {!typedTask.url ? (
+          // No signature - show Link component
+          <Link link={link} isAdmin={isAdmin} isCopied={isCopied} handleCopyLink={handleCopyLink} />
+        ) : (
+          // Signature exists - show SignatureSection
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <SignatureSection task={typedTask} />
+          </div>
+        )}
       </div>
+  
 
       {/* Delete Modal */}
       <DeleteModal

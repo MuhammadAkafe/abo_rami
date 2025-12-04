@@ -8,9 +8,10 @@ import LoadingComponent from '@/components/user/LoadingComponent';
 import ControlPanel from '@/components/packages/Controlpanel';
 import SuppliersTable from '@/app/client/Admin/Dashboard/SuppliersTable/page';
 import TasksMangment from '@/app/client/Admin/Dashboard/TasksMangment/page';
-import { Token as Tokens } from '@/app/client/Admin/Dashboard/Token/[id]/page';
 import { ActiveView } from '@/types/types';
 import { useParams } from 'next/navigation';
+
+
 
 function DashboardView() {
   const params = useParams();
@@ -32,8 +33,6 @@ function DashboardView() {
         return <AddSuppliers />;
       case 'addTask':
         return <Add_task />;
-      case 'tokens':
-        return <Tokens />;
       default:
         return <SuppliersTable />;
     }

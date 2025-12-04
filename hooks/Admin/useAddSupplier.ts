@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { NewSupplier } from "@/types/types";
-import { addSupplier } from "@/app/actions/SupplierActions";
+import { addSupplier } from "@/app/actions/addSupplier";
 
 const Add_Supplier = async (formData: NewSupplier) => {
     try {
