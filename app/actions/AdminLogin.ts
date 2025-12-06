@@ -56,14 +56,25 @@ export async function Adminlogin(prevState: { error?: string } | null, formData:
       }
       
       // Log error for debugging (visible in Vercel logs)
+      const errorMessage = error instanceof Error ? error.message : String(error);
       console.error('Login error:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: errorMessage,
         error: error,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        databaseUrl: process.env.DATABASE_URL ? 'Set' : 'Missing' // Don't log the actual URL
       })
       
-      // Always return a proper error object
-      return { error: "שגיאת שרת. נסה שוב מאוחר יותר. שגיאה: " + error }
+      // Handle specific database connection errors
+      if (errorMessage.includes('Can\'t reach database server') || 
+          errorMessage.includes('P1001') ||
+          errorMessage.includes('connection') ||
+          errorMessage.includes('ECONNREFUSED') ||
+          errorMessage.includes('ETIMEDOUT')) {
+        return { error: "שגיאת חיבור למסד הנתונים. אנא נסה שוב בעוד כמה רגעים." };
+      }
+      
+      // Generic error for users (don't expose internal error details)
+      return { error: "שגיאת שרת. נסה שוב מאוחר יותר." }
     }
   }
   

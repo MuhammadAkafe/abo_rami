@@ -11,8 +11,15 @@ if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL environment variable is required');
 }
 
-// Create PostgreSQL connection pool
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Create PostgreSQL connection pool with serverless-optimized settings for Neon
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  // Serverless-optimized settings
+  max: 1, // Single connection for serverless (Neon pooler handles the rest)
+  idleTimeoutMillis: 20000, // Close idle connections after 20 seconds
+  connectionTimeoutMillis: 10000, // 10 second connection timeout
+  // SSL is handled by the connection string parameters (sslmode=require)
+});
 const adapter = new PrismaPg(pool);
 
 export const prisma =

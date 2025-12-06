@@ -20,7 +20,7 @@ export interface SessionData {
 export type CreateSessionInput = Omit<SessionData, 'session_id'>
 
 const generateSessionId = (): string => {
-  return crypto.randomBytes(512).toString('hex') + Date.now().toString()
+  return crypto.randomBytes(64).toString('hex') + Date.now().toString()
 }
 
 export async function createSession(data: CreateSessionInput): Promise<void> {
