@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { CLIENT_ROUTES } from "@/app/constans/constans";
 import { SessionData } from "@/lib/session";
 
+// Mark as dynamic since it uses cookies for authentication
+export const dynamic = 'force-dynamic';
 
 export default async function UserLayout({ children }: { children: React.ReactNode }) {
     const session = await getSession();

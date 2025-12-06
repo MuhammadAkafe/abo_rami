@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import DeleteModal from '@/components/packages/DeleteModal';
 import LoadingComponent from '@/components/user/LoadingComponent';
 import { DeleteModalState, supplierList } from '@/types/types';
@@ -69,7 +69,11 @@ function SuppliersTable()
     return (
       <ErrorAlert 
         message="שגיאה בטעינת הספקים. אנא נסה שוב." 
-        onClose={() => window.location.reload()} 
+        onClose={() => {
+          if (typeof window !== 'undefined') {
+            window.location.reload();
+          }
+        }} 
       />
     );
   }
