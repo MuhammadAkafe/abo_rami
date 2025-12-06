@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react'
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import DeleteModal from '@/components/packages/DeleteModal';
 import LoadingComponent from '@/components/user/LoadingComponent';
 import { DeleteModalState, supplierList } from '@/types/types';

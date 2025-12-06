@@ -1,20 +1,22 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect } from "react";
 import { SessionData } from "@/lib/session";
 import { useRouter } from "next/navigation";
 import { CLIENT_ROUTES } from "../constans/constans";
 const SessionContext = createContext<SessionData | null>(null);
 
 
-export const useSession = (): SessionData | null => 
-    {
+export const useSession = (): SessionData | null => {
     const router = useRouter();
     const session = useContext(SessionContext);
-    if (!session) {
-        router.push(CLIENT_ROUTES.HOME);
-        return null;
-    }
+    
+    useEffect(() => {
+        if (!session) {
+            router.push(CLIENT_ROUTES.HOME);
+        }
+    }, [session, router]);
+    
     return session;
 }
 
