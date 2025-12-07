@@ -2,20 +2,34 @@ import "dotenv/config";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
 
-const addAdmin = async () => {
+
+type Role = "ADMIN" | "USER";
+
+
+interface Admin {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  role: Role;
+}
+
+
+const addAdmin = async ({firstName,lastName,email,phone,password,role}:Admin) => {
   try {
-    const password = await bcrypt.hash("adminadmin", 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const admin = await prisma.users.create({
       data: {
-        email: "admin@example.com",
-        firstName: "אבו ראמי",
-        lastName: "",
-        phone: "0585774408",
-        role: "ADMIN",
-        password: password,
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        phone: phone,
+        role: role,
+        password: hashedPassword,
       },
     });
-    console.log("✅ Admin user created successfully:", admin.email);
+    console.log(`✅ Admin user created successfully: ${firstName} ${lastName} (${email})`);
   } catch (error: unknown) 
   {
     if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
@@ -23,40 +37,53 @@ const addAdmin = async () => {
     } 
     else {
       console.error("❌ Error creating admin user:", error);
-      throw error;
+      process.exit(1);
     }
   }
 };
 
-const delete_admin = async () => {
+const edit_admin=async(email:string,phone:string)=>{
+try {
+  const admin=await prisma.users.update({
+    where:{
+      email:email
+    },
+    data:{
+      phone:phone
+    }
+  })
+  if(!admin){
+    console.log(`admin ${email} not found`);
+    return;
+  }
+
+  console.log("✅ Admin user updated successfully:", admin.email);
+} 
+catch (error) {
+  console.error("❌ Error editing admin user:", error);
+  process.exit(1);
+}
+}
+
+
+
+const delete_admin = async (email:string) => {
   try {
     // Delete admin user by email
-    const deletedAdmin = await prisma.users.deleteMany();
-    
-    if (deletedAdmin.count > 0) {
-      console.log(`✅ Admin user deleted successfully (${deletedAdmin.count} user(s))`);
-    } else {
-      console.log("ℹ️  Admin user not found");
+    const deletedAdmin = await prisma.users.delete({
+      where:{
+        email:email
+      }
+    })
+    if(!deletedAdmin){
+      console.log(`admin ${email} not found`);
+      return;
     }
+    console.log(`✅ Admin user deleted successfully (${deletedAdmin.email})`);
   } catch (error) {
     console.error("❌ Error deleting admin user:", error);
-    throw error;
-  }
-};
-
-const main = async () => {
-  try {
-    // await delete_admin();
-    await addAdmin();
-    console.log("✅ Seed completed successfully!");
-  } 
-  catch (error) {
-    console.error("❌ Seed failed:", error);
     process.exit(1);
-  } 
-  finally {
-    await prisma.$disconnect();
   }
 };
 
-main();
+

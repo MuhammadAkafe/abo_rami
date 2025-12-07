@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { Task } from "@/types/types";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/prisma/generated/client";
 interface updateTaskResult {
     error?: string | null;
     task?: Task | null;

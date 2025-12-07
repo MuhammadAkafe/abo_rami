@@ -7,7 +7,7 @@ import EditCitiesClient from '@/components/admin/EditCitiesClient';
 import SupplierDetailsClient from '@/components/admin/suppliers/SupplierDetailsClient';
 import { CLIENT_ROUTES } from '@/app/constans/constans';
 import Link from 'next/link';
-import { suppliers, tasks, cities } from '@prisma/client';
+import { suppliers, tasks, cities } from '@/prisma/generated/client';
 
 type SupplierWithRelations = suppliers & {
   tasks: tasks[];

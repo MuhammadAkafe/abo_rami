@@ -4,7 +4,7 @@
 import { getSession } from "@/lib/session";
 import { Task, TaskFilters } from "@/types/types";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/prisma/generated/client";
 
 type status = 'PENDING' | 'COMPLETED' | 'REJECTED';
 interface filterTasksResult {

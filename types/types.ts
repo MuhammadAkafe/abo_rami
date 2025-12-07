@@ -1,4 +1,4 @@
-import { suppliers, tasks, cities } from "@prisma/client";
+import { suppliers, tasks, cities } from "@/prisma/generated/client";
 
 // Export the Status enum type for use throughout the application
 
